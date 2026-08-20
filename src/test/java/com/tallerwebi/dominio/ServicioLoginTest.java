@@ -37,13 +37,13 @@ public class ServicioLoginTest {
   }
 
   @Test
-  public void registrarUsuarioSiNoExisteDeberiaGuardarlo() throws UsuarioExistente {
+  public void registrarUsuarioSiNoExisteDeberiaGuardarlo() throws UsuarioExistente, Exception {
     // preparacion
     Usuario usuario = new Usuario();
     usuario.setEmail("nuevo@test.com");
-    usuario.setPassword("123");
+    usuario.setPassword("Abcd.1234!");
     when(this.repositorioUsuarioMock.buscarUsuario(usuario.getEmail(), usuario.getPassword()))
-      .thenReturn(null);
+            .thenReturn(null);
 
     // ejecucion
     this.servicioLogin.registrar(usuario);
@@ -59,10 +59,24 @@ public class ServicioLoginTest {
     usuario.setEmail("existe@test.com");
     usuario.setPassword("123");
     when(this.repositorioUsuarioMock.buscarUsuario(usuario.getEmail(), usuario.getPassword()))
-      .thenReturn(new Usuario());
+            .thenReturn(new Usuario());
 
     // ejecucion y validacion
     assertThrows(UsuarioExistente.class, () -> this.servicioLogin.registrar(usuario));
+    verify(this.repositorioUsuarioMock, times(0)).guardar(usuario);
+  }
+  @Test
+  public void registrarUsuarioConContrasenaDebilDeberiaLanzarExcepcion() {
+    Usuario usuario = new Usuario();
+    usuario.setEmail("nuevo@test.com");
+    usuario.setPassword("123");
+
+    when(this.repositorioUsuarioMock.buscarUsuario(usuario.getEmail(), usuario.getPassword()))
+            .thenReturn(null);
+
+    Exception excepcion = assertThrows(Exception.class, () -> this.servicioLogin.registrar(usuario));
+
+    assertThat(excepcion.getMessage(), equalTo("La contraseña es demasiado debil"));
     verify(this.repositorioUsuarioMock, times(0)).guardar(usuario);
   }
 }
