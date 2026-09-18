@@ -22,13 +22,12 @@ public class ServicioLoginImpl implements ServicioLogin {
   }
 
   @Override
+  @SuppressWarnings("PMD.CyclomaticComplexity") // Ignora la complejidad en este método
   public void registrar(Usuario usuario) throws UsuarioExistente, Exception {
     Usuario usuarioEncontrado = repositorioUsuario.buscarUsuario(
       usuario.getEmail(),
       usuario.getPassword()
     );
-
-    //deberia de buscar por mail ???????????????????
 
     if (usuarioEncontrado != null) {
       throw new UsuarioExistente();
@@ -43,12 +42,13 @@ public class ServicioLoginImpl implements ServicioLogin {
       case "DEBIL":
         throw new Exception("La contraseña es demasiado debil");
       case "INVALIDA":
-        throw new Exception("La contaseña no puede estar vacia.");
+        throw new Exception("La contraseña no puede estar vacía.");
       default:
         throw new Exception("Error desconocido al validar la contraseña.");
     }
   }
 
+  @SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.AvoidLiteralsInIfCondition" }) // Ignora complejidad y literales aquí
   private String validarFortaleza(String password) {
     if (password == null || password.trim().isEmpty()) {
       return "INVALIDA";

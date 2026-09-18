@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
-public class ResumenController {
+public class TablaDeEquiposController {
 
-  @RequestMapping("/resumen")
-  public ModelAndView irAResumen() {
+  @RequestMapping("/tablaEquipos")
+  public ModelAndView irATablaEquipos() {
     Map<String, Object> model = new ModelMap();
-    return new ModelAndView("resumen", model);
+    return new ModelAndView("tablaEquipos", model);
   }
 }
