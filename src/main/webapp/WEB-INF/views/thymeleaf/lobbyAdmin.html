@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Simulador de Torneo</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #1f1f1f;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* HEADER / BARRA SUPERIOR */
+        .navbar {
+            width: 100%;
+            background: #b6ff00;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            height: 60px;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            background: #50ff50; /* Verde más claro del sesgo */
+            padding-right: 30px;
+            height: 100%;
+            clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%);
+        }
+
+        .navbar-left img {
+            height: 40px;
+            filter: invert(1); /* Invierte el icono a negro si es blanco */
+        }
+
+        .navbar-title {
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            text-transform: uppercase;
+            padding-right: 20px;
+        }
+
+        .navbar-user {
+            color: black;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* CONTENEDOR PRINCIPAL DE OPCIONES */
+        .contenedor {
+            width: 100%;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* ESTILO DE LOS BOTONES GRANDES */
+        .opcion-link {
+            text-decoration: none;
+            display: block;
+        }
+
+        .opcion-card {
+            background: #444444;
+            border: 2px solid #b6ff00;
+            border-radius: 12px;
+            padding: 35px 20px;
+            text-align: center;
+            transition: background 0.2s ease, transform 0.1s ease;
+        }
+
+        .opcion-card:hover {
+            background: #505050;
+            transform: translateY(-2px);
+        }
+
+        .opcion-card h1 {
+            color: #b6ff00;
+            font-size: 18px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 600px) {
+            .navbar-title {
+                font-size: 16px;
+            }
+            .navbar-user {
+                font-size: 13px;
+            }
+            .opcion-card {
+                padding: 25px 15px;
+            }
+            .opcion-card h1 {
+                font-size: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- BARRA SUPERIOR -->
+<header class="navbar">
+    <div class="navbar-left">
+        <!-- Puedes reemplazar la URL de la imagen por la tuya local -->
+        <img src="https://cdn-icons-png.flaticon.com/512/53/53283.png" alt="Jugador">
+        <span class="navbar-title">SIMULADOR</span>
+    </div>
+    <div class="navbar-user">
+        Bienvenido Administrador
+    </div>
+</header>
+
+<!-- CONTENIDO CON LOS BOTONES DE ADMINISTRACIÓN -->
+<main class="contenedor">
+
+    <!-- BOTÓN 1: CREAR NUEVO TORNEO -->
+    <a th:href="@{/formulario-torneo}" class="opcion-link">
+        <div class="opcion-card">
+            <h1>CREAR NUEVO TORNEO</h1>
+        </div>
+    </a>
+
+    <!-- BOTÓN 2: ADMINISTRAR TORNEO EN CURSO -->
+    <a th:href="@{/administrarTorneo}" class="opcion-link">
+        <div class="opcion-card">
+            <h1>ADMINISTRAR TORNEO EN CURSO</h1>
+        </div>
+    </a>
+
+</main>
+
+</body>
+</html>

@@ -40,9 +40,12 @@ public class ControladorLogin {
       datosLogin.getEmail(),
       datosLogin.getPassword()
     );
-    if (usuarioBuscado != null) {
+    if (usuarioBuscado != null && usuarioBuscado.getRol().equalsIgnoreCase("admin")) {
       request.getSession().setAttribute("ROL", usuarioBuscado.getRol());
-      return new ModelAndView("redirect:/home");
+      return new ModelAndView("redirect:/lobbyAdmin");
+    } else if (usuarioBuscado != null && usuarioBuscado.getRol().equalsIgnoreCase("usuario")) {
+      request.getSession().setAttribute("ROL", usuarioBuscado.getRol());
+      return new ModelAndView("redirect:/lobby");
     } else {
       Map<String, Object> model = new HashMap<>();
       model.put("error", "Usuario o clave incorrecta");

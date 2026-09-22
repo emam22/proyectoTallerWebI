@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Administrar Torneo en Curso</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #1f1f1f;
+            color: white;
+            min-height: 100vh;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* CONTENEDOR PRINCIPAL */
+        .card-container {
+            width: 100%;
+            max-width: 900px;
+            background: #1f1f1f;
+            border: 2px solid #b6ff00;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        /* HEADER DE LA SECCIÓN */
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            gap: 15px;
+        }
+
+        .input-search {
+            background: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-size: 13px;
+            color: #333;
+            outline: none;
+            width: 250px;
+        }
+
+        .header-title {
+            color: #b6ff00;
+            font-size: 20px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* CONTENEDOR DE TABLA DE TORNEOS */
+        .tabla-card {
+            background: #444444;
+            border-radius: 12px;
+            overflow: hidden;
+            min-height: 350px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: #b6ff00;
+        }
+
+        th {
+            color: #111;
+            padding: 12px 10px;
+            font-size: 13px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #555;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        tbody tr:hover {
+            background: #505050;
+        }
+
+        td {
+            padding: 12px 10px;
+            font-size: 13px;
+            text-align: center;
+            color: white;
+        }
+
+        td.nombre-torneo {
+            font-weight: bold;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 700px) {
+            .header-bar {
+                flex-direction: column-reverse;
+                align-items: stretch;
+            }
+            .input-search {
+                width: 100%;
+            }
+            .header-title {
+                text-align: center;
+                font-size: 16px;
+            }
+            th, td {
+                font-size: 11px;
+                padding: 8px 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card-container">
+
+    <!-- HEADER / BUSCADOR -->
+    <div class="header-bar">
+        <input type="text" class="input-search" placeholder="Ingrese nombre del torneo...">
+        <div class="header-title">
+            ADMINISTRAR TORNEO EN CURSO
+        </div>
+    </div>
+
+    <!-- TABLA DE TORNEOS -->
+    <div class="tabla-card">
+        <table>
+            <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Fecha creacion</th>
+                <th>Cantidad Equipos</th>
+                <th>Cantidad Jugadores</th>
+                <th>Cantidad fechas</th>
+            </tr>
+            </thead>
+            <tbody>
+            <!-- Ejemplo con Thymeleaf: th:each="torneo : ${torneoss}" -->
+            <tr th:each="torneo : ${torneos}">
+                <td class="nombre-torneo" th:text="${torneo.nombre}">TorneoMegaFutbol</td>
+                <td th:text="${#temporals.format(torneo.fechaCreacion, 'dd-MM-yyyy')}">12-06-2022</td>
+                <td th:text="${torneo.cantidadEquipos}">20</td>
+                <td th:text="${torneo.cantidadJugadores}">300</td>
+                <td th:text="${torneo.cantidadFechas}">60</td>
+            </tr>
+            <!-- Fila de respaldo estática por si se visualiza directo sin servidor -->
+            <tr>
+                <td class="nombre-torneo">TorneoFutbolTotal</td>
+                <td>07-09-2021</td>
+                <td>30</td>
+                <td>500</td>
+                <td>90</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+</body>
+</html>
