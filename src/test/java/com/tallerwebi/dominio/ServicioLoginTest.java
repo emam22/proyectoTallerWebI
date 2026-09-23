@@ -53,6 +53,24 @@ public class ServicioLoginTest {
   }
 
   @Test
+  public void registrarUsuarioSiNoExisteDeberiaAsignarRolUsuarioPorDefecto()
+    throws UsuarioExistente, Exception {
+    // preparacion
+    Usuario usuario = new Usuario();
+    usuario.setEmail("nuevo@test.com");
+    usuario.setPassword("Abcd.1234!");
+    when(this.repositorioUsuarioMock.buscarUsuario(usuario.getEmail(), usuario.getPassword()))
+      .thenReturn(null);
+
+    // ejecucion
+    this.servicioLogin.registrar(usuario);
+
+    // validacion
+    assertThat(usuario.getRol(), equalTo("usuario"));
+    verify(this.repositorioUsuarioMock, times(1)).guardar(usuario);
+  }
+
+  @Test
   public void registrarUsuarioSiExisteDeberiaLanzarExcepcion() {
     // preparacion
     Usuario usuario = new Usuario();

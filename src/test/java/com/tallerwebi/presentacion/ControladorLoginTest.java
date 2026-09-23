@@ -52,7 +52,7 @@ public class ControladorLoginTest {
   }
 
   @Test
-  public void loginConUsuarioYPasswordCorrectosDeberiaLLevarAHome() {
+  public void loginDeAdministradorCorrectoDeberiaLlevarALobbyAdmin() {
     // preparacion
     Usuario usuarioEncontradoMock = mock(Usuario.class);
     when(usuarioEncontradoMock.getRol()).thenReturn("ADMIN");
@@ -65,7 +65,46 @@ public class ControladorLoginTest {
     ModelAndView modelAndView = controladorLogin.validarLogin(datosLoginMock, requestMock);
 
     // validacion
-    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/home"));
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/lobbyAdmin"));
+    verify(sessionMock, times(1)).setAttribute("ROL", usuarioEncontradoMock.getRol());
+  }
+
+  @Test
+  public void loginDeUsuarioConRolNullNoDeberiaLanzarExcepcion() {
+    // preparacion
+    Usuario usuarioEncontradoMock = mock(Usuario.class);
+    when(usuarioEncontradoMock.getRol()).thenReturn(null);
+
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(servicioLoginMock.consultarUsuario(anyString(), anyString()))
+      .thenReturn(usuarioEncontradoMock);
+
+    // ejecucion
+    ModelAndView modelAndView = controladorLogin.validarLogin(datosLoginMock, requestMock);
+
+    // validacion
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("login"));
+    assertThat(
+      modelAndView.getModel().get("error").toString(),
+      equalToIgnoringCase("Usuario o clave incorrecta")
+    );
+  }
+
+  @Test
+  public void loginDeUsuarioCorrectoDeberiaLlevarALobby() {
+    // preparacion
+    Usuario usuarioEncontradoMock = mock(Usuario.class);
+    when(usuarioEncontradoMock.getRol()).thenReturn("usuario");
+
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(servicioLoginMock.consultarUsuario(anyString(), anyString()))
+      .thenReturn(usuarioEncontradoMock);
+
+    // ejecucion
+    ModelAndView modelAndView = controladorLogin.validarLogin(datosLoginMock, requestMock);
+
+    // validacion
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/lobby"));
     verify(sessionMock, times(1)).setAttribute("ROL", usuarioEncontradoMock.getRol());
   }
 
