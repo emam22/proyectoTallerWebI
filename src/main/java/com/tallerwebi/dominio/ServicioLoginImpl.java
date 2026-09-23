@@ -37,6 +37,9 @@ public class ServicioLoginImpl implements ServicioLogin {
     switch (fortaleza) {
       case "FUERTE":
       case "MEDIANA":
+        if (usuario.getRol() == null) {
+          usuario.setRol("usuario");
+        }
         repositorioUsuario.guardar(usuario);
         break;
       case "DEBIL":

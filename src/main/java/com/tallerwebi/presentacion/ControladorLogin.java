@@ -40,11 +40,12 @@ public class ControladorLogin {
       datosLogin.getEmail(),
       datosLogin.getPassword()
     );
-    if (usuarioBuscado != null && usuarioBuscado.getRol().equalsIgnoreCase("admin")) {
-      request.getSession().setAttribute("ROL", usuarioBuscado.getRol());
+    String rol = usuarioBuscado == null ? null : usuarioBuscado.getRol();
+    if (usuarioBuscado != null && "admin".equalsIgnoreCase(rol)) {
+      request.getSession().setAttribute("ROL", rol);
       return new ModelAndView("redirect:/lobbyAdmin");
-    } else if (usuarioBuscado != null && usuarioBuscado.getRol().equalsIgnoreCase("usuario")) {
-      request.getSession().setAttribute("ROL", usuarioBuscado.getRol());
+    } else if (usuarioBuscado != null && "usuario".equalsIgnoreCase(rol)) {
+      request.getSession().setAttribute("ROL", rol);
       return new ModelAndView("redirect:/lobby");
     } else {
       Map<String, Object> model = new HashMap<>();
