@@ -13,10 +13,10 @@ public class Torneo {
   private Long id;
 
   private String nombre;
-  private Integer cantindadDeEquipos;
-  private Integer cantindadMinJugadores;
-  private Integer cantindadMaxJugadores;
-  private Integer cantindadAmaSusp;
+  private Integer cantidadDeEquipos;
+  private Integer cantidadMinJugadores;
+  private Integer cantidadMaxJugadores;
+  private Integer cantidadAmaSusp;
   private Boolean idaYVuelta;
 
   public Long getId() {
@@ -35,36 +35,36 @@ public class Torneo {
     this.nombre = nombre;
   }
 
-  public Integer getCantindadDeEquipos() {
-    return cantindadDeEquipos;
+  public Integer getCantidadDeEquipos() {
+    return cantidadDeEquipos;
   }
 
-  public void setCantindadDeEquipos(Integer cantindadDeEquipos) {
-    this.cantindadDeEquipos = cantindadDeEquipos;
+  public void setCantidadDeEquipos(Integer cantindadDeEquipos) {
+    this.cantidadDeEquipos = cantindadDeEquipos;
   }
 
-  public Integer getCantindadMaxJugadores() {
-    return cantindadMaxJugadores;
+  public Integer getCantidadMaxJugadores() {
+    return cantidadMaxJugadores;
   }
 
-  public void setCantindadMaxJugadores(Integer cantindadMaxJugadores) {
-    this.cantindadMaxJugadores = cantindadMaxJugadores;
+  public void setCantidadMaxJugadores(Integer cantidadMaxJugadores) {
+    this.cantidadMaxJugadores = cantidadMaxJugadores;
   }
 
-  public Integer getCantindadMinJugadores() {
-    return cantindadMinJugadores;
+  public Integer getCantidadMinJugadores() {
+    return cantidadMinJugadores;
   }
 
-  public void setCantindadMinJugadores(Integer cantindadMinJugadores) {
-    this.cantindadMinJugadores = cantindadMinJugadores;
+  public void setCantidadMinJugadores(Integer cantidadMinJugadores) {
+    this.cantidadMinJugadores = cantidadMinJugadores;
   }
 
-  public Integer getCantindadAmaSusp() {
-    return cantindadAmaSusp;
+  public Integer getCantidadAmaSusp() {
+    return cantidadAmaSusp;
   }
 
-  public void setCantindadAmaSusp(Integer cantindadAmaSusp) {
-    this.cantindadAmaSusp = cantindadAmaSusp;
+  public void setCantidadAmaSusp(Integer cantidadAmaSusp) {
+    this.cantidadAmaSusp = cantidadAmaSusp;
   }
 
   public Boolean getIdaYVuelta() {

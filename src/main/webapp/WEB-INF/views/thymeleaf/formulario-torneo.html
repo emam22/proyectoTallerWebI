@@ -147,7 +147,7 @@
 </head>
 <body>
 
-<form th:action="@{/crearTorneo}" method="post" class="form-card">
+<form th:action="@{/crearTorneo}" method="post" class="form-card" th:object="${torneo}">
 
     <div class="form-header">
         FORMULARIO TORNEO
@@ -159,37 +159,37 @@
             <!-- Columna Izquierda -->
             <div class="form-group">
                 <label for="nombreTorneo">Ingresar nombre Torneo</label>
-                <input type="text" id="nombreTorneo" name="nombreTorneo" class="input-text" placeholder="Ingrese un nombre descriptivo..." required>
+                <input th:field="*{nombre}" type="text" id="nombreTorneo" name="nombreTorneo" class="input-text" placeholder="Ingrese un nombre descriptivo..." required>
             </div>
 
             <!-- Columna Derecha -->
             <div class="form-group">
                 <label for="cantidadEquipos">Ingresar Cantidad de Equipos</label>
-                <input type="number" id="cantidadEquipos" name="cantidadEquipos" class="input-text input-short" required>
+                <input th:field="*{cantidadDeEquipos}" type="number" id="cantidadEquipos" name="cantidadEquipos" class="input-text input-short" required>
             </div>
 
             <!-- Columna Izquierda -->
             <div class="form-group">
                 <label for="maxJugadores">Ingresar Cantidad Máxima de jugadores por equipo</label>
-                <input type="number" id="maxJugadores" name="maxJugadores" class="input-text input-short" required>
+                <input th:field="*{cantidadMaxJugadores}" type="number" id="maxJugadores" name="maxJugadores" class="input-text input-short" required>
             </div>
 
             <!-- Columna Derecha -->
             <div class="form-group">
                 <label for="minJugadores">Ingresar Cantidad Mínima de jugadores por equipo</label>
-                <input type="number" id="minJugadores" name="minJugadores" class="input-text input-short" required>
+                <input th:field="*{cantidadMinJugadores}"  type="number" id="minJugadores" name="minJugadores" class="input-text input-short" required>
             </div>
 
             <!-- Columna Izquierda -->
             <div class="form-group">
                 <label for="idaVuelta">Partidos de ida y vuelta</label>
-                <input type="checkbox" id="idaVuelta" name="idaVuelta" class="checkbox-custom">
+                <input th:field="*{idaYVuelta}" type="checkbox" id="idaVuelta" name="idaVuelta" class="checkbox-custom">
             </div>
 
             <!-- Columna Derecha -->
             <div class="form-group">
                 <label for="amarillasSuspension">Ingresar Cantidad De Amarillas para suspensión</label>
-                <input type="number" id="amarillasSuspension" name="amarillasSuspension" class="input-text input-short" required>
+                <input th:field="*{cantidadAmaSusp}" type="number" id="amarillasSuspension" name="amarillasSuspension" class="input-text input-short" required>
             </div>
 
         </div>
