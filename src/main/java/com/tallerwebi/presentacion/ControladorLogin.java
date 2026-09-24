@@ -26,7 +26,7 @@ public class ControladorLogin {
 
   @RequestMapping("/login")
   public ModelAndView irALogin() {
-    Map<String, Object> modelo = new HashMap<>();
+    Map<String, Object> modelo = new ModelMap();
     modelo.put("datosLogin", new DatosLogin());
     return new ModelAndView("login", modelo);
   }
@@ -48,7 +48,7 @@ public class ControladorLogin {
       request.getSession().setAttribute("ROL", rol);
       return new ModelAndView("redirect:/lobby");
     } else {
-      Map<String, Object> model = new HashMap<>();
+      Map<String, Object> model = new ModelMap();
       model.put("error", "Usuario o clave incorrecta");
       return new ModelAndView("login", model);
     }
@@ -56,7 +56,7 @@ public class ControladorLogin {
 
   @RequestMapping(path = "/registrarme", method = RequestMethod.POST)
   public ModelAndView registrarme(@ModelAttribute("usuario") Usuario usuario) {
-    Map<String, Object> model = new HashMap<>();
+    Map<String, Object> model = new ModelMap();
     try {
       servicioLogin.registrar(usuario);
     } catch (UsuarioExistente e) {

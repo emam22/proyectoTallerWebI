@@ -12,7 +12,7 @@ public class EstadisticasDeJugadorController {
 
   @RequestMapping("/estadisticasDeJugadores")
   public ModelAndView irAEstadisticasDeJugadores() {
-    Map<String, Object> model = new HashMap<>();
+    Map<String, Object> model = new ModelMap();
     return new ModelAndView("estadisticasDeJugadores", model);
   }
 }

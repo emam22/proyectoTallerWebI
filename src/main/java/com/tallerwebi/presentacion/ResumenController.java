@@ -12,7 +12,7 @@ public class ResumenController {
 
   @RequestMapping("/resumen")
   public ModelAndView irAResumen() {
-    Map<String, Object> model = new HashMap<>();
+    Map<String, Object> model = new ModelMap();
     return new ModelAndView("resumen", model);
   }
 }

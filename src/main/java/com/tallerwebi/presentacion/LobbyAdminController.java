@@ -15,7 +15,7 @@ public class LobbyAdminController {
 
   @RequestMapping("/lobbyAdmin")
   public ModelAndView irALobbyAdmin() {
-    Map<String, Object> model = new HashMap<>();
+    Map<String, Object> model = new ModelMap();
     return new ModelAndView("lobbyAdmin", model);
   }
 }

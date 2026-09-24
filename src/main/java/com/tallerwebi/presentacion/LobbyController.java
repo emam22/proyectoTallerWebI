@@ -12,7 +12,7 @@ public class LobbyController {
 
   @RequestMapping("/lobby")
   public ModelAndView irALobby() {
-    Map<String, Object> model = new HashMap<>();
+    Map<String, Object> model = new ModelMap();
     return new ModelAndView("lobby", model);
   }
 }

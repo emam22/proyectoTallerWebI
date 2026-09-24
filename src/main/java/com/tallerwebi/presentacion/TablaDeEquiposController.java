@@ -12,7 +12,7 @@ public class TablaDeEquiposController {
 
   @RequestMapping("/tablaEquipos")
   public ModelAndView irATablaEquipos() {
-    Map<String, Object> model = new HashMap<>();
+    Map<String, Object> model = new ModelMap();
     return new ModelAndView("tablaEquipos", model);
   }
 }
