@@ -38,13 +38,6 @@ public class ControladorTorneo {
     return new ModelAndView("redirect:/creacion-equipo");
   }
 
-  @RequestMapping(path = "/formulario-torneo", method = RequestMethod.GET)
-  public ModelAndView FormularioTorneo() {
-    Map<String, Object> model = new HashMap<>();
-    model.put("torneo", new Torneo());
-    return new ModelAndView("formulario-torneo", model);
-  }
-
   @RequestMapping(path = "/creacion-equipo", method = RequestMethod.GET)
   public ModelAndView crearEquipo() {
     return new ModelAndView("creacion-equipo");

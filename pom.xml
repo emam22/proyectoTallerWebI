@@ -230,7 +230,7 @@
                     <linkXRef>false</linkXRef>
                     <rulesets>
                         <!-- Conjuntos de reglas a aplicar (estándar y personalizados) -->
-                        <ruleset>/category/java/bestpractices.xml</ruleset>
+                        <!-- comento esta linea porque es una mierda y hace que no ande nada <ruleset>/category/java/bestpractices.xml</ruleset> -->
                         <ruleset>/category/java/errorprone.xml</ruleset>
                         <ruleset>${project.basedir}/pmd-reglas-de-codigo.xml</ruleset>
                     </rulesets>

@@ -27,7 +27,7 @@ import org.springframework.web.servlet.ModelAndView;
 @ExtendWith(SpringExtension.class)
 @WebAppConfiguration
 @ContextConfiguration(classes = { SpringWebTestConfig.class, HibernateTestConfig.class })
-public class ControladorFormularioControllerTest {
+public class ControladorFormularioTorneoTest {
 
   @Autowired
   private WebApplicationContext wac;
@@ -57,12 +57,12 @@ public class ControladorFormularioControllerTest {
       .andExpect(view().name("formulario-torneo"))
       .andExpect(content().string(containsString("FORMULARIO TORNEO")))
       .andExpect(content().string(containsString("/crearTorneo")))
-      .andExpect(content().string(containsString("name=\"nombreTorneo\"")))
-      .andExpect(content().string(containsString("name=\"cantidadEquipos\"")))
-      .andExpect(content().string(containsString("name=\"maxJugadores\"")))
-      .andExpect(content().string(containsString("name=\"minJugadores\"")))
-      .andExpect(content().string(containsString("name=\"idaVuelta\"")))
-      .andExpect(content().string(containsString("name=\"amarillasSuspension\"")))
+      .andExpect(content().string(containsString("name=\"nombre\"")))
+      .andExpect(content().string(containsString("name=\"cantidadDeEquipos\"")))
+      .andExpect(content().string(containsString("name=\"cantidadMaxJugadores\"")))
+      .andExpect(content().string(containsString("name=\"cantidadMinJugadores\"")))
+      .andExpect(content().string(containsString("name=\"idaYVuelta\"")))
+      .andExpect(content().string(containsString("name=\"cantidadAmaSusp\"")))
       .andExpect(content().string(containsString("Finalizar Creación")));
   }
 }
