@@ -49,7 +49,7 @@ public class ControladorTorneoTest {
 
         //validacion
         assertThat(mav.getViewName(), equalToIgnoringCase("formulario-torneo"));
-        assertThat(mav.getModel().get("error").toString(), equalToIgnoringCase("Ya existe el torneo con ese nombre"));
+        assertThat(mav.getModel().get("error").toString(), equalToIgnoringCase("Ya existe un torneo con este nombre"));
     }
 
 
