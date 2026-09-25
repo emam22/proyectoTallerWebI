@@ -63,8 +63,7 @@ public class ControladorTorneoTest {
 
         // validacion
         assertThat(modelAndView.getViewName(), equalToIgnoringCase("formulario-torneo"));
-        assertThat(modelAndView.getModel().get("error").toString(), equalToIgnoringCase("Error al registrar nuevo torneo")
-        );
+        assertThat(modelAndView.getModel().get("error").toString(), equalToIgnoringCase("Error al crear el torneo"));
     }
 
     //agregar boton de volver al lobby admin en hmtl y generar test de validacion
