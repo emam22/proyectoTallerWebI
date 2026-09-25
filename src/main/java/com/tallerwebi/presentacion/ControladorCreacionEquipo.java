@@ -14,7 +14,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class ControladorCreacionEquipo {
 
   @RequestMapping("/creacion-equipo")
-  public ModelAndView irALobbyAdmin() {
+  public ModelAndView irACreacionTorneo() {
     Map<String, Object> model = new ModelMap();
     return new ModelAndView("creacion-equipo", model);
   }

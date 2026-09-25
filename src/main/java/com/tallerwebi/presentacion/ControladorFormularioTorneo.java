@@ -12,7 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 public class ControladorFormularioTorneo {
 
   @RequestMapping(path = "/formulario-torneo", method = RequestMethod.GET)
-  public ModelAndView FormularioTorneo() {
+  public ModelAndView irAFormularioTorneo() {
     Map<String, Object> model = new HashMap<>();
     model.put("torneo", new Torneo());
     return new ModelAndView("formulario-torneo", model);

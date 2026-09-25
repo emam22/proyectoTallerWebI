@@ -7,12 +7,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
-public class ControladorAdministrarTorneo {
+public class ControladorEstadisticasDeEquipos {
 
-  @RequestMapping("/administrarTorneo")
-  public ModelAndView irAAdministrarTorneo() {
+  @RequestMapping("/estadisticasDeEquipos")
+  public ModelAndView irAEstadisticasDeEquipos() {
     Map<String, Object> model = new ModelMap();
-    model.put("prueba", "prueba");
-    return new ModelAndView("administrarTorneo", model);
+    return new ModelAndView("estadisticasDeEquipos", model);
   }
 }
