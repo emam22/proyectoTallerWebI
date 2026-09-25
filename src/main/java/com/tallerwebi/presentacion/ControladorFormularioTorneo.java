@@ -17,5 +17,4 @@ public class ControladorFormularioTorneo {
     model.put("torneo", new Torneo());
     return new ModelAndView("formulario-torneo", model);
   }
-
 }
