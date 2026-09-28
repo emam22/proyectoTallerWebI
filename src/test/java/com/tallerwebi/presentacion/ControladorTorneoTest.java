@@ -50,7 +50,7 @@ public class ControladorTorneoTest {
     assertThat(mav.getViewName(), equalToIgnoringCase("formulario-torneo"));
     assertThat(
       mav.getModel().get("error").toString(),
-      equalToIgnoringCase("Ya existe un torneo con este nombre")
+      equalToIgnoringCase("Ya existe el torneo con ese nombre")
     );
   }
 
@@ -69,6 +69,6 @@ public class ControladorTorneoTest {
       equalToIgnoringCase("Error al crear el torneo")
     );
   }
-  //agregar boton de volver al lobby admin en hmtl y generar test de validacion
+
 
 }
