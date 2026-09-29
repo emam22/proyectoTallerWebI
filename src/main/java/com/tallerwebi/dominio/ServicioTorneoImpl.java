@@ -3,6 +3,7 @@ package com.tallerwebi.dominio;
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,5 +31,10 @@ public class ServicioTorneoImpl implements ServicioTorneo {
       throw new TorneoExistente();
     }
     repositorioTorneo.guardar(torneo);
+  }
+
+  @Override
+  public List<Torneo> obtenerTorneos() {
+    return repositorioTorneo.listar();
   }
 }

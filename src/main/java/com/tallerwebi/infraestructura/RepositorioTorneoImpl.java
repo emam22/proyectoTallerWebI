@@ -2,6 +2,7 @@ package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.RepositorioTorneo;
 import com.tallerwebi.dominio.Torneo;
+import java.util.List;
 import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -28,5 +29,13 @@ public class RepositorioTorneoImpl implements RepositorioTorneo {
   @Override
   public void guardar(Torneo torneo) {
     sessionFactory.getCurrentSession().persist(torneo);
+  }
+
+  @Override
+  public List<Torneo> listar() {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery("from Torneo", Torneo.class)
+      .getResultList();
   }
 }

@@ -9,12 +9,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import com.tallerwebi.dominio.ServicioTorneo;
+import com.tallerwebi.dominio.Torneo;
 import com.tallerwebi.integracion.config.HibernateTestConfig;
 import com.tallerwebi.integracion.config.SpringWebTestConfig;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -33,11 +37,18 @@ public class ControladorAdministrarTorneoTest {
   @Autowired
   private WebApplicationContext wac;
 
+  @Autowired
+  private DataSource dataSource;
+
+  @Autowired
+  private ServicioTorneo servicioTorneo;
+
   private MockMvc mockMvc;
 
   @BeforeEach
   public void init() {
     this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
+    new JdbcTemplate(this.dataSource).execute("DELETE FROM Torneo");
   }
 
   @Test
@@ -52,16 +63,41 @@ public class ControladorAdministrarTorneoTest {
   }
 
   @Test
-  public void laVistaAdministrarTorneoDebeContenerLaTablaDeTorneos() throws Exception {
+  public void laVistaAdministrarTorneoDebeMostrarLosDatosDeEjemploCuandoNoHayTorneos()
+    throws Exception {
     this.mockMvc.perform(get("/administrarTorneo"))
       .andExpect(status().isOk())
       .andExpect(view().name("administrarTorneo"))
       .andExpect(content().string(containsString("ADMINISTRAR TORNEO EN CURSO")))
       .andExpect(content().string(containsString("Ingrese nombre del torneo...")))
-      .andExpect(content().string(containsString("Fecha creacion")))
       .andExpect(content().string(containsString("Cantidad Equipos")))
-      .andExpect(content().string(containsString("Cantidad Jugadores")))
-      .andExpect(content().string(containsString("Cantidad fechas")))
+      .andExpect(content().string(containsString("Jugadores por equipo")))
+      .andExpect(content().string(containsString("Amarillas/Susp.")))
+      .andExpect(content().string(containsString("Ida y vuelta")))
+      .andExpect(content().string(containsString("TorneoFutbolTotal")))
       .andExpect(content().string(not(containsString("TorneoMegaFutbol"))));
+  }
+
+  @Test
+  public void laVistaAdministrarTorneoDebeMostrarElTorneoCargadoYOcultarLaFilaDeEjemplo()
+    throws Exception {
+    // preparacion
+    Torneo torneo = new Torneo();
+    torneo.setNombre("Torneo de Prueba");
+    torneo.setCantidadDeEquipos(8);
+    torneo.setCantidadMinJugadores(10);
+    torneo.setCantidadMaxJugadores(15);
+    torneo.setCantidadAmaSusp(3);
+    torneo.setIdaYVuelta(false);
+    this.servicioTorneo.registrarTorneo(torneo);
+
+    // ejecucion y validacion
+    this.mockMvc.perform(get("/administrarTorneo"))
+      .andExpect(status().isOk())
+      .andExpect(view().name("administrarTorneo"))
+      .andExpect(content().string(containsString("Torneo de Prueba")))
+      .andExpect(content().string(containsString("10 - 15")))
+      .andExpect(content().string(containsString("No")))
+      .andExpect(content().string(not(containsString("TorneoFutbolTotal"))));
   }
 }
