@@ -21,6 +21,7 @@ public class ServicioTorneoTest {
     this.repositorioTorneoMock = mock(RepositorioTorneo.class);
     this.servicioTorneo = new ServicioTorneoImpl(this.repositorioTorneoMock);
   }
+
   @Test
   public void consultarTorneoDeberiaLlamarAlRepositorio() {
     // preparacion
@@ -38,29 +39,27 @@ public class ServicioTorneoTest {
 
   @Test
   public void registrarTorneoSiNoExisteDeberiaGuardarlo() throws TorneoExistente, Exception {
-      // preparacion
-      Torneo torneo = new Torneo();
-      torneo.setNombre("nuevoTorneo");
-      when(this.repositorioTorneoMock.buscarTorneo(torneo.getNombre()))
-              .thenReturn(null);
+    // preparacion
+    Torneo torneo = new Torneo();
+    torneo.setNombre("nuevoTorneo");
+    when(this.repositorioTorneoMock.buscarTorneo(torneo.getNombre())).thenReturn(null);
 
-      // ejecucion
-      this.servicioTorneo.registrarTorneo(torneo);
+    // ejecucion
+    this.servicioTorneo.registrarTorneo(torneo);
 
-      // validacion
-      verify(this.repositorioTorneoMock, times(1)).guardar(torneo);
+    // validacion
+    verify(this.repositorioTorneoMock, times(1)).guardar(torneo);
   }
 
-    @Test
-    public void registrarTorneoSiExisteDeberiaLanzarExcepcion() {
-        // preparacion
-        Torneo torneo = new Torneo();
-        torneo.setNombre("MegaFutbol");
-        when(this.repositorioTorneoMock.buscarTorneo(torneo.getNombre()))
-                .thenReturn(new Torneo());
+  @Test
+  public void registrarTorneoSiExisteDeberiaLanzarExcepcion() {
+    // preparacion
+    Torneo torneo = new Torneo();
+    torneo.setNombre("MegaFutbol");
+    when(this.repositorioTorneoMock.buscarTorneo(torneo.getNombre())).thenReturn(new Torneo());
 
-        // ejecucion y validacion
-        assertThrows(TorneoExistente.class, () -> this.servicioTorneo.registrarTorneo(torneo));
-        verify(this.repositorioTorneoMock, times(0)).guardar(torneo);
-    }
+    // ejecucion y validacion
+    assertThrows(TorneoExistente.class, () -> this.servicioTorneo.registrarTorneo(torneo));
+    verify(this.repositorioTorneoMock, times(0)).guardar(torneo);
+  }
 }

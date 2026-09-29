@@ -69,6 +69,4 @@ public class ControladorTorneoTest {
       equalToIgnoringCase("Error al crear el torneo")
     );
   }
-
-
 }

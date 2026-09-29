@@ -1,5 +1,8 @@
 package com.tallerwebi.infraestructura;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+
 import com.tallerwebi.dominio.RepositorioTorneo;
 import com.tallerwebi.dominio.Torneo;
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
@@ -12,77 +15,65 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = { HibernateInfraestructuraTestConfig.class })
 public class RepositorioTorneoTest {
 
-    @Autowired
-    private SessionFactory sessionFactory;
+  @Autowired
+  private SessionFactory sessionFactory;
 
-    private RepositorioTorneo repositorioTorneo;
+  private RepositorioTorneo repositorioTorneo;
 
+  @BeforeEach
+  public void init() {
+    repositorioTorneo = new RepositorioTorneoImpl(sessionFactory);
+  }
 
-    @BeforeEach
-    public void init() {
-        repositorioTorneo = new RepositorioTorneoImpl(sessionFactory);
-    }
+  @Test
+  @Transactional
+  @Rollback
+  public void deberiaGuardarUnNuevoTorneo() {
+    String nombreTorneo = "MegaFutbol";
+    //preparacion
+    Torneo torneo = new Torneo();
+    torneo.setNombre(nombreTorneo);
+    //ejecucion
+    repositorioTorneo.guardar(torneo);
+    //validacion
+    Torneo torneoObtenido = repositorioTorneo.buscarTorneo(nombreTorneo);
 
-    @Test
-    @Transactional
-    @Rollback
-    public void deberiaGuardarUnNuevoTorneo() {
+    assertThat(torneoObtenido.getNombre(), is(equalTo(nombreTorneo)));
+  }
 
-        String nombreTorneo = "MegaFutbol";
-        //preparacion
-        Torneo torneo = new Torneo();
-        torneo.setNombre(nombreTorneo);
-        //ejecucion
-        repositorioTorneo.guardar(torneo);
-        //validacion
-        Torneo torneoObtenido = repositorioTorneo.buscarTorneo(nombreTorneo);
+  @Test
+  @Transactional
+  @Rollback
+  public void deberiaEncontrarUnTorneoExistenteCuandoBuscoPorNombre() {
+    String nombreTorneo = "MegaFutbol";
+    Torneo torneo = new Torneo();
+    torneo.setNombre(nombreTorneo);
 
-        assertThat(torneoObtenido.getNombre(), is(equalTo(nombreTorneo)));
+    //preparacion
+    repositorioTorneo.guardar(torneo);
 
-    }
+    //ejecucion
+    Torneo torneoObtenido = repositorioTorneo.buscarTorneo(nombreTorneo);
 
-    @Test
-    @Transactional
-    @Rollback
-    public void deberiaEncontrarUnTorneoExistenteCuandoBuscoPorNombre(){
+    //validacion
+    assertThat(torneoObtenido.getNombre(), is(equalTo(nombreTorneo)));
+  }
 
-        String nombreTorneo = "MegaFutbol";
-        Torneo torneo = new Torneo();
-        torneo.setNombre(nombreTorneo);
+  @Test
+  @Transactional
+  public void noDeberiaEncontrarUnTorneoInexistenteCuandoBuscoPorNombre() {
+    //preparacion
+    String nombreTorneo = "Campito";
 
-        //preparacion
-        repositorioTorneo.guardar(torneo);
+    //ejecucion
+    Torneo torneoBuscado = repositorioTorneo.buscarTorneo(nombreTorneo);
 
-        //ejecucion
-        Torneo torneoObtenido = repositorioTorneo.buscarTorneo(nombreTorneo);
-
-        //validacion
-        assertThat(torneoObtenido.getNombre(), is(equalTo(nombreTorneo)));
-
-    }
-
-    @Test
-    @Transactional
-    public void noDeberiaEncontrarUnTorneoInexistenteCuandoBuscoPorNombre() {
-
-        //preparacion
-        String nombreTorneo = "Campito";
-
-        //ejecucion
-        Torneo torneoBuscado = repositorioTorneo.buscarTorneo(nombreTorneo);
-
-        //validacion
-        assertThat(torneoBuscado, is(nullValue()));
-    }
-
-
-
+    //validacion
+    assertThat(torneoBuscado, is(nullValue()));
+  }
 }
