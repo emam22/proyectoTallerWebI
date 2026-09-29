@@ -2,6 +2,7 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/app.css}"/>
     <title>Creación Equipo</title>
     <style>
         * {
@@ -204,6 +205,49 @@
             color: #111;
         }
 
+        .btn:disabled {
+            opacity: 0.45;
+            cursor: not-allowed;
+        }
+
+        /* FORM AGREGAR JUGADOR (debajo de la lista) */
+        .form-agregar-jugador {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .input-jugador {
+            background: white;
+            border: none;
+            border-radius: 6px;
+            padding: 7px 10px;
+            font-size: 12px;
+            color: #333;
+            outline: none;
+            flex: 1;
+            min-width: 110px;
+        }
+
+        /* Botón agregar: mismo tamaño que el de eliminar pero invertido (verde con check) */
+        .btn-agregar {
+            background: #b6ff00;
+            color: #111;
+            border: none;
+            border-radius: 4px;
+            width: 22px;
+            height: 22px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: auto;
+        }
+
         /* RESPONSIVE */
         @media (max-width: 700px) {
             .grid-equipo {
@@ -266,7 +310,7 @@
         <!-- SECCIÓN JUGADORES -->
         <div class="jugadores-bar">
             <span>INGRESAR JUGADORES</span>
-            <span>Mín. 11  Máx. 23</span>
+            <span th:text="|Mín. ${minJugadores}  Máx. ${maxJugadores}|">Mín. 11  Máx. 23</span>
         </div>
 
         <table class="tabla-jugadores">
@@ -280,21 +324,99 @@
                 <th></th>
             </tr>
             </thead>
-            <tbody>
-            <tr>
-                <td>9</td>
-                <td>Delantero</td>
-                <td>Juan</td>
-                <td>Perez</td>
-                <td>18</td>
-                <td>
-                    <button type="button" class="btn-eliminar">&times;</button>
-                </td>
-            </tr>
+            <tbody id="listaJugadores">
             </tbody>
         </table>
 
+        <!-- FORM CORTO PARA AGREGAR JUGADORES -->
+        <form class="form-agregar-jugador" id="formAgregarJugador">
+            <input type="number" id="jugadorDorsal" class="input-jugador" placeholder="Nro. Dorsal" min="1" required>
+            <select id="jugadorPuesto" class="input-jugador" required>
+                <option value="" disabled selected>Puesto</option>
+                <option value="Arquero">Arquero</option>
+                <option value="Defensor">Defensor</option>
+                <option value="Mediocampista">Mediocampista</option>
+                <option value="Delantero">Delantero</option>
+            </select>
+            <input type="text" id="jugadorNombre" class="input-jugador" placeholder="Nombre" required>
+            <input type="text" id="jugadorApellido" class="input-jugador" placeholder="Apellido" required>
+            <input type="number" id="jugadorEdad" class="input-jugador" placeholder="Categoría (edad)" min="1" required>
+            <button type="submit" class="btn-agregar" title="Agregar jugador">&#10003;</button>
+        </form>
+
         <!-- BOTONES DE ACCIÓN -->
         <div class="form-actions">
-            <button type="button" class="btn btn-verde-oscuro">Finalizar Creación</button>
+            <button type="button" class="btn btn-verde-oscuro" id="btnAgregarEquipo" disabled>Agregar Equipo</button>
             <button type="button" class="btn btn-verde-claro">Importar equipos</button>
+        </div>
+
+    </div>
+</div>
+
+<!-- MENÚ DE USUARIO -->
+<div class="menu-usuario">
+    <button type="button" class="btn-menu-hamburguesa" id="btnMenuUsuario" aria-label="Abrir menú">
+        <span></span>
+        <span></span>
+    </button>
+    <div class="menu-usuario-opciones" id="menuUsuarioOpciones">
+        <a th:href="@{/logout}">Cerrar sesión</a>
+    </div>
+</div>
+<script th:src="@{/js/menu.js}"></script>
+
+<script th:inline="javascript">
+    const MIN_JUGADORES = /*[[${minJugadores}]]*/ 11;
+
+    const formAgregarJugador = document.getElementById('formAgregarJugador');
+    const listaJugadores = document.getElementById('listaJugadores');
+    const btnAgregarEquipo = document.getElementById('btnAgregarEquipo');
+
+    function actualizarBotonAgregarEquipo() {
+        btnAgregarEquipo.disabled = listaJugadores.children.length < MIN_JUGADORES;
+    }
+
+    function eliminarJugador(fila) {
+        fila.remove();
+        actualizarBotonAgregarEquipo();
+    }
+
+    formAgregarJugador.addEventListener('submit', function (evento) {
+        evento.preventDefault();
+
+        const valores = [
+            document.getElementById('jugadorDorsal').value,
+            document.getElementById('jugadorPuesto').value,
+            document.getElementById('jugadorNombre').value,
+            document.getElementById('jugadorApellido').value,
+            document.getElementById('jugadorEdad').value
+        ];
+
+        const fila = document.createElement('tr');
+        valores.forEach(function (valor) {
+            const celda = document.createElement('td');
+            celda.textContent = valor;
+            fila.appendChild(celda);
+        });
+
+        const celdaAccion = document.createElement('td');
+        const btnEliminar = document.createElement('button');
+        btnEliminar.type = 'button';
+        btnEliminar.className = 'btn-eliminar';
+        btnEliminar.innerHTML = '&times;';
+        btnEliminar.addEventListener('click', function () {
+            eliminarJugador(fila);
+        });
+        celdaAccion.appendChild(btnEliminar);
+        fila.appendChild(celdaAccion);
+
+        listaJugadores.appendChild(fila);
+        formAgregarJugador.reset();
+        actualizarBotonAgregarEquipo();
+    });
+
+    actualizarBotonAgregarEquipo();
+</script>
+
+</body>
+</html>

@@ -2,6 +2,7 @@ package com.tallerwebi.presentacion;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.mockito.Mockito.*;
@@ -9,6 +10,7 @@ import static org.mockito.Mockito.*;
 import com.tallerwebi.dominio.ServicioTorneo;
 import com.tallerwebi.dominio.Torneo;
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.ModelAndView;
@@ -68,5 +70,37 @@ public class ControladorTorneoTest {
       modelAndView.getModel().get("error").toString(),
       equalToIgnoringCase("Error al crear el torneo")
     );
+  }
+
+  @Test
+  public void crearEquipoDebePasarMinYMaxDelTorneoEnCurso() {
+    // preparacion
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    torneo.setCantidadMinJugadores(10);
+    torneo.setCantidadMaxJugadores(15);
+    when(servicioTorneoMock.obtenerTorneos()).thenReturn(List.of(torneo));
+
+    // ejecucion
+    ModelAndView mav = controladorTorneo.crearEquipo();
+
+    // validacion
+    assertThat(mav.getViewName(), equalToIgnoringCase("creacion-equipo"));
+    assertThat(mav.getModel().get("minJugadores").toString(), equalTo("10"));
+    assertThat(mav.getModel().get("maxJugadores").toString(), equalTo("15"));
+  }
+
+  @Test
+  public void crearEquipoSinTorneosCargadosDeberiaUsarLosValoresPorDefecto() {
+    // preparacion
+    when(servicioTorneoMock.obtenerTorneos()).thenReturn(List.of());
+
+    // ejecucion
+    ModelAndView mav = controladorTorneo.crearEquipo();
+
+    // validacion
+    assertThat(mav.getViewName(), equalToIgnoringCase("creacion-equipo"));
+    assertThat(mav.getModel().get("minJugadores").toString(), equalTo("11"));
+    assertThat(mav.getModel().get("maxJugadores").toString(), equalTo("23"));
   }
 }

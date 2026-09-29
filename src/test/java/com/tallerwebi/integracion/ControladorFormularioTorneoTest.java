@@ -4,16 +4,21 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import com.tallerwebi.dominio.ServicioTorneo;
+import com.tallerwebi.dominio.Torneo;
 import com.tallerwebi.integracion.config.HibernateTestConfig;
 import com.tallerwebi.integracion.config.SpringWebTestConfig;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -32,11 +37,18 @@ public class ControladorFormularioTorneoTest {
   @Autowired
   private WebApplicationContext wac;
 
+  @Autowired
+  private DataSource dataSource;
+
+  @Autowired
+  private ServicioTorneo servicioTorneo;
+
   private MockMvc mockMvc;
 
   @BeforeEach
   public void init() {
     this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
+    new JdbcTemplate(this.dataSource).execute("DELETE FROM Torneo");
   }
 
   @Test
@@ -63,6 +75,25 @@ public class ControladorFormularioTorneoTest {
       .andExpect(content().string(containsString("name=\"cantidadMinJugadores\"")))
       .andExpect(content().string(containsString("name=\"idaYVuelta\"")))
       .andExpect(content().string(containsString("name=\"cantidadAmaSusp\"")))
-      .andExpect(content().string(containsString("Finalizar Creación")));
+      .andExpect(content().string(containsString("Agregar Equipos")));
+  }
+
+  @Test
+  public void crearTorneoConNombreRepetidoDebeMostrarUnMensajeDeError() throws Exception {
+    // preparacion
+    Torneo torneoExistente = new Torneo();
+    torneoExistente.setNombre("Torneo Repetido");
+    torneoExistente.setCantidadDeEquipos(4);
+    torneoExistente.setCantidadMinJugadores(10);
+    torneoExistente.setCantidadMaxJugadores(15);
+    torneoExistente.setCantidadAmaSusp(3);
+    torneoExistente.setIdaYVuelta(true);
+    this.servicioTorneo.registrarTorneo(torneoExistente);
+
+    // ejecucion y validacion
+    this.mockMvc.perform(post("/crearTorneo").param("nombre", "Torneo Repetido"))
+      .andExpect(status().isOk())
+      .andExpect(view().name("formulario-torneo"))
+      .andExpect(content().string(containsString("Ya existe un torneo con este nombre")));
   }
 }

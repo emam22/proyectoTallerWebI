@@ -26,9 +26,15 @@ public class ControladorLogin {
 
   @RequestMapping("/login")
   public ModelAndView irALogin() {
-    Map<String, Object> modelo = new ModelMap();
+    Map<String, Object> modelo = new HashMap<>();
     modelo.put("datosLogin", new DatosLogin());
     return new ModelAndView("login", modelo);
+  }
+
+  @RequestMapping("/logout")
+  public ModelAndView logout(HttpServletRequest request) {
+    request.getSession().invalidate();
+    return new ModelAndView("redirect:/login");
   }
 
   @RequestMapping(path = "/validar-login", method = RequestMethod.POST)

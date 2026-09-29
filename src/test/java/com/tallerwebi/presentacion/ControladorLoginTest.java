@@ -180,6 +180,19 @@ public class ControladorLoginTest {
   }
 
   @Test
+  public void logoutDeberiaCerrarLaSesionYRedirigirALogin() {
+    // preparacion
+    when(requestMock.getSession()).thenReturn(sessionMock);
+
+    // ejecucion
+    ModelAndView modelAndView = controladorLogin.logout(requestMock);
+
+    // validacion
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/login"));
+    verify(sessionMock, times(1)).invalidate();
+  }
+
+  @Test
   public void inicioDeberiaRedirigirALogin() {
     // ejecucion
     ModelAndView modelAndView = controladorLogin.inicio();

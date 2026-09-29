@@ -8,12 +8,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import com.tallerwebi.dominio.ServicioTorneo;
+import com.tallerwebi.dominio.Torneo;
 import com.tallerwebi.integracion.config.HibernateTestConfig;
 import com.tallerwebi.integracion.config.SpringWebTestConfig;
+import javax.sql.DataSource;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -32,11 +36,18 @@ public class ControladorCreacionEquipoTest {
   @Autowired
   private WebApplicationContext wac;
 
+  @Autowired
+  private DataSource dataSource;
+
+  @Autowired
+  private ServicioTorneo servicioTorneo;
+
   private MockMvc mockMvc;
 
   @BeforeEach
   public void init() {
     this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).build();
+    new JdbcTemplate(this.dataSource).execute("DELETE FROM Torneo");
   }
 
   @Test
@@ -65,6 +76,29 @@ public class ControladorCreacionEquipoTest {
       .andExpect(content().string(containsString("INGRESAR JUGADORES")))
       .andExpect(content().string(containsString("Mín. 11")))
       .andExpect(content().string(containsString("Nro. Dorsal")))
-      .andExpect(content().string(containsString("Agregar Equipo")));
+      .andExpect(content().string(containsString("Agregar Equipo")))
+      .andExpect(content().string(containsString("id=\"formAgregarJugador\"")))
+      .andExpect(content().string(containsString("id=\"btnAgregarEquipo\"")))
+      .andExpect(content().string(containsString("btnAgregarEquipo\" disabled")));
+  }
+
+  @Test
+  public void laVistaCreacionEquipoDebeMostrarMinYMaxDelTorneoEnCurso() throws Exception {
+    // preparacion
+    Torneo torneo = new Torneo();
+    torneo.setNombre("Torneo Min Max");
+    torneo.setCantidadDeEquipos(4);
+    torneo.setCantidadMinJugadores(10);
+    torneo.setCantidadMaxJugadores(15);
+    torneo.setCantidadAmaSusp(3);
+    torneo.setIdaYVuelta(true);
+    this.servicioTorneo.registrarTorneo(torneo);
+
+    // ejecucion y validacion
+    this.mockMvc.perform(get("/creacion-equipo"))
+      .andExpect(status().isOk())
+      .andExpect(view().name("creacion-equipo"))
+      .andExpect(content().string(containsString("Mín. 10")))
+      .andExpect(content().string(containsString("Máx. 15")));
   }
 }

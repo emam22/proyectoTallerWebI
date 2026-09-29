@@ -2,6 +2,7 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/app.css}"/>
     <title>Formulario Torneo</title>
     <style>
         * {
@@ -143,6 +144,18 @@
                 width: 100%;
             }
         }
+        /* MENSAJE DE ERROR (nombre de torneo repetido, etc.) */
+        .error-form {
+            background: rgba(255, 51, 51, 0.15);
+            border: 1px solid #ff3333;
+            color: #ff6666;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -154,6 +167,7 @@
     </div>
 
     <div class="form-body">
+        <div class="error-form" th:if="${error}" th:text="${error}">Error</div>
         <div class="grid-inputs">
 
             <!-- Columna Izquierda -->
@@ -200,6 +214,18 @@
     </div>
 
 </form>
+
+<!-- MENÚ DE USUARIO -->
+<div class="menu-usuario">
+    <button type="button" class="btn-menu-hamburguesa" id="btnMenuUsuario" aria-label="Abrir menú">
+        <span></span>
+        <span></span>
+    </button>
+    <div class="menu-usuario-opciones" id="menuUsuarioOpciones">
+        <a th:href="@{/logout}">Cerrar sesión</a>
+    </div>
+</div>
+<script th:src="@{/js/menu.js}"></script>
 
 </body>
 </html>

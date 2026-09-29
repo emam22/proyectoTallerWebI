@@ -2,6 +2,7 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/app.css}"/>
     <title>Administrar Torneo en Curso</title>
     <style>
         * {
@@ -171,6 +172,18 @@
     </div>
 
 </div>
+
+<!-- MENÚ DE USUARIO -->
+<div class="menu-usuario">
+    <button type="button" class="btn-menu-hamburguesa" id="btnMenuUsuario" aria-label="Abrir menú">
+        <span></span>
+        <span></span>
+    </button>
+    <div class="menu-usuario-opciones" id="menuUsuarioOpciones">
+        <a th:href="@{/logout}">Cerrar sesión</a>
+    </div>
+</div>
+<script th:src="@{/js/menu.js}"></script>
 
 </body>
 </html>
