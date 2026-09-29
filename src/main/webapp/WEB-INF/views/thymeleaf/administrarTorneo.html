@@ -144,28 +144,27 @@
             <thead>
             <tr>
                 <th>Nombre</th>
-                <th>Fecha creacion</th>
                 <th>Cantidad Equipos</th>
-                <th>Cantidad Jugadores</th>
-                <th>Cantidad fechas</th>
+                <th>Jugadores por equipo</th>
+                <th>Amarillas/Susp.</th>
+                <th>Ida y vuelta</th>
             </tr>
             </thead>
             <tbody>
-            <!-- Ejemplo con Thymeleaf: th:each="torneo : ${torneoss}" -->
             <tr th:each="torneo : ${torneos}">
                 <td class="nombre-torneo" th:text="${torneo.nombre}">TorneoMegaFutbol</td>
-                <td th:text="${#temporals.format(torneo.fechaCreacion, 'dd-MM-yyyy')}">12-06-2022</td>
-                <td th:text="${torneo.cantidadEquipos}">20</td>
-                <td th:text="${torneo.cantidadJugadores}">300</td>
-                <td th:text="${torneo.cantidadFechas}">60</td>
+                <td th:text="${torneo.cantidadDeEquipos}">20</td>
+                <td th:text="|${torneo.cantidadMinJugadores} - ${torneo.cantidadMaxJugadores}|">10 - 15</td>
+                <td th:text="${torneo.cantidadAmaSusp}">3</td>
+                <td th:text="${torneo.idaYVuelta == true ? 'Sí' : 'No'}">No</td>
             </tr>
-            <!-- Fila de respaldo estática por si se visualiza directo sin servidor -->
-            <tr>
+            <!-- Fila de ejemplo: solo se muestra si no hay torneos cargados -->
+            <tr th:if="${#lists.isEmpty(torneos)}">
                 <td class="nombre-torneo">TorneoFutbolTotal</td>
-                <td>07-09-2021</td>
                 <td>30</td>
-                <td>500</td>
-                <td>90</td>
+                <td>10 - 15</td>
+                <td>5</td>
+                <td>Sí</td>
             </tr>
             </tbody>
         </table>
