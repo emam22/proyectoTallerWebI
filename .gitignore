@@ -24,3 +24,6 @@ hs_err_pid*
 
 # Reportes de codigo limpio y cobertura de pruebas
 .calidad-de-codigo/
+
+# Configuracion local de base de datos (no compartir)
+src/main/resources/db-local.properties
