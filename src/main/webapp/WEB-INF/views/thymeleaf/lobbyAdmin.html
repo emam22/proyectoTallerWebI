@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" th:href="@{/css/app.css}"/>
+    <link rel="icon" type="image/png" th:href="@{/img/favicon.png?v=2}"/>
     <title>Simulador de Torneo</title>
     <style>
         * {
@@ -44,7 +45,6 @@
 
         .navbar-left img {
             height: 40px;
-            filter: invert(1); /* Invierte el icono a negro si es blanco */
         }
 
         .navbar-title {
@@ -122,7 +122,7 @@
 <!-- BARRA SUPERIOR -->
 <header class="navbar">
     <div class="navbar-left">
-        <img src="https://cdn-icons-png.flaticon.com/512/53/53283.png" alt="Jugador">
+        <img th:src="@{/img/isotipo.png?v=2}" alt="System TOR">
         <span class="navbar-title">SIMULADOR</span>
     </div>
     <div class="navbar-user">

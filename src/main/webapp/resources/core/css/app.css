@@ -81,3 +81,31 @@ body::before {
     background: rgba(182, 255, 0, 0.15);
     color: #fff;
 }
+
+/* =========================
+   LOGO DE MARCA (SUPERIOR IZQUIERDA)
+========================= */
+
+.logo-marca {
+    position: fixed;
+    top: 12px;
+    left: 16px;
+    width: 46px;
+    height: 46px;
+    object-fit: contain;
+    z-index: 2000;
+    pointer-events: none;
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.5));
+}
+
+.logo-marca-debajo-menu {
+    position: fixed;
+    top: 64px;
+    right: 22px;
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    z-index: 2000;
+    pointer-events: none;
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.5));
+}

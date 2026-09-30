@@ -13,6 +13,7 @@
 
     <!-- custom style -->
     <link rel="stylesheet" th:href="@{/css/main.css}" />
+    <link rel="icon" type="image/png" th:href="@{/img/favicon.png?v=2}" />
     <style>
 
         * {
@@ -44,6 +45,18 @@
         color: black;
         border: solid 1px white;
          }
+        .logo-login-columna {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 50px;
+            padding: 0 15px;
+        }
+        .logo-login-grande {
+            width: 100%;
+            max-width: 440px;
+            height: auto;
+        }
         @media (max-width: 800px) {
 
             body {
@@ -62,8 +75,8 @@
     <main role="main" class="container">
 
         <div class="container">
-            <div id="loginbox" style="margin-top:50px;"
-                class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
+            <div class="row align-items-center justify-content-center">
+                <div id="loginbox" style="margin-top:50px;" class="mainbox col-md-6 col-sm-10">
                 <form class="container-form" action="#" th:action="@{/validar-login}" method="POST" th:object="${datosLogin}">
                     <h3 class="form-signin-heading">Taller Web I</h3>
                     <hr class="colorgraph">
@@ -78,6 +91,10 @@
                     </p>
                 </form>
                 <a id="btn-register" href="nuevo-usuario">Registrarme</a>
+                </div>
+                <div class="col-md-6 col-sm-10 logo-login-columna">
+                    <img class="logo-login-grande" th:src="@{/img/isotipo.png?v=2}" alt="System TOR" />
+                </div>
             </div>
         </div>
     </main>
