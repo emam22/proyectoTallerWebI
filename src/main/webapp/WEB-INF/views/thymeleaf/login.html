@@ -28,7 +28,11 @@
             min-height: 100vh;
             padding: 20px;
         }
-
+        .container-form{
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
         .avanzar-fecha h1 {
             color: #b6ff00;
             font-size: 20px;
@@ -60,10 +64,10 @@
         <div class="container">
             <div id="loginbox" style="margin-top:50px;"
                 class="mainbox col-md-6 col-md-offset-3 col-sm-8 col-sm-offset-2">
-                <form action="#" th:action="@{/validar-login}" method="POST" th:object="${datosLogin}">
+                <form class="container-form" action="#" th:action="@{/validar-login}" method="POST" th:object="${datosLogin}">
                     <h3 class="form-signin-heading">Taller Web I</h3>
-                    <hr class="colorgraph"><br>
-
+                    <hr class="colorgraph">
+                    <h3 class="form-signin-heading" style="color: #50ff50">SystemTOR</h3>
                     <input th:field="*{email}" id="email" type="email" class="form-control" required />
                     <input th:field="*{password}" type="password" id="password" class="form-control" required />
 
