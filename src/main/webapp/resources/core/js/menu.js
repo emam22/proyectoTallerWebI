@@ -1,3 +1,4 @@
+
 document.addEventListener("DOMContentLoaded", function () {
   var boton = document.getElementById("btnMenuUsuario");
   var opciones = document.getElementById("menuUsuarioOpciones");

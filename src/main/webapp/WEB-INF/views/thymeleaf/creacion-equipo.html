@@ -371,13 +371,18 @@
 
 <script th:inline="javascript">
     const MIN_JUGADORES = /*[[${minJugadores}]]*/ 11;
+    const MAX_JUGADORES = /*[[${maxJugadores}]]*/ 23;
 
     const formAgregarJugador = document.getElementById('formAgregarJugador');
     const listaJugadores = document.getElementById('listaJugadores');
     const btnAgregarEquipo = document.getElementById('btnAgregarEquipo');
 
     function actualizarBotonAgregarEquipo() {
-        btnAgregarEquipo.disabled = listaJugadores.children.length < MIN_JUGADORES;
+        const cantidadJugadores = listaJugadores.children.length;
+
+        btnAgregarEquipo.disabled =
+            cantidadJugadores < MIN_JUGADORES ||
+            cantidadJugadores > MAX_JUGADORES;
     }
 
     function eliminarJugador(fila) {
