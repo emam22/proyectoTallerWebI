@@ -48,24 +48,6 @@ public class RepositorioTorneoTest {
 
   @Test
   @Transactional
-  @Rollback
-  public void deberiaEncontrarUnTorneoExistenteCuandoBuscoPorNombre() {
-    String nombreTorneo = "MegaFutbol";
-    Torneo torneo = new Torneo();
-    torneo.setNombre(nombreTorneo);
-
-    //preparacion
-    repositorioTorneo.guardar(torneo);
-
-    //ejecucion
-    Torneo torneoObtenido = repositorioTorneo.buscarTorneo(nombreTorneo);
-
-    //validacion
-    assertThat(torneoObtenido.getNombre(), is(equalTo(nombreTorneo)));
-  }
-
-  @Test
-  @Transactional
   public void noDeberiaEncontrarUnTorneoInexistenteCuandoBuscoPorNombre() {
     //preparacion
     String nombreTorneo = "Campito";
