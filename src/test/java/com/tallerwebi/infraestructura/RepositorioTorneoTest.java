@@ -41,7 +41,11 @@ public class RepositorioTorneoTest {
     //ejecucion
     repositorioTorneo.guardar(torneo);
     //validacion
-    Torneo torneoObtenido = repositorioTorneo.buscarTorneo(nombreTorneo);
+    Torneo torneoObtenido = sessionFactory
+            .getCurrentSession()
+            .createQuery("from Torneo where nombre = :nombre", Torneo.class)
+            .setParameter("nombre", nombreTorneo)
+            .uniqueResult();
 
     assertThat(torneoObtenido.getNombre(), is(equalTo(nombreTorneo)));
   }

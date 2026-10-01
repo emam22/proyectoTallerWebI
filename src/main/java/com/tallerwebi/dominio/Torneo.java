@@ -5,6 +5,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
+import java.util.List;
+
 @Entity
 public class Torneo {
 
@@ -18,6 +20,8 @@ public class Torneo {
   private Integer cantidadMaxJugadores;
   private Integer cantidadAmaSusp;
   private Boolean idaYVuelta;
+  private List<Equipo> equipos;
+  private List<Partido> partidos;
 
   public Long getId() {
     return id;
