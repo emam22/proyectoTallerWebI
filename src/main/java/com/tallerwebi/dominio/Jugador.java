@@ -4,20 +4,12 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
-import java.util.List;
+public class Jugador {
 
-public class Equipo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    private String nombre;
-    private String escudo;
-    private String ColorLocal;
-    private String ColorVisitanate;
-    private List<Jugador> jugadores;
-
 
 
 
