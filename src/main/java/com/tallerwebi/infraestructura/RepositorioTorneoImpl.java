@@ -18,6 +18,15 @@ public class RepositorioTorneoImpl implements RepositorioTorneo {
   }
 
   @Override
+  public Torneo buscarTorneoPorId(Long id) {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery("from Torneo where id = :id", Torneo.class)
+      .setParameter("id", id)
+      .uniqueResult();
+  }
+
+  @Override
   public Torneo buscarTorneo(String nombre) {
     return sessionFactory
       .getCurrentSession()

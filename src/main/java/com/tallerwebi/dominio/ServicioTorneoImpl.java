@@ -19,6 +19,11 @@ public class ServicioTorneoImpl implements ServicioTorneo {
   }
 
   @Override
+  public Torneo consultarTorneoPorId(Long id) {
+    return repositorioTorneo.buscarTorneoPorId(id);
+  }
+
+  @Override
   public Torneo consultarTorneo(String nombre) {
     return repositorioTorneo.buscarTorneo(nombre);
   }

@@ -30,13 +30,15 @@ public class ControladorTorneoTest {
 
   @Test
   public void alCrearTorneoSeDebeCrearTorneoYRedirigirACreacionDeEquipo() throws Exception {
-    // preparacion
+    // preparación
+    when(torneoMock.getId()).thenReturn(5L);
 
-    // ejecucion
+    // ejecución
     ModelAndView mav = controladorTorneo.crearTorneo(torneoMock);
 
-    // validacion
-    assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/creacion-equipo"));
+    // validación
+    assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/creacion-equipo?idTorneo=5"));
+
     verify(servicioTorneoMock, times(1)).registrarTorneo(torneoMock);
   }
 
@@ -79,10 +81,10 @@ public class ControladorTorneoTest {
     torneo.setId(1L);
     torneo.setCantidadMinJugadores(10);
     torneo.setCantidadMaxJugadores(15);
-    when(servicioTorneoMock.obtenerTorneos()).thenReturn(List.of(torneo));
+    when(servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(torneo);
 
     // ejecucion
-    ModelAndView mav = controladorTorneo.crearEquipo();
+    ModelAndView mav = controladorTorneo.crearEquipo(1L);
 
     // validacion
     assertThat(mav.getViewName(), equalToIgnoringCase("creacion-equipo"));
@@ -93,14 +95,58 @@ public class ControladorTorneoTest {
   @Test
   public void crearEquipoSinTorneosCargadosDeberiaUsarLosValoresPorDefecto() {
     // preparacion
-    when(servicioTorneoMock.obtenerTorneos()).thenReturn(List.of());
+    when(servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(null);
 
     // ejecucion
-    ModelAndView mav = controladorTorneo.crearEquipo();
+    ModelAndView mav = controladorTorneo.crearEquipo(1L);
 
     // validacion
     assertThat(mav.getViewName(), equalToIgnoringCase("creacion-equipo"));
     assertThat(mav.getModel().get("minJugadores").toString(), equalTo("11"));
     assertThat(mav.getModel().get("maxJugadores").toString(), equalTo("23"));
+  }
+
+  @Test
+  public void crearTorneoDeberiaRedirigirAcreacionEquipoConIdDelTorneo() {
+    //preparacion
+    Torneo torneo = new Torneo();
+    torneo.setId(5L);
+    torneo.setNombre("MegaFutbol");
+
+    //ejecucion
+    ModelAndView mav = controladorTorneo.crearTorneo(torneo);
+
+    // validacion
+    assertThat(mav.getViewName(), equalTo("redirect:/creacion-equipo?idTorneo=5"));
+  }
+
+  @Test
+  public void crearEquipoDeberiaPasarElIdDelTorneoAlModelo() {
+    // preparacion
+    Torneo torneo = new Torneo();
+    torneo.setId(5L);
+
+    when(servicioTorneoMock.consultarTorneoPorId(5L)).thenReturn(torneo);
+
+    // ejecucion
+    ModelAndView mav = controladorTorneo.crearEquipo(5L);
+
+    // validacion
+    assertThat(mav.getModel().get("idTorneo"), equalTo(5L));
+  }
+
+  @Test
+  public void crearEquipoDeberiaConsultarElTorneoConElIdRecibido() {
+    // preparacion
+    Torneo torneo = new Torneo();
+    torneo.setId(8L);
+
+    when(servicioTorneoMock.consultarTorneoPorId(8L)).thenReturn(torneo);
+
+    // ejecucion
+    controladorTorneo.crearEquipo(8L);
+
+    // validacion
+    verify(servicioTorneoMock, times(1)).consultarTorneoPorId(8L);
   }
 }

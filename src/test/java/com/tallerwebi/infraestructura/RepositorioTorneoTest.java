@@ -42,10 +42,10 @@ public class RepositorioTorneoTest {
     repositorioTorneo.guardar(torneo);
     //validacion
     Torneo torneoObtenido = sessionFactory
-            .getCurrentSession()
-            .createQuery("from Torneo where nombre = :nombre", Torneo.class)
-            .setParameter("nombre", nombreTorneo)
-            .uniqueResult();
+      .getCurrentSession()
+      .createQuery("from Torneo where nombre = :nombre", Torneo.class)
+      .setParameter("nombre", nombreTorneo)
+      .uniqueResult();
 
     assertThat(torneoObtenido.getNombre(), is(equalTo(nombreTorneo)));
   }
@@ -61,5 +61,46 @@ public class RepositorioTorneoTest {
 
     //validacion
     assertThat(torneoBuscado, is(nullValue()));
+  }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void deberiaBuscarUnTorneoPorId() {
+    //preparacion
+    Torneo torneo = new Torneo();
+    torneo.setNombre("MegaFutbol");
+
+    //ejecucion
+    repositorioTorneo.guardar(torneo);
+
+    Long id = torneo.getId();
+
+    //validacion
+    Torneo torneoObtenido = sessionFactory
+      .getCurrentSession()
+      .createQuery("from Torneo where id = :id", Torneo.class)
+      .setParameter("id", id)
+      .uniqueResult();
+
+    assertThat(torneoObtenido.getId(), is(equalTo(id)));
+  }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void buscarTorneoPorIdSiNoExisteDeberiaDevolverNull() {
+    // preparación
+    Long id = 999999L;
+
+    // ejecución
+    Torneo torneoObtenido = sessionFactory
+      .getCurrentSession()
+      .createQuery("from Torneo where id = :id", Torneo.class)
+      .setParameter("id", id)
+      .uniqueResult();
+
+    // validación
+    assertThat(torneoObtenido, is(nullValue()));
   }
 }

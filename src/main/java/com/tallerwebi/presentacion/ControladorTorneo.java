@@ -12,16 +12,25 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class ControladorTorneo {
 
   private ServicioTorneo servicioTorneo;
+  private static final String TORNEO = "torneo";
 
   @Autowired
   public ControladorTorneo(ServicioTorneo servicioTorneo) {
     this.servicioTorneo = servicioTorneo;
+  }
+
+  @RequestMapping(path = "/formulario-torneo", method = RequestMethod.GET)
+  public ModelAndView irAFormularioTorneo() {
+    Map<String, Object> model = new HashMap<>();
+    model.put(TORNEO, new Torneo());
+    return new ModelAndView("formulario-torneo", model);
   }
 
   @RequestMapping(path = "/crearTorneo", method = RequestMethod.POST)
@@ -31,27 +40,24 @@ public class ControladorTorneo {
       servicioTorneo.registrarTorneo(torneo);
     } catch (TorneoExistente e) {
       model.put("error", "Ya existe un torneo con este nombre");
-      model.put("torneo", torneo);
+      model.put(TORNEO, torneo);
       return new ModelAndView("formulario-torneo", model);
     } catch (Exception e) {
       model.put("error", "Error al crear el torneo");
-      model.put("torneo", torneo);
+      model.put(TORNEO, torneo);
       return new ModelAndView("formulario-torneo", model);
     }
-    return new ModelAndView("redirect:/creacion-equipo");
+    return new ModelAndView("redirect:/creacion-equipo?idTorneo=" + torneo.getId());
   }
 
   @RequestMapping(path = "/creacion-equipo", method = RequestMethod.GET)
-  public ModelAndView crearEquipo() {
+  public ModelAndView crearEquipo(@RequestParam("idTorneo") Long id) {
     Map<String, Object> model = new HashMap<>();
-    Torneo torneoEnCurso = servicioTorneo
-      .obtenerTorneos()
-      .stream()
-      .max(Comparator.comparing(Torneo::getId))
-      .orElse(null);
+    Torneo torneoEnCurso = servicioTorneo.consultarTorneoPorId(id);
 
     int minJugadores = 11;
     int maxJugadores = 23;
+
     if (torneoEnCurso != null) {
       if (torneoEnCurso.getCantidadMinJugadores() != null) {
         minJugadores = torneoEnCurso.getCantidadMinJugadores();
@@ -62,6 +68,8 @@ public class ControladorTorneo {
     }
     model.put("minJugadores", minJugadores);
     model.put("maxJugadores", maxJugadores);
+    model.put("idTorneo", id);
+
     return new ModelAndView("creacion-equipo", model);
   }
 }

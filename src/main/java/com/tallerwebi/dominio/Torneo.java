@@ -1,10 +1,6 @@
 package com.tallerwebi.dominio;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-
+import jakarta.persistence.*;
 import java.util.List;
 
 @Entity
@@ -20,7 +16,11 @@ public class Torneo {
   private Integer cantidadMaxJugadores;
   private Integer cantidadAmaSusp;
   private Boolean idaYVuelta;
+
+  @OneToMany
   private List<Equipo> equipos;
+
+  @OneToMany
   private List<Partido> partidos;
 
   public Long getId() {

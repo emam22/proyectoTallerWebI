@@ -62,4 +62,38 @@ public class ServicioTorneoTest {
     assertThrows(TorneoExistente.class, () -> this.servicioTorneo.registrarTorneo(torneo));
     verify(this.repositorioTorneoMock, times(0)).guardar(torneo);
   }
+
+  @Test
+  public void consultarTorneoPorIdDeberiaLlamarAlRepositorio() {
+    //preparacion
+    Long id = 5L;
+    Torneo torneoEsperado = new Torneo();
+    torneoEsperado.setId(5L);
+
+    when(this.repositorioTorneoMock.buscarTorneoPorId(id)).thenReturn(torneoEsperado);
+
+    //ejecucion
+    Torneo torneoObtenido = this.servicioTorneo.consultarTorneoPorId(id);
+
+    //validacion
+    assertThat(torneoObtenido, equalTo(torneoEsperado));
+
+    verify(this.repositorioTorneoMock, times(1)).buscarTorneoPorId(id);
+  }
+
+  @Test
+  public void consultarTorneoPorIdSiNoExisteDeberiaRetornarNull() {
+    // preparacion
+    Long id = 99L;
+
+    when(this.repositorioTorneoMock.buscarTorneoPorId(id)).thenReturn(null);
+
+    // ejecucion
+    Torneo torneoObtenido = this.servicioTorneo.consultarTorneoPorId(id);
+
+    // validacion
+    assertThat(torneoObtenido, equalTo(null));
+
+    verify(this.repositorioTorneoMock, times(1)).buscarTorneoPorId(id);
+  }
 }
