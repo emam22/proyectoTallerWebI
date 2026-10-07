@@ -108,6 +108,21 @@
             font-weight: bold;
         }
 
+        a.link-gestionar {
+            display: inline-block;
+            background: #b6ff00;
+            color: #111;
+            font-weight: bold;
+            font-size: 12px;
+            text-decoration: none;
+            border-radius: 7px;
+            padding: 6px 12px;
+        }
+
+        a.link-gestionar:hover {
+            background: #d9ff66;
+        }
+
         /* RESPONSIVE */
         @media (max-width: 700px) {
             .header-bar {
@@ -150,6 +165,7 @@
                 <th>Jugadores por equipo</th>
                 <th>Amarillas/Susp.</th>
                 <th>Ida y vuelta</th>
+                <th>Gestion</th>
             </tr>
             </thead>
             <tbody>
@@ -159,14 +175,14 @@
                 <td th:text="|${torneo.cantidadMinJugadores} - ${torneo.cantidadMaxJugadores}|">10 - 15</td>
                 <td th:text="${torneo.cantidadAmaSusp}">3</td>
                 <td th:text="${torneo.idaYVuelta == true ? 'Sí' : 'No'}">No</td>
+                <td>
+                    <a class="link-gestionar"
+                       th:href="@{/administrarTorneo/{idTorneo}(idTorneo=${torneo.id})}">Seleccionar</a>
+                </td>
             </tr>
             <!-- Fila de ejemplo: solo se muestra si no hay torneos cargados -->
             <tr th:if="${#lists.isEmpty(torneos)}">
-                <td class="nombre-torneo">TorneoFutbolTotal</td>
-                <td>30</td>
-                <td>10 - 15</td>
-                <td>5</td>
-                <td>Sí</td>
+                <td class="nombre-torneo" colspan="6">No hay torneos cargados todavia</td>
             </tr>
             </tbody>
         </table>
