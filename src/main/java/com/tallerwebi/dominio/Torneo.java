@@ -17,12 +17,6 @@ public class Torneo {
   private Integer cantidadAmaSusp;
   private Boolean idaYVuelta;
 
-  @OneToMany
-  private List<Equipo> equipos;
-
-  @OneToMany
-  private List<Partido> partidos;
-
   public Long getId() {
     return id;
   }

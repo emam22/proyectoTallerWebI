@@ -1,10 +1,10 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.ServicioTorneo;
-import com.tallerwebi.dominio.Torneo;
+import com.tallerwebi.dominio.*;
+import com.tallerwebi.dominio.excepcion.EquipoExistente;
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
-import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,16 +14,28 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class ControladorTorneo {
 
   private ServicioTorneo servicioTorneo;
+  private ServicioEquipoTorneo servicioEquipoTorneo;
+  private ServicioEquipo servicioEquipo;
+
   private static final String TORNEO = "torneo";
+  private static final String ID_TORNEO = "idTorneo";
+  private static final String REDIRECT_CREACION_EQUIPO = "redirect:/creacion-equipo?idTorneo=";
 
   @Autowired
-  public ControladorTorneo(ServicioTorneo servicioTorneo) {
+  public ControladorTorneo(
+    ServicioTorneo servicioTorneo,
+    ServicioEquipoTorneo servicioEquipoTorneo,
+    ServicioEquipo servicioEquipo
+  ) {
     this.servicioTorneo = servicioTorneo;
+    this.servicioEquipoTorneo = servicioEquipoTorneo;
+    this.servicioEquipo = servicioEquipo;
   }
 
   @RequestMapping(path = "/formulario-torneo", method = RequestMethod.GET)
@@ -34,24 +46,27 @@ public class ControladorTorneo {
   }
 
   @RequestMapping(path = "/crearTorneo", method = RequestMethod.POST)
-  public ModelAndView crearTorneo(@ModelAttribute("torneo") Torneo torneo) {
-    Map<String, Object> model = new ModelMap();
+  public ModelAndView crearTorneo(
+    @ModelAttribute("torneo") Torneo torneo,
+    RedirectAttributes redirectAttributes
+  ) {
     try {
       servicioTorneo.registrarTorneo(torneo);
     } catch (TorneoExistente e) {
-      model.put("error", "Ya existe un torneo con este nombre");
-      model.put(TORNEO, torneo);
-      return new ModelAndView("formulario-torneo", model);
+      redirectAttributes.addFlashAttribute("error", "Ya existe un torneo con este nombre");
+
+      return new ModelAndView("redirect:/formulario-torneo");
     } catch (Exception e) {
-      model.put("error", "Error al crear el torneo");
-      model.put(TORNEO, torneo);
-      return new ModelAndView("formulario-torneo", model);
+      redirectAttributes.addFlashAttribute("error", "Error al crear el torneo");
+
+      return new ModelAndView("redirect:/formulario-torneo");
     }
-    return new ModelAndView("redirect:/creacion-equipo?idTorneo=" + torneo.getId());
+
+    return new ModelAndView(REDIRECT_CREACION_EQUIPO + torneo.getId());
   }
 
   @RequestMapping(path = "/creacion-equipo", method = RequestMethod.GET)
-  public ModelAndView crearEquipo(@RequestParam("idTorneo") Long id) {
+  public ModelAndView crearEquipo(@RequestParam(ID_TORNEO) Long id) {
     Map<String, Object> model = new HashMap<>();
     Torneo torneoEnCurso = servicioTorneo.consultarTorneoPorId(id);
 
@@ -66,10 +81,83 @@ public class ControladorTorneo {
         maxJugadores = torneoEnCurso.getCantidadMaxJugadores();
       }
     }
+
+    int cantidadEquiposActuales = servicioEquipoTorneo.contarEquiposPorTorneo(id);
+
+    int cantidadEquiposNecesarios = torneoEnCurso.getCantidadDeEquipos();
+
     model.put("minJugadores", minJugadores);
     model.put("maxJugadores", maxJugadores);
-    model.put("idTorneo", id);
+    model.put(ID_TORNEO, id);
+    model.put("cantidadEquiposActuales", cantidadEquiposActuales);
+    model.put("cantidadEquiposNecesarios", cantidadEquiposNecesarios);
 
     return new ModelAndView("creacion-equipo", model);
+  }
+
+  @RequestMapping(path = "/guardarEquipo", method = RequestMethod.POST)
+  public ModelAndView guardarEquipo(
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    @RequestParam("nombreEquipo") String nombreEquipo,
+    @RequestParam("colorLocal1") String colorLocal1,
+    @RequestParam("colorLocal2") String colorLocal2,
+    @RequestParam("colorVisitante1") String colorVisitante1,
+    @RequestParam("colorVisitante2") String colorVisitante2,
+    RedirectAttributes redirectAttributes
+  ) {
+    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+
+    int cantidadActual = servicioEquipoTorneo.contarEquiposPorTorneo(idTorneo);
+
+    int cantidadNecesaria = torneo.getCantidadDeEquipos();
+
+    if (cantidadActual >= cantidadNecesaria) {
+      return new ModelAndView(REDIRECT_CREACION_EQUIPO + idTorneo);
+    }
+
+    Equipo equipo = new Equipo();
+
+    equipo.setNombre(nombreEquipo);
+    equipo.setColorLocal1(colorLocal1);
+    equipo.setColorLocal2(colorLocal2);
+    equipo.setColorVisitante1(colorVisitante1);
+    equipo.setColorVisitante2(colorVisitante2);
+
+    try {
+      servicioEquipoTorneo.crearEquipoEInscribirlo(equipo, torneo);
+    } catch (EquipoExistente e) {
+      redirectAttributes.addFlashAttribute("error", "Ya existe un equipo con ese nombre");
+
+      return new ModelAndView(REDIRECT_CREACION_EQUIPO + idTorneo);
+    }
+
+    return new ModelAndView(REDIRECT_CREACION_EQUIPO + idTorneo);
+  }
+
+  @RequestMapping(path = "/lista-equipos", method = RequestMethod.GET)
+  public ModelAndView listarEquipos(@RequestParam(ID_TORNEO) Long idTorneo) {
+    Map<String, Object> model = new HashMap<>();
+
+    List<Equipo> equipos = servicioEquipo.obtenerEquipos();
+
+    model.put("equipos", equipos);
+    model.put(ID_TORNEO, idTorneo);
+
+    return new ModelAndView("lista-equipos", model);
+  }
+
+  @RequestMapping(path = "/finalizarTorneo", method = RequestMethod.POST)
+  public ModelAndView finalizarTorneo(@RequestParam(ID_TORNEO) Long idTorneo) {
+    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+
+    int cantidadActual = servicioEquipoTorneo.contarEquiposPorTorneo(idTorneo);
+
+    int cantidadNecesaria = torneo.getCantidadDeEquipos();
+
+    if (cantidadActual < cantidadNecesaria) {
+      return new ModelAndView(REDIRECT_CREACION_EQUIPO + idTorneo);
+    }
+
+    return new ModelAndView("redirect:/lobbyAdmin");
   }
 }

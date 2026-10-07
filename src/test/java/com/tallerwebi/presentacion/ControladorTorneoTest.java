@@ -7,6 +7,8 @@ import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.mockito.Mockito.*;
 
+import com.tallerwebi.dominio.ServicioEquipo;
+import com.tallerwebi.dominio.ServicioEquipoTorneo;
 import com.tallerwebi.dominio.ServicioTorneo;
 import com.tallerwebi.dominio.Torneo;
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
@@ -14,18 +16,25 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.mvc.support.RedirectAttributesModelMap;
 
 public class ControladorTorneoTest {
 
   private ControladorTorneo controladorTorneo;
   private Torneo torneoMock;
   private ServicioTorneo servicioTorneoMock;
+  private ServicioEquipoTorneo servicioEquipoTorneoMock;
+  private ServicioEquipo servicioEquipoMock;
 
   @BeforeEach
   public void init() {
     torneoMock = mock(Torneo.class);
     servicioTorneoMock = mock(ServicioTorneo.class);
-    controladorTorneo = new ControladorTorneo(servicioTorneoMock);
+    servicioEquipoTorneoMock = mock(ServicioEquipoTorneo.class);
+    servicioEquipoMock = mock(ServicioEquipo.class);
+    controladorTorneo =
+      new ControladorTorneo(servicioTorneoMock, servicioEquipoTorneoMock, servicioEquipoMock);
   }
 
   @Test
@@ -33,8 +42,10 @@ public class ControladorTorneoTest {
     // preparación
     when(torneoMock.getId()).thenReturn(5L);
 
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
     // ejecución
-    ModelAndView mav = controladorTorneo.crearTorneo(torneoMock);
+    ModelAndView mav = controladorTorneo.crearTorneo(torneoMock, redirectAttributes);
 
     // validación
     assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/creacion-equipo?idTorneo=5"));
@@ -47,8 +58,10 @@ public class ControladorTorneoTest {
     //preparacion
     doThrow(TorneoExistente.class).when(servicioTorneoMock).registrarTorneo(torneoMock);
 
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
     //ejecucion
-    ModelAndView mav = controladorTorneo.crearTorneo(torneoMock);
+    ModelAndView mav = controladorTorneo.crearTorneo(torneoMock, redirectAttributes);
 
     //validacion
     assertThat(mav.getViewName(), equalToIgnoringCase("formulario-torneo"));
@@ -63,8 +76,10 @@ public class ControladorTorneoTest {
     // preparacion
     doThrow(RuntimeException.class).when(servicioTorneoMock).registrarTorneo(torneoMock);
 
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
     // ejecucion
-    ModelAndView modelAndView = controladorTorneo.crearTorneo(torneoMock);
+    ModelAndView modelAndView = controladorTorneo.crearTorneo(torneoMock, redirectAttributes);
 
     // validacion
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("formulario-torneo"));
@@ -113,8 +128,10 @@ public class ControladorTorneoTest {
     torneo.setId(5L);
     torneo.setNombre("MegaFutbol");
 
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
     //ejecucion
-    ModelAndView mav = controladorTorneo.crearTorneo(torneo);
+    ModelAndView mav = controladorTorneo.crearTorneo(torneo, redirectAttributes);
 
     // validacion
     assertThat(mav.getViewName(), equalTo("redirect:/creacion-equipo?idTorneo=5"));

@@ -5,6 +5,7 @@
     <link rel="stylesheet" th:href="@{/css/app.css}"/>
     <link rel="icon" type="image/png" th:href="@{/img/favicon.png?v=2}"/>
     <title>Creación Equipo</title>
+
     <style>
         * {
             box-sizing: border-box;
@@ -24,7 +25,7 @@
         }
 
         /* CONTENEDOR PRINCIPAL */
-        .card-container {
+        .form-card {
             width: 100%;
             max-width: 850px;
             background: #444444;
@@ -34,8 +35,8 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
 
-        /* HEADER */
-        .card-header {
+        /* ENCABEZADO */
+        .form-header {
             background: #b6ff00;
             color: #111;
             padding: 12px;
@@ -43,33 +44,37 @@
             font-size: 16px;
             font-weight: bold;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         /* CUERPO */
-        .card-body {
-            padding: 20px 25px;
+        .form-body {
+            padding: 25px;
         }
 
+        /* GRID */
         .grid-equipo {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px 30px;
-            margin-bottom: 20px;
-            align-items: center;
+            gap: 20px 40px;
+            margin-bottom: 25px;
         }
 
+        /* GRUPOS */
         .form-group {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 10px;
+            gap: 15px;
         }
 
         .form-group label {
             font-size: 13px;
             font-weight: bold;
+            color: #efefef;
         }
 
+        /* INPUTS */
         .input-text {
             background: white;
             border: none;
@@ -78,10 +83,28 @@
             font-size: 13px;
             color: #333;
             outline: none;
-            width: 200px;
+            width: 210px;
         }
 
-        /* SELECTORES DE COLOR / ESCUDO */
+        /* ESCUDO */
+        .input-file-escudo {
+            width: 60px;
+            height: 50px;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .input-file-escudo input[type="file"] {
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        /* COLORES */
         .color-pickers {
             display: flex;
             gap: 8px;
@@ -100,85 +123,45 @@
         .color-box::-webkit-color-swatch-wrapper {
             padding: 0;
         }
+
         .color-box::-webkit-color-swatch {
             border: none;
             border-radius: 6px;
         }
 
-        .input-file-escudo {
-            width: 60px;
-            height: 50px;
-            background: white;
+        /* MENSAJE DE ERROR */
+        .error-form {
+            background: rgba(255, 51, 51, 0.15);
+            border: 1px solid #ff3333;
+            color: #ff6666;
             border-radius: 8px;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .input-file-escudo input[type="file"] {
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
-
-        /* SECCIÓN JUGADORES */
-        .jugadores-bar {
-            background: #b6ff00;
-            color: #111;
-            padding: 8px 15px;
-            border-radius: 6px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: bold;
+            padding: 8px 12px;
             font-size: 13px;
-            margin-bottom: 12px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
         }
 
-        .tabla-jugadores {
-            width: 100%;
-            border-collapse: collapse;
+        /* CONTADOR */
+        .contador-equipos {
             background: #333333;
             border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 20px;
-        }
-
-        .tabla-jugadores th {
-            color: white;
-            padding: 10px;
-            font-size: 12px;
+            padding: 12px;
             text-align: center;
+            margin-bottom: 15px;
         }
 
-        .tabla-jugadores td {
-            padding: 10px;
-            font-size: 12px;
-            text-align: center;
-            border-top: 1px solid #444;
-        }
-
-        .btn-eliminar {
-            background: #ff3333;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            width: 22px;
-            height: 22px;
+        .contador-equipos p {
+            font-size: 14px;
             font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: auto;
         }
 
-        /* BOTONES ACCIÓN */
+        /* BOTONES */
         .form-actions {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
+            margin-top: 10px;
         }
 
         .btn {
@@ -189,20 +172,16 @@
             font-size: 14px;
             font-weight: bold;
             cursor: pointer;
-            transition: opacity 0.2s;
+            transition: opacity 0.2s, transform 0.1s;
         }
 
         .btn:hover {
             opacity: 0.9;
+            transform: translateY(-1px);
         }
 
-        .btn-verde-oscuro {
+        .btn-verde {
             background: #b6ff00;
-            color: #111;
-        }
-
-        .btn-verde-claro {
-            background: #50ff50;
             color: #111;
         }
 
@@ -211,221 +190,237 @@
             cursor: not-allowed;
         }
 
-        /* FORM AGREGAR JUGADOR (debajo de la lista) */
-        .form-agregar-jugador {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
+        /* ESPACIO ENTRE FORMULARIOS */
+        .form-finalizar {
+            margin-top: 12px;
         }
 
-        .input-jugador {
-            background: white;
-            border: none;
-            border-radius: 6px;
-            padding: 7px 10px;
-            font-size: 12px;
+        a.btn {
+            text-decoration: none;
+            text-align: center;
+            display: block;
+        }
+
+        .btn-blanco {
+            background-color: white;
             color: #333;
-            outline: none;
-            flex: 1;
-            min-width: 110px;
+            border: 1px solid #ccc;
         }
 
-        /* Botón agregar: mismo tamaño que el de eliminar pero invertido (verde con check) */
-        .btn-agregar {
-            background: #b6ff00;
-            color: #111;
-            border: none;
-            border-radius: 4px;
-            width: 22px;
-            height: 22px;
-            font-size: 13px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: auto;
+        .btn-blanco:hover {
+            background-color: #f2f2f2;
+        }
+
+        .btn-deshabilitado {
+            pointer-events: none;
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         /* RESPONSIVE */
         @media (max-width: 700px) {
             .grid-equipo {
                 grid-template-columns: 1fr;
+                gap: 15px;
             }
+
             .form-group {
                 flex-direction: column;
                 align-items: flex-start;
+                gap: 6px;
             }
+
             .input-text {
                 width: 100%;
             }
         }
     </style>
 </head>
+
 <body>
 
-<div class="card-container">
+<div class="form-card">
 
-    <div class="card-header">
-        CREACIÓN EQUIPO
+    <!-- ENCABEZADO -->
+    <div class="form-header">
+        CREACIÓN DE EQUIPO
     </div>
 
-    <div class="card-body">
+    <!-- CUERPO -->
+    <div class="form-body">
 
-        <form th:action="@{/guardarEquipo(idTorneo=${idTorneo})}" method="post">
+        <!-- MENSAJE DE ERROR -->
+        <div class="error-form"
+             th:if="${error}"
+             th:text="${error}">
+            Error
+        </div>
+
+        <!-- FORMULARIO EQUIPO -->
+        <form id="formEquipo"
+              th:action="@{/guardarEquipo(idTorneo=${idTorneo})}"
+              method="post">
+
             <div class="grid-equipo">
 
+                <!-- NOMBRE -->
                 <div class="form-group">
-                    <label for="nombreEquipo">Ingresar nombre de equipo</label>
-                    <input type="text" id="nombreEquipo" name="nombreEquipo" class="input-text" required>
+                    <label for="nombreEquipo">
+                        Ingresar nombre de equipo
+                    </label>
+
+                    <input type="text"
+                           id="nombreEquipo"
+                           name="nombreEquipo"
+                           class="input-text"
+                           required>
                 </div>
 
+                <!-- ESCUDO -->
                 <div class="form-group">
-                    <label for="escudoEquipo">Ingresar escudo de equipo</label>
+                    <label for="escudoEquipo">
+                        Ingresar escudo de equipo
+                    </label>
+
                     <div class="input-file-escudo">
-                        <input type="file" id="escudoEquipo" name="escudoEquipo" accept="image/*">
+                        <input type="file"
+                               id="escudoEquipo"
+                               name="escudoEquipo"
+                               accept="image/*">
                     </div>
                 </div>
 
+                <!-- COLORES LOCAL -->
                 <div class="form-group">
-                    <label>Ingresar Colores Local</label>
+                    <label>
+                        Ingresar Colores Local
+                    </label>
+
                     <div class="color-pickers">
-                        <input type="color" name="colorLocal1" value="#ffffff" class="color-box">
-                        <input type="color" name="colorLocal2" value="#ff3333" class="color-box">
+
+                        <input type="color"
+                               name="colorLocal1"
+                               value="#ffffff"
+                               class="color-box">
+
+                        <input type="color"
+                               name="colorLocal2"
+                               value="#ff3333"
+                               class="color-box">
+
                     </div>
                 </div>
 
+                <!-- COLORES VISITANTE -->
                 <div class="form-group">
-                    <label>Ingresar Colores Visitante</label>
+                    <label>
+                        Ingresar Colores Visitante
+                    </label>
+
                     <div class="color-pickers">
-                        <input type="color" name="colorVisitante1" value="#33ffff" class="color-box">
-                        <input type="color" name="colorVisitante2" value="#ff66cc" class="color-box">
+
+                        <input type="color"
+                               name="colorVisitante1"
+                               value="#33ffff"
+                               class="color-box">
+
+                        <input type="color"
+                               name="colorVisitante2"
+                               value="#ff66cc"
+                               class="color-box">
+
                     </div>
                 </div>
 
             </div>
+
+            <!-- CONTADOR -->
+            <div class="contador-equipos">
+                <p>
+                    Equipos:
+                    <strong th:text="${cantidadEquiposActuales}">0</strong>
+                    /
+                    <strong th:text="${cantidadEquiposNecesarios}">4</strong>
+                </p>
+            </div>
+
+            <!-- AGREGAR EQUIPO -->
+            <div class="form-actions">
+
+                <button type="submit"
+                        class="btn btn-verde"
+                        id="btnAgregarEquipo"
+                        th:disabled="${cantidadEquiposActuales >= cantidadEquiposNecesarios}">
+                    Agregar Equipo
+                </button>
+
+            </div>
+
         </form>
 
-        <!-- SECCIÓN JUGADORES -->
-        <div class="jugadores-bar">
-            <span>INGRESAR JUGADORES</span>
-            <span th:text="|Mín. ${minJugadores}  Máx. ${maxJugadores}|">Mín. 11  Máx. 23</span>
-        </div>
 
-        <table class="tabla-jugadores">
-            <thead>
-            <tr>
-                <th>Nro. Dorsal</th>
-                <th>Puesto</th>
-                <th>Nombre</th>
-                <th>Apellido</th>
-                <th>Categoría (edad)</th>
-                <th></th>
-            </tr>
-            </thead>
-            <tbody id="listaJugadores">
-            </tbody>
-        </table>
-
-        <!-- FORM CORTO PARA AGREGAR JUGADORES -->
-        <form class="form-agregar-jugador" id="formAgregarJugador">
-            <input type="number" id="jugadorDorsal" class="input-jugador" placeholder="Nro. Dorsal" min="1" required>
-            <select id="jugadorPuesto" class="input-jugador" required>
-                <option value="" disabled selected>Puesto</option>
-                <option value="Arquero">Arquero</option>
-                <option value="Defensor">Defensor</option>
-                <option value="Mediocampista">Mediocampista</option>
-                <option value="Delantero">Delantero</option>
-            </select>
-            <input type="text" id="jugadorNombre" class="input-jugador" placeholder="Nombre" required>
-            <input type="text" id="jugadorApellido" class="input-jugador" placeholder="Apellido" required>
-            <input type="number" id="jugadorEdad" class="input-jugador" placeholder="Categoría (edad)" min="1" required>
-            <button type="submit" class="btn-agregar" title="Agregar jugador">&#10003;</button>
-        </form>
-
-        <!-- BOTONES DE ACCIÓN -->
+        <!-- BOTÓN PARA IMPORTAR EQUIPO EXISTENTE -->
         <div class="form-actions">
-            <button type="button" class="btn btn-verde-oscuro" id="btnAgregarEquipo" disabled>Agregar Equipo</button>
-            <button type="button" class="btn btn-verde-claro">Importar equipos</button>
+            <a th:href="@{/lista-equipos(idTorneo=${idTorneo})}"
+               class="btn btn-blanco"
+               th:classappend="${cantidadEquiposActuales >= cantidadEquiposNecesarios} ? ' btn-deshabilitado' : ''"
+               th:attr="aria-disabled=${cantidadEquiposActuales >= cantidadEquiposNecesarios}">
+                Cargar equipo existente
+            </a>
+        </div>
+        <!-- FINALIZAR TORNEO -->
+        <div class="form-actions form-finalizar">
+
+            <form th:action="@{/finalizarTorneo}"
+                  method="post">
+
+                <input type="hidden"
+                       name="idTorneo"
+                       th:value="${idTorneo}">
+
+                <button type="submit"
+                        class="btn btn-verde"
+                        th:disabled="${cantidadEquiposActuales < cantidadEquiposNecesarios}">
+                    Finalizar creación del torneo
+                </button>
+
+            </form>
+
         </div>
 
     </div>
 </div>
 
-<!-- LOGO DE MARCA -->
-<img class="logo-marca" th:src="@{/img/isotipo.png?v=2}" alt="System TOR"/>
+<!-- LOGO -->
+<img class="logo-marca"
+     th:src="@{/img/isotipo.png?v=2}"
+     alt="System TOR"/>
 
-<!-- MENÚ DE USUARIO -->
+<!-- MENÚ -->
 <div class="menu-usuario">
-    <button type="button" class="btn-menu-hamburguesa" id="btnMenuUsuario" aria-label="Abrir menú">
+
+    <button type="button"
+            class="btn-menu-hamburguesa"
+            id="btnMenuUsuario"
+            aria-label="Abrir menú">
+
         <span></span>
         <span></span>
+
     </button>
-    <div class="menu-usuario-opciones" id="menuUsuarioOpciones">
-        <a th:href="@{/logout}">Cerrar sesión</a>
+
+    <div class="menu-usuario-opciones"
+         id="menuUsuarioOpciones">
+
+        <a th:href="@{/logout}">
+            Cerrar sesión
+        </a>
+
     </div>
+
 </div>
+
 <script th:src="@{/js/menu.js}"></script>
-
-<script th:inline="javascript">
-    const MIN_JUGADORES = /*[[${minJugadores}]]*/ 11;
-    const MAX_JUGADORES = /*[[${maxJugadores}]]*/ 23;
-
-    const formAgregarJugador = document.getElementById('formAgregarJugador');
-    const listaJugadores = document.getElementById('listaJugadores');
-    const btnAgregarEquipo = document.getElementById('btnAgregarEquipo');
-
-    function actualizarBotonAgregarEquipo() {
-        const cantidadJugadores = listaJugadores.children.length;
-
-        btnAgregarEquipo.disabled =
-            cantidadJugadores < MIN_JUGADORES ||
-            cantidadJugadores > MAX_JUGADORES;
-    }
-
-    function eliminarJugador(fila) {
-        fila.remove();
-        actualizarBotonAgregarEquipo();
-    }
-
-    formAgregarJugador.addEventListener('submit', function (evento) {
-        evento.preventDefault();
-
-        const valores = [
-            document.getElementById('jugadorDorsal').value,
-            document.getElementById('jugadorPuesto').value,
-            document.getElementById('jugadorNombre').value,
-            document.getElementById('jugadorApellido').value,
-            document.getElementById('jugadorEdad').value
-        ];
-
-        const fila = document.createElement('tr');
-        valores.forEach(function (valor) {
-            const celda = document.createElement('td');
-            celda.textContent = valor;
-            fila.appendChild(celda);
-        });
-
-        const celdaAccion = document.createElement('td');
-        const btnEliminar = document.createElement('button');
-        btnEliminar.type = 'button';
-        btnEliminar.className = 'btn-eliminar';
-        btnEliminar.innerHTML = '&times;';
-        btnEliminar.addEventListener('click', function () {
-            eliminarJugador(fila);
-        });
-        celdaAccion.appendChild(btnEliminar);
-        fila.appendChild(celdaAccion);
-
-        listaJugadores.appendChild(fila);
-        formAgregarJugador.reset();
-        actualizarBotonAgregarEquipo();
-    });
-
-    actualizarBotonAgregarEquipo();
-</script>
 
 </body>
 </html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div class="form-card">
+
+    <div class="form-header">
+        EQUIPOS GUARDADOS
+    </div>
+
+    <div class="form-body">
+
+        <div th:if="${#lists.isEmpty(equipos)}">
+            <p>No hay equipos guardados.</p>
+        </div>
+
+        <div th:each="equipo : ${equipos}">
+
+            <div class="equipo-item">
+
+                <div>
+                    <strong th:text="${equipo.nombre}">
+                        Nombre del equipo
+                    </strong>
+                </div>
+
+                <form th:action="@{/cargar-equipo}"
+                      method="post">
+
+                    <input type="hidden"
+                           name="idEquipo"
+                           th:value="${equipo.id}">
+
+                    <input type="hidden"
+                           name="idTorneo"
+                           th:value="${idTorneo}">
+
+                    <button type="submit"
+                            class="btn btn-verde">
+                        Cargar al torneo
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>
