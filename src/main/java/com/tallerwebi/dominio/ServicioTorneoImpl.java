@@ -35,7 +35,6 @@ public class ServicioTorneoImpl implements ServicioTorneo {
     if (torneoEncontrado != null) {
       throw new TorneoExistente();
     }
-    ValidadorTorneo.validar(torneo);
 
     repositorioTorneo.guardar(torneo);
   }

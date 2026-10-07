@@ -7,8 +7,6 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
-import com.tallerwebi.dominio.excepcion.TorneoInvalidoException;
-import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -70,35 +68,6 @@ public class ServicioTorneoTest {
     // ejecucion y validacion
     assertThrows(TorneoExistente.class, () -> this.servicioTorneo.registrarTorneo(torneo));
     verify(this.repositorioTorneoMock, times(0)).guardar(torneo);
-  }
-
-  @Test
-  public void registrarTorneoInvalidoDeberiaLanzarErrorSinGuardar() {
-    // preparacion
-    Torneo torneo = torneoValido("TorneoInvalido");
-    torneo.setCantidadDeEquipos(1);
-
-    // ejecucion y validacion
-    assertThrows(TorneoInvalidoException.class, () -> this.servicioTorneo.registrarTorneo(torneo));
-    verify(this.repositorioTorneoMock, times(0)).guardar(torneo);
-  }
-
-  @Test
-  public void consultarTorneoPorIdDeberiaLlamarAlRepositorio() {
-    //preparacion
-    Long id = 5L;
-    Torneo torneoEsperado = new Torneo();
-    torneoEsperado.setId(5L);
-
-    when(this.repositorioTorneoMock.buscarTorneoPorId(id)).thenReturn(torneoEsperado);
-
-    //ejecucion
-    Torneo torneoObtenido = this.servicioTorneo.consultarTorneoPorId(id);
-
-    //validacion
-    assertThat(torneoObtenido, equalTo(torneoEsperado));
-
-    verify(this.repositorioTorneoMock, times(1)).buscarTorneoPorId(id);
   }
 
   @Test

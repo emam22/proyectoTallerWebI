@@ -1,10 +1,135 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+
+    <link rel="stylesheet" th:href="@{/css/app.css}"/>
+    <link rel="icon" type="image/png" th:href="@{/img/favicon.png?v=2}"/>
+
+    <title>Equipos Guardados</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #1f1f1f;
+            color: white;
+            min-height: 100vh;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* CONTENEDOR PRINCIPAL */
+        .form-card {
+            width: 100%;
+            max-width: 850px;
+            background: #444444;
+            border: 2px solid #b6ff00;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        /* ENCABEZADO */
+        .form-header {
+            background: #b6ff00;
+            color: #111;
+            padding: 12px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* CUERPO */
+        .form-body {
+            padding: 25px;
+        }
+
+        /* EQUIPO */
+        .equipo-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+
+            background: #333333;
+            border: 1px solid #666666;
+            border-radius: 8px;
+
+            padding: 15px 18px;
+            margin-bottom: 12px;
+        }
+
+        .equipo-item:last-child {
+            margin-bottom: 0;
+        }
+
+        /* NOMBRE DEL EQUIPO */
+        .equipo-item strong {
+            color: white;
+            font-size: 15px;
+        }
+
+        /* BOTONES */
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: opacity 0.2s, transform 0.1s;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-verde {
+            background: #b6ff00;
+            color: #111;
+        }
+
+        /* MENSAJE CUANDO NO HAY EQUIPOS */
+        .sin-equipos {
+            text-align: center;
+            color: #efefef;
+            font-size: 14px;
+            padding: 20px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 700px) {
+
+            .equipo-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+            }
+
+            .equipo-item form {
+                width: 100%;
+            }
+
+            .equipo-item .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
+
 <body>
+
 <div class="form-card">
 
     <div class="form-header">
@@ -13,7 +138,8 @@
 
     <div class="form-body">
 
-        <div th:if="${#lists.isEmpty(equipos)}">
+        <div class="sin-equipos"
+             th:if="${#lists.isEmpty(equipos)}">
             <p>No hay equipos guardados.</p>
         </div>
 
@@ -52,5 +178,23 @@
     </div>
 
 </div>
+
+
+<!-- LOGO DE MARCA -->
+<img class="logo-marca" th:src="@{/img/isotipo.png?v=2}" alt="System TOR"/>
+
+<!-- MENÚ DE USUARIO -->
+<div class="menu-usuario">
+    <button type="button" class="btn-menu-hamburguesa" id="btnMenuUsuario" aria-label="Abrir menú">
+        <span></span>
+        <span></span>
+    </button>
+    <div class="menu-usuario-opciones" id="menuUsuarioOpciones">
+        <a th:href="@{/logout}">Cerrar sesión</a>
+    </div>
+</div>
+<script th:src="@{/js/menu.js}"></script>
+
+
 </body>
 </html>
