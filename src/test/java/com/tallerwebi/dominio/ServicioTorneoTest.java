@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
+import com.tallerwebi.dominio.excepcion.TorneoInvalidoException;
 import com.tallerwebi.dominio.excepcion.UsuarioExistente;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -37,11 +38,20 @@ public class ServicioTorneoTest {
     verify(this.repositorioTorneoMock, times(1)).buscarTorneo(nombre);
   }
 
+  private Torneo torneoValido(String nombre) {
+    Torneo torneo = new Torneo();
+    torneo.setNombre(nombre);
+    torneo.setCantidadDeEquipos(4);
+    torneo.setCantidadMinJugadores(10);
+    torneo.setCantidadMaxJugadores(15);
+    torneo.setCantidadAmaSusp(3);
+    return torneo;
+  }
+
   @Test
   public void registrarTorneoSiNoExisteDeberiaGuardarlo() throws TorneoExistente, Exception {
     // preparacion
-    Torneo torneo = new Torneo();
-    torneo.setNombre("nuevoTorneo");
+    Torneo torneo = torneoValido("nuevoTorneo");
     when(this.repositorioTorneoMock.buscarTorneo(torneo.getNombre())).thenReturn(null);
 
     // ejecucion
@@ -54,12 +64,22 @@ public class ServicioTorneoTest {
   @Test
   public void registrarTorneoSiExisteDeberiaLanzarExcepcion() {
     // preparacion
-    Torneo torneo = new Torneo();
-    torneo.setNombre("MegaFutbol");
+    Torneo torneo = torneoValido("MegaFutbol");
     when(this.repositorioTorneoMock.buscarTorneo(torneo.getNombre())).thenReturn(new Torneo());
 
     // ejecucion y validacion
     assertThrows(TorneoExistente.class, () -> this.servicioTorneo.registrarTorneo(torneo));
+    verify(this.repositorioTorneoMock, times(0)).guardar(torneo);
+  }
+
+  @Test
+  public void registrarTorneoInvalidoDeberiaLanzarErrorSinGuardar() {
+    // preparacion
+    Torneo torneo = torneoValido("TorneoInvalido");
+    torneo.setCantidadDeEquipos(1);
+
+    // ejecucion y validacion
+    assertThrows(TorneoInvalidoException.class, () -> this.servicioTorneo.registrarTorneo(torneo));
     verify(this.repositorioTorneoMock, times(0)).guardar(torneo);
   }
 

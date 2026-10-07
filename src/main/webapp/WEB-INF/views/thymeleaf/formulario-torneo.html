@@ -180,19 +180,19 @@
             <!-- Columna Derecha -->
             <div class="form-group">
                 <label for="cantidadEquipos">Ingresar Cantidad de Equipos</label>
-                <input th:field="*{cantidadDeEquipos}" type="number" id="cantidadEquipos" name="cantidadEquipos" class="input-text input-short" required>
+                <input th:field="*{cantidadDeEquipos}" type="number" id="cantidadEquipos" name="cantidadEquipos" class="input-text input-short" min="2" required>
             </div>
 
             <!-- Columna Izquierda -->
             <div class="form-group">
                 <label for="maxJugadores">Ingresar Cantidad Máxima de jugadores por equipo</label>
-                <input th:field="*{cantidadMaxJugadores}" type="number" id="maxJugadores" name="maxJugadores" class="input-text input-short" required>
+                <input th:field="*{cantidadMaxJugadores}" type="number" id="maxJugadores" name="maxJugadores" class="input-text input-short" min="2" required>
             </div>
 
             <!-- Columna Derecha -->
             <div class="form-group">
                 <label for="minJugadores">Ingresar Cantidad Mínima de jugadores por equipo</label>
-                <input th:field="*{cantidadMinJugadores}"  type="number" id="minJugadores" name="minJugadores" class="input-text input-short" required>
+                <input th:field="*{cantidadMinJugadores}"  type="number" id="minJugadores" name="minJugadores" class="input-text input-short" min="2" required>
             </div>
 
             <!-- Columna Izquierda -->
@@ -204,7 +204,7 @@
             <!-- Columna Derecha -->
             <div class="form-group">
                 <label for="amarillasSuspension">Ingresar Cantidad De Amarillas para suspensión</label>
-                <input th:field="*{cantidadAmaSusp}" type="number" id="amarillasSuspension" name="amarillasSuspension" class="input-text input-short" required>
+                <input th:field="*{cantidadAmaSusp}" type="number" id="amarillasSuspension" name="amarillasSuspension" class="input-text input-short" min="0" required>
             </div>
 
         </div>

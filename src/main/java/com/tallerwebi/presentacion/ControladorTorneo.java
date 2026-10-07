@@ -3,6 +3,7 @@ package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.ServicioTorneo;
 import com.tallerwebi.dominio.Torneo;
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
+import com.tallerwebi.dominio.excepcion.TorneoInvalidoException;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +21,7 @@ public class ControladorTorneo {
 
   private ServicioTorneo servicioTorneo;
   private static final String TORNEO = "torneo";
+  private static final String VISTA_FORMULARIO = "formulario-torneo";
 
   @Autowired
   public ControladorTorneo(ServicioTorneo servicioTorneo) {
@@ -30,7 +32,7 @@ public class ControladorTorneo {
   public ModelAndView irAFormularioTorneo() {
     Map<String, Object> model = new HashMap<>();
     model.put(TORNEO, new Torneo());
-    return new ModelAndView("formulario-torneo", model);
+    return new ModelAndView(VISTA_FORMULARIO, model);
   }
 
   @RequestMapping(path = "/crearTorneo", method = RequestMethod.POST)
@@ -38,14 +40,18 @@ public class ControladorTorneo {
     Map<String, Object> model = new ModelMap();
     try {
       servicioTorneo.registrarTorneo(torneo);
+    } catch (TorneoInvalidoException e) {
+      model.put("error", e.getMessage());
+      model.put(TORNEO, torneo);
+      return new ModelAndView(VISTA_FORMULARIO, model);
     } catch (TorneoExistente e) {
       model.put("error", "Ya existe un torneo con este nombre");
       model.put(TORNEO, torneo);
-      return new ModelAndView("formulario-torneo", model);
+      return new ModelAndView(VISTA_FORMULARIO, model);
     } catch (Exception e) {
       model.put("error", "Error al crear el torneo");
       model.put(TORNEO, torneo);
-      return new ModelAndView("formulario-torneo", model);
+      return new ModelAndView(VISTA_FORMULARIO, model);
     }
     return new ModelAndView("redirect:/creacion-equipo?idTorneo=" + torneo.getId());
   }
