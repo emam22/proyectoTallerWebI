@@ -63,8 +63,7 @@ public class ControladorAdministrarTorneoTest {
   }
 
   @Test
-  public void laVistaAdministrarTorneoDebeMostrarLosDatosDeEjemploCuandoNoHayTorneos()
-    throws Exception {
+  public void laVistaAdministrarTorneoDebeMostrarUnAvisoCuandoNoHayTorneos() throws Exception {
     this.mockMvc.perform(get("/administrarTorneo"))
       .andExpect(status().isOk())
       .andExpect(view().name("administrarTorneo"))
@@ -74,7 +73,7 @@ public class ControladorAdministrarTorneoTest {
       .andExpect(content().string(containsString("Jugadores por equipo")))
       .andExpect(content().string(containsString("Amarillas/Susp.")))
       .andExpect(content().string(containsString("Ida y vuelta")))
-      .andExpect(content().string(containsString("TorneoFutbolTotal")))
+      .andExpect(content().string(containsString("No hay torneos cargados todavia")))
       .andExpect(content().string(not(containsString("TorneoMegaFutbol"))));
   }
 

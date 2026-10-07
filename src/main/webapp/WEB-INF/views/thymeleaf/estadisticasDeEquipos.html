@@ -216,6 +216,45 @@
 
 
     /* =========================
+       SELECTOR DE METRICAS
+    ========================= */
+
+    .metricas-selector {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 14px 0 18px;
+    }
+
+    .metricas-selector a {
+        border: 2px solid #b6ff00;
+        color: #b6ff00;
+        background: #2c2c2c;
+        border-radius: 7px;
+        padding: 7px 13px;
+        font-size: 12px;
+        font-weight: bold;
+        text-decoration: none;
+    }
+
+    .metricas-selector a:hover {
+        background: #d9ff66;
+        color: #222;
+    }
+
+    .metricas-selector a.activa {
+        background: #b6ff00;
+        color: #222;
+    }
+
+    td.vacio {
+        padding: 22px;
+        color: #ccc;
+        font-size: 13px;
+    }
+
+
+    /* =========================
        ESTADISTICAS
     ========================= */
 
@@ -309,9 +348,42 @@
 
     <h1> ESTADISTICAS DE EQUIPOS</h1>
 
-</div>
+    <!-- SELECTOR DE ESTADISTICA (por defecto: Puntos) -->
+    <div class="metricas-selector">
+        <a th:each="metrica : ${metricas}"
+           th:href="@{/estadisticasDeEquipos(metrica=${metrica.key}, idTorneo=${idTorneo})}"
+           th:classappend="${metrica.key == metricaActual} ? 'activa'"
+           th:text="${metrica.value}">Puntos</a>
+    </div>
 
-<div class="contenedor">
+    <!-- RANKING DE EQUIPOS -->
+    <div class="tabla-container">
+        <table>
+            <thead>
+            <tr>
+                <th>POS</th>
+                <th>EQUIPO</th>
+                <th>PARTIDOS JUGADOS</th>
+                <th th:text="${metricaActualTitulo}">PUNTOS</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="fila : ${ranking}">
+                <td th:text="${fila.posicion}">1</td>
+                <td class="equipo" th:text="${fila.nombreEquipo}">Equipo</td>
+                <td th:text="${fila.partidosJugados}">0</td>
+                <td th:text="${fila.valor}">0</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(ranking)}">
+                <td class="vacio" colspan="4">
+                    No hay equipos inscriptos todavia en este torneo.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <br/>
 
     <a th:href="@{/lobby}">
         <div class="avanzar-fecha">

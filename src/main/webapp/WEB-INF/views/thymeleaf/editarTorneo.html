@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" th:href="@{/css/app.css}"/>
     <link rel="icon" type="image/png" th:href="@{/img/favicon.png?v=2}"/>
-    <title>Formulario Torneo</title>
+    <title>Editar Torneo</title>
     <style>
         * {
             box-sizing: border-box;
@@ -23,7 +23,6 @@
             align-items: center;
         }
 
-        /* CONTENEDOR PRINCIPAL DEL FORMULARIO */
         .form-card {
             width: 100%;
             max-width: 850px;
@@ -34,7 +33,6 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
 
-        /* ENCABEZADO */
         .form-header {
             background: #b6ff00;
             color: #111;
@@ -46,7 +44,6 @@
             letter-spacing: 0.5px;
         }
 
-        /* CUERPO DEL FORMULARIO */
         .form-body {
             padding: 25px;
         }
@@ -71,7 +68,6 @@
             color: #efefef;
         }
 
-        /* INPUTS DE TEXTO Y NÚMEROS */
         .input-text {
             background: white;
             border: none;
@@ -88,7 +84,6 @@
             text-align: center;
         }
 
-        /* RADIO BUTTON / CHECKBOX CUSTOM */
         .checkbox-custom {
             width: 22px;
             height: 22px;
@@ -96,7 +91,6 @@
             cursor: pointer;
         }
 
-        /* BOTONES */
         .form-actions {
             display: flex;
             flex-direction: column;
@@ -113,6 +107,8 @@
             font-weight: bold;
             cursor: pointer;
             transition: opacity 0.2s, transform 0.1s;
+            text-align: center;
+            text-decoration: none;
         }
 
         .btn:hover {
@@ -130,7 +126,18 @@
             color: #111;
         }
 
-        /* RESPONSIVE */
+        .error-form {
+            background: rgba(255, 51, 51, 0.15);
+            border: 1px solid #ff3333;
+            color: #ff6666;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
         @media (max-width: 700px) {
             .grid-inputs {
                 grid-template-columns: 1fr;
@@ -145,72 +152,57 @@
                 width: 100%;
             }
         }
-        /* MENSAJE DE ERROR (nombre de torneo repetido, etc.) */
-        .error-form {
-            background: rgba(255, 51, 51, 0.15);
-            border: 1px solid #ff3333;
-            color: #ff6666;
-            border-radius: 8px;
-            padding: 8px 12px;
-            font-size: 13px;
-            font-weight: bold;
-            text-align: center;
-            margin-bottom: 15px;
-        }
     </style>
 </head>
 <body>
 
-<form th:action="@{/crearTorneo}" method="post" class="form-card" th:object="${torneo}">
+<form th:action="@{/administrarTorneo/{idTorneo}/editar(idTorneo=${torneo.id})}" method="post"
+      class="form-card" th:object="${torneo}">
 
     <div class="form-header">
-        FORMULARIO TORNEO
+        EDITAR PARAMETROS DEL TORNEO
     </div>
 
     <div class="form-body">
         <div class="error-form" th:if="${error}" th:text="${error}">Error</div>
         <div class="grid-inputs">
 
-            <!-- Columna Izquierda -->
             <div class="form-group">
-                <label for="nombreTorneo">Ingresar nombre Torneo</label>
-                <input th:field="*{nombre}" type="text" id="nombreTorneo" name="nombreTorneo" class="input-text" placeholder="Ingrese un nombre descriptivo..." required>
+                <label for="nombreTorneo">Nombre del torneo</label>
+                <input th:field="*{nombre}" type="text" id="nombreTorneo" class="input-text" required>
             </div>
 
-            <!-- Columna Derecha -->
             <div class="form-group">
-                <label for="cantidadEquipos">Ingresar Cantidad de Equipos</label>
-                <input th:field="*{cantidadDeEquipos}" type="number" id="cantidadEquipos" name="cantidadEquipos" class="input-text input-short" min="2" required>
+                <label for="cantidadEquipos">Cantidad de equipos</label>
+                <input th:field="*{cantidadDeEquipos}" type="number" id="cantidadEquipos" class="input-text input-short" min="2" required>
             </div>
 
-            <!-- Columna Izquierda -->
             <div class="form-group">
-                <label for="maxJugadores">Ingresar Cantidad Máxima de jugadores por equipo</label>
-                <input th:field="*{cantidadMaxJugadores}" type="number" id="maxJugadores" name="maxJugadores" class="input-text input-short" min="2" required>
+                <label for="maxJugadores">Maximo de jugadores por equipo</label>
+                <input th:field="*{cantidadMaxJugadores}" type="number" id="maxJugadores" class="input-text input-short" min="2" required>
             </div>
 
-            <!-- Columna Derecha -->
             <div class="form-group">
-                <label for="minJugadores">Ingresar Cantidad Mínima de jugadores por equipo</label>
-                <input th:field="*{cantidadMinJugadores}"  type="number" id="minJugadores" name="minJugadores" class="input-text input-short" min="2" required>
+                <label for="minJugadores">Minimo de jugadores por equipo</label>
+                <input th:field="*{cantidadMinJugadores}" type="number" id="minJugadores" class="input-text input-short" min="2" required>
             </div>
 
-            <!-- Columna Izquierda -->
             <div class="form-group">
                 <label for="idaVuelta">Partidos de ida y vuelta</label>
-                <input th:field="*{idaYVuelta}" type="checkbox" id="idaVuelta" name="idaYVuelta" class="checkbox-custom">
+                <input th:field="*{idaYVuelta}" type="checkbox" id="idaVuelta" class="checkbox-custom">
             </div>
 
-            <!-- Columna Derecha -->
             <div class="form-group">
-                <label for="amarillasSuspension">Ingresar Cantidad De Amarillas para suspensión</label>
-                <input th:field="*{cantidadAmaSusp}" type="number" id="amarillasSuspension" name="amarillasSuspension" class="input-text input-short" min="0" required>
+                <label for="amarillasSuspension">Amarillas para suspension</label>
+                <input th:field="*{cantidadAmaSusp}" type="number" id="amarillasSuspension" class="input-text input-short" min="0" required>
             </div>
 
         </div>
 
         <div class="form-actions">
-            <button  type="submit" class="btn btn-verde">Agregar Equipos</button>
+            <button type="submit" class="btn btn-verde">Guardar cambios</button>
+            <a class="btn btn-blanco"
+               th:href="@{/administrarTorneo/{idTorneo}(idTorneo=${torneo.id})}">Cancelar</a>
         </div>
     </div>
 

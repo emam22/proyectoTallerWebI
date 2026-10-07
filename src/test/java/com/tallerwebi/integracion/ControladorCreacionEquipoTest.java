@@ -53,7 +53,9 @@ public class ControladorCreacionEquipoTest {
   @Test
   public void debeRetornarLaVistaCreacionEquipoCuandoSeNavegaACreacionEquipo() throws Exception {
     MvcResult result =
-      this.mockMvc.perform(get("/creacion-equipo")).andExpect(status().isOk()).andReturn();
+      this.mockMvc.perform(get("/creacion-equipo").param("idTorneo", "1"))
+        .andExpect(status().isOk())
+        .andReturn();
 
     ModelAndView modelAndView = result.getModelAndView();
     assert modelAndView != null;
@@ -62,17 +64,17 @@ public class ControladorCreacionEquipoTest {
 
   @Test
   public void laVistaCreacionEquipoDebeEnviarLosDatosALaAccionGuardarEquipo() throws Exception {
-    this.mockMvc.perform(get("/creacion-equipo"))
+    this.mockMvc.perform(get("/creacion-equipo").param("idTorneo", "1"))
       .andExpect(status().isOk())
       .andExpect(view().name("creacion-equipo"))
       .andExpect(content().string(containsString("CREACIÓN EQUIPO")))
       .andExpect(content().string(containsString("/guardarEquipo")))
       .andExpect(content().string(containsString("name=\"nombreEquipo\"")))
       .andExpect(content().string(containsString("name=\"escudoEquipo\"")))
-      .andExpect(content().string(containsString("name=\"colorTitular1\"")))
-      .andExpect(content().string(containsString("name=\"colorTitular2\"")))
-      .andExpect(content().string(containsString("name=\"colorSuplente1\"")))
-      .andExpect(content().string(containsString("name=\"colorSuplente2\"")))
+      .andExpect(content().string(containsString("name=\"colorLocal1\"")))
+      .andExpect(content().string(containsString("name=\"colorLocal2\"")))
+      .andExpect(content().string(containsString("name=\"colorVisitante1\"")))
+      .andExpect(content().string(containsString("name=\"colorVisitante2\"")))
       .andExpect(content().string(containsString("INGRESAR JUGADORES")))
       .andExpect(content().string(containsString("Mín. 11")))
       .andExpect(content().string(containsString("Nro. Dorsal")))
@@ -95,7 +97,7 @@ public class ControladorCreacionEquipoTest {
     this.servicioTorneo.registrarTorneo(torneo);
 
     // ejecucion y validacion
-    this.mockMvc.perform(get("/creacion-equipo"))
+    this.mockMvc.perform(get("/creacion-equipo").param("idTorneo", torneo.getId().toString()))
       .andExpect(status().isOk())
       .andExpect(view().name("creacion-equipo"))
       .andExpect(content().string(containsString("Mín. 10")))
