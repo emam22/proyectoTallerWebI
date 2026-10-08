@@ -2,6 +2,7 @@ package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.excepcion.EquipoExistente;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -51,5 +52,11 @@ public class ServicioEquipoTorneoImpl implements ServicioEquipoTorneo {
   @Override
   public int contarEquiposPorTorneo(Long idTorneo) {
     return repositorioEquipoTorneo.contarEquiposPorTorneo(idTorneo);
+  }
+
+  @Override
+  public List<EquipoTorneo> obtenerEstadisticas(Long idTorneo) {
+    List<EquipoTorneo> estadisticas = repositorioEquipoTorneo.obtenerTablaPosiciones(idTorneo);
+    return estadisticas;
   }
 }
