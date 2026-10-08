@@ -52,7 +52,7 @@ public class ControladorLogin {
       return new ModelAndView("redirect:/lobbyAdmin");
     } else if (usuarioBuscado != null && "usuario".equalsIgnoreCase(rol)) {
       request.getSession().setAttribute("ROL", rol);
-      return new ModelAndView("redirect:/lobby");
+      return new ModelAndView("redirect:/elegirTorneo");
     } else {
       Map<String, Object> model = new ModelMap();
       model.put("error", "Usuario o clave incorrecta");

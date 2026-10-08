@@ -484,7 +484,7 @@
         </div>
 
         <!-- TABLA (th:href="@{/tablaEquipos}") -->
-        <a th:href="@{/tablaEquipos}">
+        <a th:href="@{/tablaEquipos(idTorneo=${idTorneoActual})}">
             <div class="panel-tabla">
                 <table>
                     <thead>
@@ -502,39 +502,18 @@
                     </thead>
                     <tbody>
                     <!-- Iteración dinámica Thymeleaf -->
-                    <tr th:each="fila, iter : ${tablaPosiciones}">
+                    <tr th:each="fila, iter : ${tablaPosiciones}" th:if="${iter.count le 8}">
                         <td class="posicion" th:text="${iter.count}">1</td>
-                        <td class="equipo" th:text="${fila.nombreEquipo}">Defensa y Justicia</td>
-                        <td th:text="${fila.pj}">10</td>
-                        <td th:text="${fila.pg}">5</td>
-                        <td th:text="${fila.pe}">2</td>
-                        <td th:text="${fila.pp}">3</td>
-                        <td th:text="${fila.gf}">13</td>
-                        <td th:text="${fila.gc}">7</td>
+                        <td class="equipo" th:text="${fila.equipo.nombre}">Defensa y Justicia</td>
+                        <td th:text="${fila.partidosJugados}">10</td>
+                        <td th:text="${fila.partidosGanados}">5</td>
+                        <td th:text="${fila.partidosEmpatados}">2</td>
+                        <td th:text="${fila.partidoPerdidos}">3</td>
+                        <td th:text="${fila.golesAFavor}">13</td>
+                        <td th:text="${fila.golesEnContra}">7</td>
                         <td class="pts" th:text="${fila.puntos}">17</td>
                     </tr>
 
-                    <!-- Filas de muestra estáticas si tablaPosiciones es null -->
-                    <tr th:if="${tablaPosiciones == null}">
-                        <td class="posicion">1</td>
-                        <td class="equipo">Defensa y<br>Justicia</td>
-                        <td>10</td><td>5</td><td>2</td><td>3</td><td>13</td><td>7</td><td class="pts">17</td>
-                    </tr>
-                    <tr th:if="${tablaPosiciones == null}">
-                        <td class="posicion">2</td>
-                        <td class="equipo">Barracas<br>Central</td>
-                        <td>10</td><td>5</td><td>1</td><td>4</td><td>9</td><td>10</td><td class="pts">16</td>
-                    </tr>
-                    <tr th:if="${tablaPosiciones == null}">
-                        <td class="posicion">3</td>
-                        <td class="equipo">Boca<br>Juniors</td>
-                        <td>10</td><td>5</td><td>1</td><td>4</td><td>9</td><td>10</td><td class="pts">16</td>
-                    </tr>
-                    <tr th:if="${tablaPosiciones == null}">
-                        <td class="posicion">4</td>
-                        <td class="equipo">Lanús</td>
-                        <td>10</td><td>5</td><td>1</td><td>4</td><td>9</td><td>10</td><td class="pts">16</td>
-                    </tr>
                     </tbody>
                 </table>
             </div>

@@ -114,7 +114,6 @@ public class RepositorioEquipoTorneoTest {
   @Transactional
   @Rollback
   public void deberiaRetornarTrueSiElEquipoEstaInscriptoEnElTorneo() {
-
     // preparacion
     Torneo torneo = new Torneo();
     torneo.setNombre("MegaFutbol");
@@ -136,18 +135,18 @@ public class RepositorioEquipoTorneoTest {
 
     // ejecucion
     String hql =
-            """
-            SELECT COUNT(et)
-            FROM EquipoTorneo et
-            WHERE et.equipo.id = :idEquipo
-            AND et.torneo.id = :idTorneo
-            """;
+      """
+      SELECT COUNT(et)
+      FROM EquipoTorneo et
+      WHERE et.equipo.id = :idEquipo
+      AND et.torneo.id = :idTorneo
+      """;
 
     Long cantidad = (Long) this.sessionFactory.getCurrentSession()
-            .createQuery(hql)
-            .setParameter("idEquipo", idEquipo)
-            .setParameter("idTorneo", idTorneo)
-            .uniqueResult();
+      .createQuery(hql)
+      .setParameter("idEquipo", idEquipo)
+      .setParameter("idTorneo", idTorneo)
+      .uniqueResult();
 
     boolean existe = cantidad > 0;
 
@@ -159,7 +158,6 @@ public class RepositorioEquipoTorneoTest {
   @Transactional
   @Rollback
   public void deberiaRetornarFalseSiElEquipoEstaEnOtroTorneo() {
-
     // preparación
     Torneo torneo1 = new Torneo();
     torneo1.setNombre("MegaFutbol");
@@ -185,25 +183,22 @@ public class RepositorioEquipoTorneoTest {
 
     // ejecucion
     String hql =
-            """
-            SELECT COUNT(et)
-            FROM EquipoTorneo et
-            WHERE et.equipo.id = :idEquipo
-            AND et.torneo.id = :idTorneo
-            """;
+      """
+      SELECT COUNT(et)
+      FROM EquipoTorneo et
+      WHERE et.equipo.id = :idEquipo
+      AND et.torneo.id = :idTorneo
+      """;
 
     Long cantidad = (Long) this.sessionFactory.getCurrentSession()
-            .createQuery(hql)
-            .setParameter("idEquipo", idEquipo)
-            .setParameter("idTorneo", idTorneo2)
-            .uniqueResult();
+      .createQuery(hql)
+      .setParameter("idEquipo", idEquipo)
+      .setParameter("idTorneo", idTorneo2)
+      .uniqueResult();
 
     boolean existe = cantidad > 0;
 
     // verificacion
     assertThat(existe, is(false));
   }
-
 }
-
-

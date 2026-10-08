@@ -93,25 +93,19 @@ public class ServicioEquipoTorneoTest {
     Torneo torneo = new Torneo();
     torneo.setId(10L);
 
-    when(this.repositorioEquipoTorneoMock
-            .existeEquipoEnTorneo(5L, 10L))
-            .thenReturn(false);
+    when(this.repositorioEquipoTorneoMock.existeEquipoEnTorneo(5L, 10L)).thenReturn(false);
 
     // ejecucion
     this.servicioEquipoTorneo.inscribirEquipoExistente(equipo, torneo);
 
     // verificacion
-    verify(this.repositorioEquipoTorneoMock, times(1))
-            .existeEquipoEnTorneo(5L, 10L);
+    verify(this.repositorioEquipoTorneoMock, times(1)).existeEquipoEnTorneo(5L, 10L);
 
-    verify(this.repositorioEquipoTorneoMock, times(1))
-            .guardar(any(EquipoTorneo.class));
+    verify(this.repositorioEquipoTorneoMock, times(1)).guardar(any(EquipoTorneo.class));
   }
 
   @Test
-  public void deberiaLanzarExcepcionSiElEquipoYaEstaInscripto()
-          throws EquipoYaInscripto {
-
+  public void deberiaLanzarExcepcionSiElEquipoYaEstaInscripto() throws EquipoYaInscripto {
     //preparacion
     Equipo equipo = new Equipo();
     equipo.setId(5L);
@@ -119,27 +113,16 @@ public class ServicioEquipoTorneoTest {
     Torneo torneo = new Torneo();
     torneo.setId(10L);
 
-    when(this.repositorioEquipoTorneoMock
-            .existeEquipoEnTorneo(5L, 10L))
-            .thenReturn(true);
+    when(this.repositorioEquipoTorneoMock.existeEquipoEnTorneo(5L, 10L)).thenReturn(true);
 
     //ejecucion y verificacion
     assertThrows(
-            EquipoYaInscripto.class,
-            () -> this.servicioEquipoTorneo.inscribirEquipoExistente(
-                    equipo,
-                    torneo
-            )
+      EquipoYaInscripto.class,
+      () -> this.servicioEquipoTorneo.inscribirEquipoExistente(equipo, torneo)
     );
 
-    verify(this.repositorioEquipoTorneoMock, times(1))
-            .existeEquipoEnTorneo(5L, 10L);
+    verify(this.repositorioEquipoTorneoMock, times(1)).existeEquipoEnTorneo(5L, 10L);
 
-    verify(this.repositorioEquipoTorneoMock, times(0))
-            .guardar(any(EquipoTorneo.class));
+    verify(this.repositorioEquipoTorneoMock, times(0)).guardar(any(EquipoTorneo.class));
   }
-
-
-
-
 }

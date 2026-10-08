@@ -2,7 +2,9 @@ package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.EquipoTorneo;
 import com.tallerwebi.dominio.RepositorioEquipoTorneo;
+import java.util.List;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -52,5 +54,22 @@ public class RepositorioEquipoTorneoImpl implements RepositorioEquipoTorneo {
       .uniqueResult();
 
     return cantidad > 0;
+  }
+
+  @Override
+  public List<EquipoTorneo> obtenerTablaPosiciones(Long idTorneo) {
+    List<EquipoTorneo> estadisticas = sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "select et from EquipoTorneo et " +
+        "where et.torneo.id = :idTorneo " +
+        "order by et.puntos desc, " +
+        "(et.golesAFavor - et.golesEnContra) desc, " +
+        "et.golesAFavor DESC",
+        EquipoTorneo.class
+      )
+      .setParameter("idTorneo", idTorneo)
+      .getResultList();
+    return estadisticas;
   }
 }
