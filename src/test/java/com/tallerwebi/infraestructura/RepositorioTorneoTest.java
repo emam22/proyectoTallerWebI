@@ -7,6 +7,7 @@ import com.tallerwebi.dominio.RepositorioTorneo;
 import com.tallerwebi.dominio.Torneo;
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -102,5 +103,39 @@ public class RepositorioTorneoTest {
 
     // validación
     assertThat(torneoObtenido, is(nullValue()));
+  }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void deberiaListarLosTorneosGuardados() {
+    // preparacion
+    Torneo torneo1 = new Torneo();
+    torneo1.setNombre("Campito");
+
+    Torneo torneo2 = new Torneo();
+    torneo2.setNombre("MegaFutbol");
+
+    sessionFactory.getCurrentSession().persist(torneo1);
+
+    sessionFactory.getCurrentSession().persist(torneo2);
+
+    // ejecucion
+    List<Torneo> torneos = repositorioTorneo.listar();
+
+    // verificacion
+    assertThat(torneos, hasSize(2));
+    assertThat(torneos, hasItems(torneo1, torneo2));
+  }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void deberiaRetornarListaVaciaSiNoHayTorneos() {
+    // ejecucion
+    List<Torneo> torneos = repositorioTorneo.listar();
+
+    // verificacion
+    assertThat(torneos, is(empty()));
   }
 }

@@ -6,6 +6,6 @@ import java.util.List;
 public interface ServicioEquipo {
   Equipo consultarEquipoPorId(Long id);
   Equipo consultarEquipo(String nombre);
-  void registrarEquipo(Equipo equipo);
+  void registrarEquipo(Equipo equipo) throws EquipoExistente;
   List<Equipo> obtenerEquipos();
 }

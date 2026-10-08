@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.excepcion.EquipoExistente;
+import com.tallerwebi.dominio.excepcion.TorneoExistente;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,13 @@ public class ServicioEquipoImpl implements ServicioEquipo {
   }
 
   @Override
-  public void registrarEquipo(Equipo equipo) {
+  public void registrarEquipo(Equipo equipo) throws EquipoExistente {
+    Equipo equipoEncontrado = repositorioEquipo.buscarEquipo(equipo.getNombre());
+
+    if (equipoEncontrado != null) {
+      throw new EquipoExistente();
+    }
+
     repositorioEquipo.guardar(equipo);
   }
 
