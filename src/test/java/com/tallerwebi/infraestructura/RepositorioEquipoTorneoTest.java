@@ -3,6 +3,7 @@ package com.tallerwebi.infraestructura;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
+import com.tallerwebi.dominio.Equipo;
 import com.tallerwebi.dominio.EquipoTorneo;
 import com.tallerwebi.dominio.RepositorioEquipoTorneo;
 import com.tallerwebi.dominio.Torneo;
@@ -91,10 +92,10 @@ public class RepositorioEquipoTorneoTest {
   @Transactional
   @Rollback
   public void deberiaRetornarCeroSiElTorneoNoTieneEquipos() {
-    // Preparación
+    // preparacion
     Long idTorneo = 999999L;
 
-    // Ejecución
+    // ejecucion
     int cantidad = sessionFactory
       .getCurrentSession()
       .createQuery(
@@ -105,7 +106,104 @@ public class RepositorioEquipoTorneoTest {
       .uniqueResult()
       .intValue();
 
-    // Verificación
+    // verificacion
     assertThat(cantidad, is(equalTo(0)));
   }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void deberiaRetornarTrueSiElEquipoEstaInscriptoEnElTorneo() {
+
+    // preparacion
+    Torneo torneo = new Torneo();
+    torneo.setNombre("MegaFutbol");
+
+    Equipo equipo = new Equipo();
+    equipo.setNombre("Los Pumas");
+
+    sessionFactory.getCurrentSession().persist(torneo);
+    sessionFactory.getCurrentSession().persist(equipo);
+
+    EquipoTorneo equipoTorneo = new EquipoTorneo();
+    equipoTorneo.setEquipo(equipo);
+    equipoTorneo.setTorneo(torneo);
+
+    sessionFactory.getCurrentSession().persist(equipoTorneo);
+
+    Long idEquipo = equipo.getId();
+    Long idTorneo = torneo.getId();
+
+    // ejecucion
+    String hql =
+            """
+            SELECT COUNT(et)
+            FROM EquipoTorneo et
+            WHERE et.equipo.id = :idEquipo
+            AND et.torneo.id = :idTorneo
+            """;
+
+    Long cantidad = (Long) this.sessionFactory.getCurrentSession()
+            .createQuery(hql)
+            .setParameter("idEquipo", idEquipo)
+            .setParameter("idTorneo", idTorneo)
+            .uniqueResult();
+
+    boolean existe = cantidad > 0;
+
+    // verificacion
+    assertThat(existe, is(true));
+  }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void deberiaRetornarFalseSiElEquipoEstaEnOtroTorneo() {
+
+    // preparación
+    Torneo torneo1 = new Torneo();
+    torneo1.setNombre("MegaFutbol");
+
+    Torneo torneo2 = new Torneo();
+    torneo2.setNombre("SuperLiga");
+
+    Equipo equipo = new Equipo();
+    equipo.setNombre("Los Pumas");
+
+    sessionFactory.getCurrentSession().persist(torneo1);
+    sessionFactory.getCurrentSession().persist(torneo2);
+    sessionFactory.getCurrentSession().persist(equipo);
+
+    EquipoTorneo equipoTorneo = new EquipoTorneo();
+    equipoTorneo.setEquipo(equipo);
+    equipoTorneo.setTorneo(torneo1);
+
+    sessionFactory.getCurrentSession().persist(equipoTorneo);
+
+    Long idEquipo = equipo.getId();
+    Long idTorneo2 = torneo2.getId();
+
+    // ejecucion
+    String hql =
+            """
+            SELECT COUNT(et)
+            FROM EquipoTorneo et
+            WHERE et.equipo.id = :idEquipo
+            AND et.torneo.id = :idTorneo
+            """;
+
+    Long cantidad = (Long) this.sessionFactory.getCurrentSession()
+            .createQuery(hql)
+            .setParameter("idEquipo", idEquipo)
+            .setParameter("idTorneo", idTorneo2)
+            .uniqueResult();
+
+    boolean existe = cantidad > 0;
+
+    // verificacion
+    assertThat(existe, is(false));
+  }
+
 }
+
+

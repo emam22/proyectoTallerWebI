@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.excepcion.EquipoExistente;
+import com.tallerwebi.dominio.excepcion.EquipoYaInscripto;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,5 +52,30 @@ public class ServicioEquipoTorneoImpl implements ServicioEquipoTorneo {
   @Override
   public int contarEquiposPorTorneo(Long idTorneo) {
     return repositorioEquipoTorneo.contarEquiposPorTorneo(idTorneo);
+  }
+
+  @Override
+  public void inscribirEquipoExistente(Equipo equipo, Torneo torneo) throws EquipoYaInscripto {
+    boolean yaInscripto =
+      this.repositorioEquipoTorneo.existeEquipoEnTorneo(equipo.getId(), torneo.getId());
+
+    if (yaInscripto) {
+      throw new EquipoYaInscripto();
+    }
+
+    EquipoTorneo equipoTorneo = new EquipoTorneo();
+
+    equipoTorneo.setEquipo(equipo);
+    equipoTorneo.setTorneo(torneo);
+
+    equipoTorneo.setPuntos(0);
+    equipoTorneo.setPartidosJugados(0);
+    equipoTorneo.setPartidosGanados(0);
+    equipoTorneo.setPartidoPerdidos(0);
+    equipoTorneo.setPartidosEmpatados(0);
+    equipoTorneo.setGolesAFavor(0);
+    equipoTorneo.setGolesEnContra(0);
+
+    this.repositorioEquipoTorneo.guardar(equipoTorneo);
   }
 }

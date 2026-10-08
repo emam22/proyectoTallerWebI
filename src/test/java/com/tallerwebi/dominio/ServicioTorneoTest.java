@@ -1,18 +1,15 @@
 package com.tallerwebi.dominio;
 
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
-
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-
 import java.util.Arrays;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class ServicioTorneoTest {
 
@@ -92,7 +89,6 @@ public class ServicioTorneoTest {
 
   @Test
   public void obtenerTorneosDeberiaRetornarLosTorneos() {
-
     // preparacion
     Torneo torneo1 = new Torneo();
     torneo1.setNombre("Campito");
@@ -102,8 +98,7 @@ public class ServicioTorneoTest {
 
     List<Torneo> torneosEsperados = Arrays.asList(torneo1, torneo2);
 
-    when(repositorioTorneoMock.listar())
-            .thenReturn(torneosEsperados);
+    when(repositorioTorneoMock.listar()).thenReturn(torneosEsperados);
 
     // ejecucion
     List<Torneo> torneosObtenidos = servicioTorneo.obtenerTorneos();
@@ -115,10 +110,8 @@ public class ServicioTorneoTest {
 
   @Test
   public void obtenerTorneosSiNoHayTorneosDeberiaRetornarListaVacia() {
-
     // preparacion
-    when(repositorioTorneoMock.listar())
-            .thenReturn(Arrays.asList());
+    when(repositorioTorneoMock.listar()).thenReturn(Arrays.asList());
 
     // ejecucion
     List<Torneo> torneosObtenidos = servicioTorneo.obtenerTorneos();
@@ -128,5 +121,4 @@ public class ServicioTorneoTest {
 
     verify(repositorioTorneoMock, times(1)).listar();
   }
-
 }

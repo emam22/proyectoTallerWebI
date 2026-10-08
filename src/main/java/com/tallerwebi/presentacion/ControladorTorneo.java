@@ -2,6 +2,7 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.*;
 import com.tallerwebi.dominio.excepcion.EquipoExistente;
+import com.tallerwebi.dominio.excepcion.EquipoYaInscripto;
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,7 @@ public class ControladorTorneo {
   private static final String TORNEO = "torneo";
   private static final String ID_TORNEO = "idTorneo";
   private static final String REDIRECT_CREACION_EQUIPO = "redirect:/creacion-equipo?idTorneo=";
+  private static final String ERROR = "error";
 
   @Autowired
   public ControladorTorneo(
@@ -53,11 +55,11 @@ public class ControladorTorneo {
     try {
       servicioTorneo.registrarTorneo(torneo);
     } catch (TorneoExistente e) {
-      redirectAttributes.addFlashAttribute("error", "Ya existe un torneo con este nombre");
+      redirectAttributes.addFlashAttribute(ERROR, "Ya existe un torneo con este nombre");
 
       return new ModelAndView("redirect:/formulario-torneo");
     } catch (Exception e) {
-      redirectAttributes.addFlashAttribute("error", "Error al crear el torneo");
+      redirectAttributes.addFlashAttribute(ERROR, "Error al crear el torneo");
 
       return new ModelAndView("redirect:/formulario-torneo");
     }
@@ -126,7 +128,7 @@ public class ControladorTorneo {
     try {
       servicioEquipoTorneo.crearEquipoEInscribirlo(equipo, torneo);
     } catch (EquipoExistente e) {
-      redirectAttributes.addFlashAttribute("error", "Ya existe un equipo con ese nombre");
+      redirectAttributes.addFlashAttribute(ERROR, "Ya existe un equipo con ese nombre");
 
       return new ModelAndView(REDIRECT_CREACION_EQUIPO + idTorneo);
     }
@@ -144,6 +146,24 @@ public class ControladorTorneo {
     model.put(ID_TORNEO, idTorneo);
 
     return new ModelAndView("lista-equipos", model);
+  }
+
+  @RequestMapping(path = "/cargar-equipo-existente", method = RequestMethod.POST)
+  public ModelAndView cargarEquipoExistente(
+    @RequestParam("idEquipo") Long idEquipo,
+    @RequestParam("idTorneo") Long idTorneo,
+    RedirectAttributes redirectAttributes
+  ) {
+    Equipo equipo = this.servicioEquipo.consultarEquipoPorId(idEquipo);
+    Torneo torneo = this.servicioTorneo.consultarTorneoPorId(idTorneo);
+
+    try {
+      this.servicioEquipoTorneo.inscribirEquipoExistente(equipo, torneo);
+    } catch (EquipoYaInscripto e) {
+      redirectAttributes.addFlashAttribute(ERROR, "El equipo ya está inscripto en este torneo");
+    }
+
+    return new ModelAndView(REDIRECT_CREACION_EQUIPO + idTorneo);
   }
 
   @RequestMapping(path = "/finalizarTorneo", method = RequestMethod.POST)

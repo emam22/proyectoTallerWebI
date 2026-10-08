@@ -6,11 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.excepcion.EquipoExistente;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.Arrays;
-import java.util.List;
 public class ServicioEquipoTest {
 
   private ServicioEquipo servicioEquipo;
@@ -65,10 +65,8 @@ public class ServicioEquipoTest {
     verify(this.repositorioEquipoMock, times(1)).buscarPorId(id);
   }
 
-
   @Test
   public void obtenerEquiposDeberiaRetornarLosEquipos() {
-
     // preparacion
     Equipo equipo1 = new Equipo();
     equipo1.setNombre("Boca");
@@ -78,8 +76,7 @@ public class ServicioEquipoTest {
 
     List<Equipo> equiposEsperados = Arrays.asList(equipo1, equipo2);
 
-    when(repositorioEquipoMock.listar())
-            .thenReturn(equiposEsperados);
+    when(repositorioEquipoMock.listar()).thenReturn(equiposEsperados);
 
     // ejecucion
     List<Equipo> equiposObtenidos = servicioEquipo.obtenerEquipos();
@@ -91,10 +88,8 @@ public class ServicioEquipoTest {
 
   @Test
   public void obtenerEquiposSiNoHayEquiposDeberiaRetornarListaVacia() {
-
     // preparacion
-    when(repositorioEquipoMock.listar())
-            .thenReturn(Arrays.asList());
+    when(repositorioEquipoMock.listar()).thenReturn(Arrays.asList());
 
     // ejecucion
     List<Equipo> equiposObtenidos = servicioEquipo.obtenerEquipos();
@@ -104,5 +99,4 @@ public class ServicioEquipoTest {
 
     verify(repositorioEquipoMock, times(1)).listar();
   }
-
 }
