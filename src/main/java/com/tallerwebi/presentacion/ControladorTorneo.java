@@ -52,6 +52,15 @@ public class ControladorTorneo {
     @ModelAttribute("torneo") Torneo torneo,
     RedirectAttributes redirectAttributes
   ) {
+    if (torneo.getCantidadMaxJugadores() <= torneo.getCantidadMinJugadores()) {
+      redirectAttributes.addFlashAttribute(
+        ERROR,
+        "La cantidad máxima de jugadores debe ser mayor que la mínima"
+      );
+
+      return new ModelAndView("redirect:/formulario-torneo");
+    }
+
     try {
       servicioTorneo.registrarTorneo(torneo);
     } catch (TorneoExistente e) {
@@ -72,24 +81,10 @@ public class ControladorTorneo {
     Map<String, Object> model = new HashMap<>();
     Torneo torneoEnCurso = servicioTorneo.consultarTorneoPorId(id);
 
-    int minJugadores = 11;
-    int maxJugadores = 23;
-
-    if (torneoEnCurso != null) {
-      if (torneoEnCurso.getCantidadMinJugadores() != null) {
-        minJugadores = torneoEnCurso.getCantidadMinJugadores();
-      }
-      if (torneoEnCurso.getCantidadMaxJugadores() != null) {
-        maxJugadores = torneoEnCurso.getCantidadMaxJugadores();
-      }
-    }
-
     int cantidadEquiposActuales = servicioEquipoTorneo.contarEquiposPorTorneo(id);
 
     int cantidadEquiposNecesarios = torneoEnCurso.getCantidadDeEquipos();
 
-    model.put("minJugadores", minJugadores);
-    model.put("maxJugadores", maxJugadores);
     model.put(ID_TORNEO, id);
     model.put("cantidadEquiposActuales", cantidadEquiposActuales);
     model.put("cantidadEquiposNecesarios", cantidadEquiposNecesarios);

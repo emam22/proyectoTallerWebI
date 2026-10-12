@@ -9,6 +9,7 @@ import com.tallerwebi.dominio.RepositorioEquipoTorneo;
 import com.tallerwebi.dominio.Torneo;
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
