@@ -7,10 +7,8 @@ import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.mockito.Mockito.*;
 
-import com.tallerwebi.dominio.ServicioEquipo;
-import com.tallerwebi.dominio.ServicioEquipoTorneo;
-import com.tallerwebi.dominio.ServicioTorneo;
-import com.tallerwebi.dominio.Torneo;
+import com.tallerwebi.dominio.*;
+import com.tallerwebi.dominio.excepcion.EquipoYaInscripto;
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -166,4 +164,110 @@ public class ControladorTorneoTest {
     // validacion
     verify(servicioTorneoMock, times(1)).consultarTorneoPorId(8L);
   }
+
+ @Test
+  public void guardarEquipoDeberiaRegistrarElEquipoYRedirigir()
+          throws Exception {
+
+    // preparacion
+    Long idTorneo = 5L;
+
+    Torneo torneo = new Torneo();
+    torneo.setId(idTorneo);
+    torneo.setCantidadDeEquipos(4);
+
+    when(servicioTorneoMock.consultarTorneoPorId(idTorneo))
+            .thenReturn(torneo);
+
+    when(servicioEquipoTorneoMock.contarEquiposPorTorneo(idTorneo))
+            .thenReturn(0);
+
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    // ejecucion
+    ModelAndView mav = controladorTorneo.guardarEquipo(
+            idTorneo,
+            "Los Leones",
+            "#ff0000",
+            "#ffffff",
+            "#0000ff",
+            "#ffffff",
+            redirectAttributes
+    );
+
+    // validacion
+    assertThat(
+            mav.getViewName(),
+            equalTo("redirect:/creacion-equipo?idTorneo=5")
+    );
+
+    verify(servicioEquipoTorneoMock, times(1))
+            .crearEquipoEInscribirlo(any(Equipo.class), eq(torneo));
+  }
+
+  @Test
+  public void listarEquiposDeberiaMostrarLaVistaConLosEquiposYElIdDelTorneo() {
+    // preparacion
+    Long idTorneo = 5L;
+
+    List<Equipo> equipos = List.of(
+            new Equipo(),
+            new Equipo()
+    );
+
+    when(servicioEquipoMock.obtenerEquipos()).thenReturn(equipos);
+
+    // ejecucion
+    ModelAndView mav = controladorTorneo.listarEquipos(idTorneo);
+
+    // validacion
+    assertThat(mav.getViewName(), equalTo("lista-equipos"));
+
+    assertThat(mav.getModel().get("idTorneo"), equalTo(idTorneo));
+
+    assertThat(mav.getModel().get("equipos"), equalTo(equipos));
+
+    verify(servicioEquipoMock, times(1)).obtenerEquipos();
+  }
+
+  @Test
+  public void cargarEquipoExistenteDeberiaInscribirEquipoYRedirigir() throws EquipoYaInscripto {
+    // preparacion
+    Long idEquipo = 2L;
+    Long idTorneo = 5L;
+
+    Equipo equipo = new Equipo();
+    Torneo torneo = new Torneo();
+
+    when(servicioEquipoMock.consultarEquipoPorId(idEquipo))
+            .thenReturn(equipo);
+
+    when(servicioTorneoMock.consultarTorneoPorId(idTorneo))
+            .thenReturn(torneo);
+
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    // ejecucion
+    ModelAndView mav = controladorTorneo.cargarEquipoExistente(
+            idEquipo,
+            idTorneo,
+            redirectAttributes
+    );
+
+    // validacion
+    assertThat(
+            mav.getViewName(),
+            equalTo("redirect:/creacion-equipo?idTorneo=5")
+    );
+
+    verify(servicioEquipoMock, times(1))
+            .consultarEquipoPorId(idEquipo);
+
+    verify(servicioTorneoMock, times(1))
+            .consultarTorneoPorId(idTorneo);
+
+    verify(servicioEquipoTorneoMock, times(1))
+            .inscribirEquipoExistente(equipo, torneo);
+  }
+
 }

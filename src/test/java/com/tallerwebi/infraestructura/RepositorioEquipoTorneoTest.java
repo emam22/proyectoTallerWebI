@@ -258,29 +258,25 @@ public class RepositorioEquipoTorneoTest {
 
     // ejecucion
     List<EquipoTorneo> resultado = sessionFactory
-            .getCurrentSession()
-            .createQuery(
-                    "select et from EquipoTorneo et " +
-                            "where et.torneo.id = :idTorneo " +
-                            "order by et.puntos desc, " +
-                            "(et.golesAFavor - et.golesEnContra) desc, " +
-                            "et.golesAFavor DESC",
-                    EquipoTorneo.class
-            )
-            .setParameter("idTorneo", idTorneo)
-            .getResultList();
+      .getCurrentSession()
+      .createQuery(
+        "select et from EquipoTorneo et " +
+        "where et.torneo.id = :idTorneo " +
+        "order by et.puntos desc, " +
+        "(et.golesAFavor - et.golesEnContra) desc, " +
+        "et.golesAFavor DESC",
+        EquipoTorneo.class
+      )
+      .setParameter("idTorneo", idTorneo)
+      .getResultList();
 
     // verificacion
     assertThat(resultado.size(), is(3));
 
-    assertThat(resultado.get(0).getEquipo().getNombre(),
-            equalTo("Equipo B"));
+    assertThat(resultado.get(0).getEquipo().getNombre(), equalTo("Equipo B"));
 
-    assertThat(resultado.get(1).getEquipo().getNombre(),
-            equalTo("Equipo C"));
+    assertThat(resultado.get(1).getEquipo().getNombre(), equalTo("Equipo C"));
 
-    assertThat(resultado.get(2).getEquipo().getNombre(),
-            equalTo("Equipo A"));
+    assertThat(resultado.get(2).getEquipo().getNombre(), equalTo("Equipo A"));
   }
-
 }

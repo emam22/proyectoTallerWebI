@@ -142,16 +142,14 @@ public class ServicioEquipoTorneoTest {
     estadisticasEsperadas.add(et2);
 
     when(repositorioEquipoTorneoMock.obtenerTablaPosiciones(idTorneo))
-            .thenReturn(estadisticasEsperadas);
+      .thenReturn(estadisticasEsperadas);
 
     // ejecucion
-    List<EquipoTorneo> resultado =
-            servicioEquipoTorneo.obtenerEstadisticas(idTorneo);
+    List<EquipoTorneo> resultado = servicioEquipoTorneo.obtenerEstadisticas(idTorneo);
 
     // verificacion
     assertThat(resultado, is(estadisticasEsperadas));
 
     verify(repositorioEquipoTorneoMock).obtenerTablaPosiciones(idTorneo);
   }
-
 }
