@@ -7,6 +7,10 @@ import com.tallerwebi.dominio.excepcion.TorneoExistente;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -28,6 +32,8 @@ public class ControladorTorneo {
   private static final String ID_TORNEO = "idTorneo";
   private static final String REDIRECT_CREACION_EQUIPO = "redirect:/creacion-equipo?idTorneo=";
   private static final String ERROR = "error";
+
+  private static final Logger LOGGER = Logger.getLogger(ControladorTorneo.class.getName());
 
   @Autowired
   public ControladorTorneo(
@@ -145,8 +151,8 @@ public class ControladorTorneo {
 
   @RequestMapping(path = "/cargar-equipo-existente", method = RequestMethod.POST)
   public ModelAndView cargarEquipoExistente(
-    @RequestParam("idEquipo") Long idEquipo,
-    @RequestParam("idTorneo") Long idTorneo,
+    @RequestParam(ID_TORNEO) Long idEquipo,
+    @RequestParam(ID_TORNEO) Long idTorneo,
     RedirectAttributes redirectAttributes
   ) {
     Equipo equipo = this.servicioEquipo.consultarEquipoPorId(idEquipo);
@@ -162,6 +168,63 @@ public class ControladorTorneo {
   }
 
   @RequestMapping(path = "/finalizarTorneo", method = RequestMethod.POST)
+  public ModelAndView finalizarTorneo(
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    RedirectAttributes redirectAttributes
+  ) {
+    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+
+    if (torneo == null) {
+      redirectAttributes.addFlashAttribute("error", "No se encontró el torneo.");
+      return new ModelAndView("redirect:/lobbyAdmin");
+    }
+
+    int cantidadActual = servicioEquipoTorneo.contarEquiposPorTorneo(idTorneo);
+
+    int cantidadNecesaria = torneo.getCantidadDeEquipos();
+
+    if (cantidadActual < cantidadNecesaria) {
+      return new ModelAndView("redirect:/creacion-equipo?idTorneo=" + idTorneo);
+    }
+
+    try {
+      // Comprobamos si el fixture ya fue generado.
+      List<Jornada> jornadasExistentes = servicioTorneo.obtenerJornadasPorTorneo(idTorneo);
+
+      if (jornadasExistentes == null || jornadasExistentes.isEmpty()) {
+        // Recuperamos las inscripciones del torneo.
+        List<EquipoTorneo> inscripciones = servicioEquipoTorneo.obtenerEquiposPorTorneo(idTorneo);
+
+        // Obtenemos los IDs de los equipos inscriptos.
+        List<Long> idsEquipos = inscripciones
+          .stream()
+          .map(inscripcion -> inscripcion.getEquipo().getId())
+          .toList();
+
+        if (LOGGER.isLoggable(Level.INFO)) {
+          LOGGER.info("ID DEL TORNEO: " + idTorneo);
+          LOGGER.info("EQUIPOS RECUPERADOS: " + idsEquipos.size());
+          LOGGER.info("IDS DE EQUIPOS: " + idsEquipos);
+        }
+
+        // Generamos y guardamos las jornadas y sus partidos.
+        servicioTorneo.crearTorneoConFixture(torneo, idsEquipos);
+      }
+
+      // Volvemos al lobby con el fixture ya generado.
+      return new ModelAndView("redirect:/lobbyAdmin");
+    } catch (Exception e) {
+      redirectAttributes.addFlashAttribute(
+        "error",
+        "No se pudo generar el fixture: " + e.getMessage()
+      );
+
+      return new ModelAndView("redirect:/lobbyAdmin");
+    }
+  }
+
+  /*
+  @RequestMapping(path = "/finalizarTorneo", method = RequestMethod.POST)
   public ModelAndView finalizarTorneo(@RequestParam(ID_TORNEO) Long idTorneo) {
     Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
 
@@ -174,5 +237,32 @@ public class ControladorTorneo {
     }
 
     return new ModelAndView("redirect:/lobbyAdmin");
+  }*/
+
+  /*
+  @RequestMapping(path = "/fixtureTorneo", method = RequestMethod.GET)
+  public ModelAndView verFixture(@RequestParam(ID_TORNEO) Long idTorneo) {
+    Map<String, Object> model = new HashMap<>();
+
+    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+    List<Jornada> jornadas = servicioTorneo.obtenerJornadasPorTorneo(idTorneo);
+
+    model.put("torneo", torneo);
+    model.put("jornadas", jornadas);
+
+    return new ModelAndView("fixtureTorneo", model);
+  }*/
+
+  @RequestMapping(path = "/fixtureTorneo", method = RequestMethod.GET)
+  public ModelAndView verFixture(@RequestParam(ID_TORNEO) Long idTorneo) {
+    Map<String, Object> model = new HashMap<>();
+
+    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+    List<Jornada> jornadas = servicioTorneo.obtenerJornadasPorTorneo(idTorneo);
+
+    model.put("torneo", torneo);
+    model.put("jornadas", jornadas);
+
+    return new ModelAndView("fixtureTorneo", model);
   }
 }

@@ -7,4 +7,6 @@ public interface RepositorioEquipoTorneo {
   int contarEquiposPorTorneo(Long idTorneo);
   boolean existeEquipoEnTorneo(Long idEquipo, Long idTorneo);
   List<EquipoTorneo> obtenerTablaPosiciones(Long idTorneo);
+
+  List<EquipoTorneo> obtenerEquiposPorTorneo(Long idTorneo);
 }

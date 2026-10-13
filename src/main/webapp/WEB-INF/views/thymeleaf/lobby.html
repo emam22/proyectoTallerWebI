@@ -435,6 +435,11 @@
         <!-- FECHAS -->
         <div class="panel-fechas">
 
+            <a th:href="@{/fixtureTorneo(idTorneo=${idTorneoActual})}"
+               style="color: #b6ff00; font-weight: 900; font-size: 20px; text-align: center;">
+                FIXTURE
+            </a>
+
             <!-- FECHA 11 -->
             <div class="card-fecha-box">
                 <h3 th:text="${tituloFechaActual} ?: 'FECHA 11 DE 30'">FECHA 11 DE 30</h3>

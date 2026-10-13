@@ -85,4 +85,9 @@ public class ServicioEquipoTorneoImpl implements ServicioEquipoTorneo {
     List<EquipoTorneo> estadisticas = repositorioEquipoTorneo.obtenerTablaPosiciones(idTorneo);
     return estadisticas;
   }
+
+  @Override
+  public List<EquipoTorneo> obtenerEquiposPorTorneo(Long idTorneo) {
+    return repositorioEquipoTorneo.obtenerEquiposPorTorneo(idTorneo);
+  }
 }

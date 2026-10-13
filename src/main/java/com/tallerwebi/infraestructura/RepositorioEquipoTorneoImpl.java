@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 public class RepositorioEquipoTorneoImpl implements RepositorioEquipoTorneo {
 
   private SessionFactory sessionFactory;
+  private static final String ID_TORNEO = "idTorneo";
 
   @Autowired
   public RepositorioEquipoTorneoImpl(SessionFactory sessionFactory) {
@@ -31,7 +32,7 @@ public class RepositorioEquipoTorneoImpl implements RepositorioEquipoTorneo {
         "select count(et) " + "from EquipoTorneo et " + "where et.torneo.id = :idTorneo",
         Long.class
       )
-      .setParameter("idTorneo", idTorneo)
+      .setParameter(ID_TORNEO, idTorneo)
       .uniqueResult();
 
     return cantidad.intValue();
@@ -50,7 +51,7 @@ public class RepositorioEquipoTorneoImpl implements RepositorioEquipoTorneo {
     Long cantidad = (Long) this.sessionFactory.getCurrentSession()
       .createQuery(hql)
       .setParameter("idEquipo", idEquipo)
-      .setParameter("idTorneo", idTorneo)
+      .setParameter(ID_TORNEO, idTorneo)
       .uniqueResult();
 
     return cantidad > 0;
@@ -68,8 +69,20 @@ public class RepositorioEquipoTorneoImpl implements RepositorioEquipoTorneo {
         "et.golesAFavor DESC",
         EquipoTorneo.class
       )
-      .setParameter("idTorneo", idTorneo)
+      .setParameter(ID_TORNEO, idTorneo)
       .getResultList();
     return estadisticas;
+  }
+
+  @Override
+  public List<EquipoTorneo> obtenerEquiposPorTorneo(Long idTorneo) {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "SELECT et FROM EquipoTorneo et WHERE et.torneo.id = :idTorneo",
+        EquipoTorneo.class
+      )
+      .setParameter(ID_TORNEO, idTorneo)
+      .getResultList();
   }
 }

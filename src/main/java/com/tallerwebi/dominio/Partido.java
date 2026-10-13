@@ -1,10 +1,8 @@
 package com.tallerwebi.dominio;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Entity
 public class Partido {
@@ -21,11 +19,14 @@ public class Partido {
   @ManyToOne
   private Equipo equipoVisitante;
 
-  private String codigoLocal;
-  private String codigoVisitante;
+  @ManyToOne
+  private Jornada jornada;
+
   private Integer golesLocal;
   private Integer golesVisitante;
   private Boolean disputado;
+  private LocalDate fecha;
+  private LocalTime hora;
 
   public Partido() {
     this.disputado = false;
@@ -37,14 +38,6 @@ public class Partido {
 
   public void setId(Long id) {
     this.id = id;
-  }
-
-  public Long getFechaId() {
-    return fechaId;
-  }
-
-  public void setFechaId(Long fechaId) {
-    this.fechaId = fechaId;
   }
 
   public Equipo getEquipoLocal() {
@@ -61,22 +54,6 @@ public class Partido {
 
   public void setEquipoVisitante(Equipo equipoVisitante) {
     this.equipoVisitante = equipoVisitante;
-  }
-
-  public String getCodigoLocal() {
-    return codigoLocal;
-  }
-
-  public void setCodigoLocal(String codigoLocal) {
-    this.codigoLocal = codigoLocal;
-  }
-
-  public String getCodigoVisitante() {
-    return codigoVisitante;
-  }
-
-  public void setCodigoVisitante(String codigoVisitante) {
-    this.codigoVisitante = codigoVisitante;
   }
 
   public Integer getGolesLocal() {
@@ -101,5 +78,29 @@ public class Partido {
 
   public void setDisputado(Boolean disputado) {
     this.disputado = disputado;
+  }
+
+  public LocalDate getFecha() {
+    return fecha;
+  }
+
+  public void setFecha(LocalDate fecha) {
+    this.fecha = fecha;
+  }
+
+  public LocalTime getHora() {
+    return hora;
+  }
+
+  public void setHora(LocalTime hora) {
+    this.hora = hora;
+  }
+
+  public Jornada getJornada() {
+    return jornada;
+  }
+
+  public void setJornada(Jornada jornada) {
+    this.jornada = jornada;
   }
 }

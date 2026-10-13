@@ -1,7 +1,10 @@
 package com.tallerwebi.dominio;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 public class Torneo {
@@ -16,6 +19,9 @@ public class Torneo {
   private Integer cantidadMaxJugadores;
   private Integer cantidadAmaSusp;
   private Boolean idaYVuelta;
+
+  @OneToMany(mappedBy = "torneo", cascade = CascadeType.ALL)
+  private List<Jornada> jornadas = new ArrayList<>();
 
   public Long getId() {
     return id;
@@ -71,5 +77,44 @@ public class Torneo {
 
   public void setIdaYVuelta(Boolean idaYVuelta) {
     this.idaYVuelta = idaYVuelta;
+  }
+
+  public void agregarJornada(Jornada jornada) {
+    jornadas.add(jornada);
+    jornada.setTorneo(this);
+  }
+
+  public List<Jornada> getJornadas() {
+    return jornadas;
+  }
+
+  public List<Partido> getPartidosEnTorneo() {
+    return jornadas
+      .stream()
+      .flatMap(jornada -> jornada.getPartidos().stream())
+      .collect(Collectors.toList());
+  }
+
+  public int contarEnfrentamientosUnicos() {
+    List<String> enfrentamientos = new ArrayList<>();
+
+    for (Partido partido : getPartidosEnTorneo()) {
+      String local = partido.getEquipoLocal().getNombre();
+      String visitante = partido.getEquipoVisitante().getNombre();
+
+      String enfrentamiento;
+
+      if (local.compareTo(visitante) < 0) {
+        enfrentamiento = local + " - " + visitante;
+      } else {
+        enfrentamiento = visitante + " - " + local;
+      }
+
+      if (!enfrentamientos.contains(enfrentamiento)) {
+        enfrentamientos.add(enfrentamiento);
+      }
+    }
+
+    return enfrentamientos.size();
   }
 }

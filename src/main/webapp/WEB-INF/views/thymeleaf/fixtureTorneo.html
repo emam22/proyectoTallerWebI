@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fixture del torneo</title>
+</head>
+<body>
+
+<h1>Fixture del torneo</h1>
+
+<h2 th:text="${torneo.nombre}">Nombre del torneo</h2>
+
+<div th:if="${#lists.isEmpty(jornadas)}">
+    <p>Este torneo todavía no tiene jornadas generadas.</p>
+</div>
+
+<section th:each="jornada : ${jornadas}">
+    <h3>
+        Jornada
+        <span th:text="${jornada.numero}">1</span>
+    </h3>
+
+    <p>
+        Estado:
+        <span th:text="${jornada.estado}">Pendiente</span>
+    </p>
+
+    <div th:each="partido : ${jornada.partidos}">
+        <p>
+            <span th:text="${partido.equipoLocal.nombre}">Equipo local</span>
+            vs.
+            <span th:text="${partido.equipoVisitante.nombre}">Equipo visitante</span>
+        </p>
+    </div>
+
+    <p th:if="${jornada.equipoFechaLibre != null}">
+        <strong>Fecha libre:</strong>
+        <span th:text="${jornada.equipoFechaLibre.nombre}"></span>
+    </p>
+
+    <hr>
+</section>
+
+</body>
+</html>
