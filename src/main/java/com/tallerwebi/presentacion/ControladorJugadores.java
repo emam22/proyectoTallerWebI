@@ -1,0 +1,88 @@
+package com.tallerwebi.presentacion;
+
+import com.tallerwebi.dominio.Equipo;
+import com.tallerwebi.dominio.EquipoTorneo;
+import com.tallerwebi.dominio.Jugador;
+import com.tallerwebi.dominio.ServicioEquipoTorneo;
+import com.tallerwebi.dominio.ServicioJugador;
+import com.tallerwebi.dominio.ServicioTorneo;
+import com.tallerwebi.dominio.Torneo;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+@Controller
+public class ControladorJugadores {
+
+  private static final String ID_TORNEO = "idTorneo";
+  private static final String REDIRECT_JUGADORES = "redirect:/jugadoresTorneo?idTorneo=";
+
+  private final ServicioTorneo servicioTorneo;
+  private final ServicioEquipoTorneo servicioEquipoTorneo;
+  private final ServicioJugador servicioJugador;
+
+  @Autowired
+  public ControladorJugadores(
+    ServicioTorneo servicioTorneo,
+    ServicioEquipoTorneo servicioEquipoTorneo,
+    ServicioJugador servicioJugador
+  ) {
+    this.servicioTorneo = servicioTorneo;
+    this.servicioEquipoTorneo = servicioEquipoTorneo;
+    this.servicioJugador = servicioJugador;
+  }
+
+  @RequestMapping(path = "/jugadoresTorneo", method = RequestMethod.GET)
+  public ModelAndView gestionarJugadores(@RequestParam(ID_TORNEO) Long idTorneo) {
+    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+    if (torneo == null) {
+      return new ModelAndView("redirect:/lobbyAdmin");
+    }
+
+    Map<String, Object> model = new ModelMap();
+    model.put("torneo", torneo);
+    model.put("equipos", equiposConJugadores(idTorneo));
+    return new ModelAndView("jugadoresTorneo", model);
+  }
+
+  @RequestMapping(path = "/jugadoresTorneo/agregar", method = RequestMethod.POST)
+  public ModelAndView agregarJugador(
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    @RequestParam("idEquipo") Long idEquipo,
+    @RequestParam("nombre") String nombre,
+    @RequestParam("apellido") String apellido,
+    @RequestParam(value = "dorsal", required = false) Integer dorsal,
+    @RequestParam(value = "puesto", required = false) String puesto,
+    RedirectAttributes redirectAttributes
+  ) {
+    Jugador jugador = new Jugador();
+    jugador.setNombre(nombre);
+    jugador.setApellido(apellido);
+    jugador.setDorsal(dorsal);
+    jugador.setPuesto(puesto);
+
+    servicioJugador.agregarJugador(idEquipo, jugador);
+
+    redirectAttributes.addFlashAttribute("ok", "Jugador agregado correctamente.");
+    return new ModelAndView(REDIRECT_JUGADORES + idTorneo);
+  }
+
+  private List<EquipoJugadores> equiposConJugadores(Long idTorneo) {
+    List<EquipoJugadores> equipos = new ArrayList<>();
+    for (EquipoTorneo equipoTorneo : servicioEquipoTorneo.obtenerEquiposPorTorneo(idTorneo)) {
+      Equipo equipo = equipoTorneo.getEquipo();
+      if (equipo != null) {
+        equipos.add(new EquipoJugadores(equipo, servicioJugador.obtenerJugadores(equipo.getId())));
+      }
+    }
+    return equipos;
+  }
+}

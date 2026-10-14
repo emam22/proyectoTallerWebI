@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  Botón "volver" reutilizable.
+  Uso:  <a th:replace="~{fragments/nav :: botonVolver(destino='/ruta')}"></a>
+  Sin destino: <a th:replace="~{fragments/nav :: botonVolver(destino='')}"></a>
+  (usa history.back()).
+-->
+<th:block th:fragment="botonVolver(destino)">
+    <a th:if="${destino != null and destino != ''}"
+       class="btn-volver"
+       th:href="@{${destino}}"
+       title="Volver a la pantalla anterior">&#8592; Volver</a>
+    <a th:unless="${destino != null and destino != ''}"
+       class="btn-volver"
+       href="javascript:void(0)"
+       onclick="history.back(); return false;"
+       title="Volver a la pantalla anterior">&#8592; Volver</a>
+</th:block>
+
+</body>
+</html>
