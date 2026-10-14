@@ -30,6 +30,7 @@ public class ControladorTorneo {
 
   private static final String TORNEO = "torneo";
   private static final String ID_TORNEO = "idTorneo";
+  private static final String ID_EQUIPO = "idEquipo";
   private static final String REDIRECT_CREACION_EQUIPO = "redirect:/creacion-equipo?idTorneo=";
   private static final String ERROR = "error";
 
@@ -151,7 +152,7 @@ public class ControladorTorneo {
 
   @RequestMapping(path = "/cargar-equipo-existente", method = RequestMethod.POST)
   public ModelAndView cargarEquipoExistente(
-    @RequestParam(ID_TORNEO) Long idEquipo,
+    @RequestParam(ID_EQUIPO) Long idEquipo,
     @RequestParam(ID_TORNEO) Long idTorneo,
     RedirectAttributes redirectAttributes
   ) {
