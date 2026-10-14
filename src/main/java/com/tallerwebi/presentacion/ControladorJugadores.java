@@ -24,6 +24,8 @@ public class ControladorJugadores {
 
   private static final String ID_TORNEO = "idTorneo";
   private static final String REDIRECT_JUGADORES = "redirect:/jugadoresTorneo?idTorneo=";
+  private static final String OK = "ok";
+  private static final String ERROR = "error";
 
   private final ServicioTorneo servicioTorneo;
   private final ServicioEquipoTorneo servicioEquipoTorneo;
@@ -63,6 +65,34 @@ public class ControladorJugadores {
     @RequestParam(value = "puesto", required = false) String puesto,
     RedirectAttributes redirectAttributes
   ) {
+    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+
+    if (torneo == null || !equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
+      return rechazar(
+        REDIRECT_JUGADORES + idTorneo,
+        "El equipo no esta inscripto en este torneo.",
+        redirectAttributes
+      );
+    }
+
+    List<Jugador> jugadores = servicioJugador.obtenerJugadores(idEquipo);
+
+    if (superaMaximo(jugadores, torneo)) {
+      return rechazar(
+        REDIRECT_JUGADORES + idTorneo,
+        "El equipo ya alcanzo la cantidad maxima de jugadores.",
+        redirectAttributes
+      );
+    }
+
+    if (dorsal != null && tieneDorsal(jugadores, dorsal)) {
+      return rechazar(
+        REDIRECT_JUGADORES + idTorneo,
+        "Ya hay un jugador con el dorsal " + dorsal + " en este equipo.",
+        redirectAttributes
+      );
+    }
+
     Jugador jugador = new Jugador();
     jugador.setNombre(nombre);
     jugador.setApellido(apellido);
@@ -71,8 +101,41 @@ public class ControladorJugadores {
 
     servicioJugador.agregarJugador(idEquipo, jugador);
 
-    redirectAttributes.addFlashAttribute("ok", "Jugador agregado correctamente.");
+    redirectAttributes.addFlashAttribute(OK, "Jugador agregado correctamente.");
     return new ModelAndView(REDIRECT_JUGADORES + idTorneo);
+  }
+
+  private ModelAndView rechazar(
+    String vista,
+    String motivo,
+    RedirectAttributes redirectAttributes
+  ) {
+    redirectAttributes.addFlashAttribute(ERROR, motivo);
+    return new ModelAndView(vista);
+  }
+
+  private boolean equipoInscriptoEnTorneo(Long idTorneo, Long idEquipo) {
+    for (EquipoTorneo equipoTorneo : servicioEquipoTorneo.obtenerEquiposPorTorneo(idTorneo)) {
+      Equipo equipo = equipoTorneo.getEquipo();
+      if (equipo != null && idEquipo.equals(equipo.getId())) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean superaMaximo(List<Jugador> jugadores, Torneo torneo) {
+    Integer maximo = torneo.getCantidadMaxJugadores();
+    return maximo != null && jugadores.size() >= maximo;
+  }
+
+  private boolean tieneDorsal(List<Jugador> jugadores, Integer dorsal) {
+    for (Jugador existente : jugadores) {
+      if (existente.getDorsal() != null && existente.getDorsal().equals(dorsal)) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private List<EquipoJugadores> equiposConJugadores(Long idTorneo) {

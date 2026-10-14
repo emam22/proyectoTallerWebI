@@ -104,6 +104,11 @@ public class ControladorJugadoresTest {
   public void deberiaAgregarElJugadorYRedirigir() {
     // preparacion
     RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    torneo.setCantidadMaxJugadores(25);
+    inscribirEquipoEnTorneo(1L, 10L, torneo);
+    when(this.servicioJugadorMock.obtenerJugadores(10L)).thenReturn(new ArrayList<>());
 
     // ejecucion
     ModelAndView mav =
@@ -132,11 +137,111 @@ public class ControladorJugadoresTest {
   public void deberiaAceptarDorsalYPuestoNulosAlAgregarUnJugador() {
     // preparacion
     RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(2L);
+    torneo.setCantidadMaxJugadores(25);
+    inscribirEquipoEnTorneo(2L, 20L, torneo);
+    when(this.servicioJugadorMock.obtenerJugadores(20L)).thenReturn(new ArrayList<>());
 
     // ejecucion
     this.controlador.agregarJugador(2L, 20L, "Ana", "Gomez", null, null, redirectAttributesMock);
 
     // verificacion
     verify(this.servicioJugadorMock).agregarJugador(eq(20L), any(Jugador.class));
+  }
+
+  @Test
+  public void noDeberiaAgregarSiElEquipoNoEstaInscriptoEnElTorneo() {
+    // preparacion
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    when(this.servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(torneo);
+    when(this.servicioEquipoTorneoMock.obtenerEquiposPorTorneo(1L)).thenReturn(new ArrayList<>());
+
+    // ejecucion
+    ModelAndView mav =
+      this.controlador.agregarJugador(
+          1L,
+          99L,
+          "Juan",
+          "Perez",
+          5,
+          "Arquero",
+          redirectAttributesMock
+        );
+
+    // verificacion
+    verify(this.servicioJugadorMock, never()).agregarJugador(any(), any());
+    verify(redirectAttributesMock).addFlashAttribute(eq("error"), anyString());
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneo?idTorneo=1"));
+  }
+
+  @Test
+  public void noDeberiaAgregarSiElEquipoAlcanzoLaCantidadMaximaDeJugadores() {
+    // preparacion
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    torneo.setCantidadMaxJugadores(1);
+    inscribirEquipoEnTorneo(1L, 10L, torneo);
+    when(this.servicioJugadorMock.obtenerJugadores(10L)).thenReturn(List.of(new Jugador()));
+
+    // ejecucion
+    ModelAndView mav =
+      this.controlador.agregarJugador(
+          1L,
+          10L,
+          "Juan",
+          "Perez",
+          5,
+          "Arquero",
+          redirectAttributesMock
+        );
+
+    // verificacion
+    verify(this.servicioJugadorMock, never()).agregarJugador(any(), any());
+    verify(redirectAttributesMock).addFlashAttribute(eq("error"), anyString());
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneo?idTorneo=1"));
+  }
+
+  @Test
+  public void noDeberiaAgregarSiYaExisteUnJugadorConElMismoDorsal() {
+    // preparacion
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    torneo.setCantidadMaxJugadores(25);
+    inscribirEquipoEnTorneo(1L, 10L, torneo);
+    Jugador existente = new Jugador();
+    existente.setDorsal(10);
+    when(this.servicioJugadorMock.obtenerJugadores(10L)).thenReturn(List.of(existente));
+
+    // ejecucion
+    ModelAndView mav =
+      this.controlador.agregarJugador(
+          1L,
+          10L,
+          "Juan",
+          "Perez",
+          10,
+          "Arquero",
+          redirectAttributesMock
+        );
+
+    // verificacion
+    verify(this.servicioJugadorMock, never()).agregarJugador(any(), any());
+    verify(redirectAttributesMock).addFlashAttribute(eq("error"), anyString());
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneo?idTorneo=1"));
+  }
+
+  private void inscribirEquipoEnTorneo(Long idTorneo, Long idEquipo, Torneo torneo) {
+    when(this.servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+    Equipo equipo = new Equipo();
+    equipo.setId(idEquipo);
+    EquipoTorneo equipoTorneo = new EquipoTorneo();
+    equipoTorneo.setEquipo(equipo);
+    when(this.servicioEquipoTorneoMock.obtenerEquiposPorTorneo(idTorneo))
+      .thenReturn(List.of(equipoTorneo));
   }
 }
