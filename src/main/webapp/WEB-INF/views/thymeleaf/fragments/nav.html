@@ -11,10 +11,12 @@
 <th:block th:fragment="botonVolver(destino)">
     <a th:if="${destino != null and destino != ''}"
        class="btn-volver"
+       style="width: auto; height: auto;"
        th:href="@{${destino}}"
        title="Volver a la pantalla anterior">&#8592; Volver</a>
     <a th:unless="${destino != null and destino != ''}"
        class="btn-volver"
+       style="width: auto; height: auto;"
        href="javascript:void(0)"
        onclick="history.back(); return false;"
        title="Volver a la pantalla anterior">&#8592; Volver</a>

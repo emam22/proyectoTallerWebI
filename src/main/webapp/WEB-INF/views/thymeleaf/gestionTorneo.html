@@ -305,6 +305,10 @@
                th:href="@{/administrarTorneo/{idTorneo}/editar(idTorneo=${torneo.id})}">
                 Editar parametros
             </a>
+            <a class="accion"
+               th:href="@{/jugadoresTorneo(idTorneo=${torneo.id})}">
+                Gestionar jugadores
+            </a>
             <form th:action="@{/administrarTorneo/{idTorneo}/fixture(idTorneo=${torneo.id})}"
                   method="post" style="flex: 1; min-width: 200px;" th:if="${!hayFixture}">
                 <button type="submit" class="accion" style="width: 100%;">Generar fixture</button>

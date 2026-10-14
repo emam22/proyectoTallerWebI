@@ -305,6 +305,8 @@ tbody tr:hover {
     left: 20px;
     z-index: 2000;
     display: inline-flex;
+    width: auto;
+    height: auto;
     align-items: center;
     gap: 6px;
     background: rgba(31, 31, 31, 0.9);
