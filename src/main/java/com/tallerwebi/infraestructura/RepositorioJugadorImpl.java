@@ -41,4 +41,13 @@ public class RepositorioJugadorImpl implements RepositorioJugador {
       .setParameter("id", idEquipo)
       .getResultList();
   }
+
+  @Override
+  public Jugador obtenerJugador(Long idJugador) {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery("select j from Jugador j where j.id = :id", Jugador.class)
+      .setParameter("id", idJugador)
+      .getSingleResult();
+  }
 }

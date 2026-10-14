@@ -5,13 +5,8 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 
-import com.tallerwebi.dominio.Equipo;
-import com.tallerwebi.dominio.EquipoTorneo;
-import com.tallerwebi.dominio.Jugador;
-import com.tallerwebi.dominio.ServicioEquipoTorneo;
-import com.tallerwebi.dominio.ServicioJugador;
-import com.tallerwebi.dominio.ServicioTorneo;
-import com.tallerwebi.dominio.Torneo;
+import com.tallerwebi.dominio.*;
+import com.tallerwebi.dominio.excepcion.JugadorNoExiste;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,17 +21,20 @@ public class ControladorJugadoresTest {
   private ServicioEquipoTorneo servicioEquipoTorneoMock;
   private ServicioJugador servicioJugadorMock;
   private ControladorJugadores controlador;
+  private ServicioEstadisticaJugador servicioEstadisticasMock;
 
   @BeforeEach
   public void init() {
     this.servicioTorneoMock = mock(ServicioTorneo.class);
     this.servicioEquipoTorneoMock = mock(ServicioEquipoTorneo.class);
     this.servicioJugadorMock = mock(ServicioJugador.class);
+    this.servicioEstadisticasMock = mock(ServicioEstadisticaJugador.class);
     this.controlador =
       new ControladorJugadores(
         this.servicioTorneoMock,
         this.servicioEquipoTorneoMock,
-        this.servicioJugadorMock
+        this.servicioJugadorMock,
+        this.servicioEstadisticasMock
       );
   }
 
@@ -101,7 +99,7 @@ public class ControladorJugadoresTest {
   }
 
   @Test
-  public void deberiaAgregarElJugadorYRedirigir() {
+  public void deberiaAgregarElJugadorYRedirigir() throws JugadorNoExiste {
     // preparacion
     RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
     Torneo torneo = new Torneo();
@@ -134,7 +132,7 @@ public class ControladorJugadoresTest {
   }
 
   @Test
-  public void deberiaAceptarDorsalYPuestoNulosAlAgregarUnJugador() {
+  public void deberiaAceptarDorsalYPuestoNulosAlAgregarUnJugador() throws JugadorNoExiste {
     // preparacion
     RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
     Torneo torneo = new Torneo();
@@ -151,7 +149,7 @@ public class ControladorJugadoresTest {
   }
 
   @Test
-  public void noDeberiaAgregarSiElEquipoNoEstaInscriptoEnElTorneo() {
+  public void noDeberiaAgregarSiElEquipoNoEstaInscriptoEnElTorneo() throws JugadorNoExiste {
     // preparacion
     RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
     Torneo torneo = new Torneo();
@@ -178,7 +176,8 @@ public class ControladorJugadoresTest {
   }
 
   @Test
-  public void noDeberiaAgregarSiElEquipoAlcanzoLaCantidadMaximaDeJugadores() {
+  public void noDeberiaAgregarSiElEquipoAlcanzoLaCantidadMaximaDeJugadores()
+    throws JugadorNoExiste {
     // preparacion
     RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
     Torneo torneo = new Torneo();
@@ -206,7 +205,7 @@ public class ControladorJugadoresTest {
   }
 
   @Test
-  public void noDeberiaAgregarSiYaExisteUnJugadorConElMismoDorsal() {
+  public void noDeberiaAgregarSiYaExisteUnJugadorConElMismoDorsal() throws JugadorNoExiste {
     // preparacion
     RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
     Torneo torneo = new Torneo();

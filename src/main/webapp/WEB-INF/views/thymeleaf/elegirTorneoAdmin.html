@@ -192,7 +192,7 @@
     <h1> ELIGE UN TORNEO </h1>
     <!-- Itera la lista enviada desde el controlador -->
     <a th:each="torneo : ${torneos}"
-       th:href="@{/administrarTorneo/{idTorneo}(idTorneo=${torneo.id})}"
+       th:href="@{/administrarTorneoAdmin/{idTorneo}(idTorneo=${torneo.id})}"
        class="torneo-link">
         <div class="torneo-card">
             <h2 th:text="${torneo.nombre}">Torneo 1</h2>

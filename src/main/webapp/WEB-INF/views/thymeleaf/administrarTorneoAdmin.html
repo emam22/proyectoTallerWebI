@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrar Torneo - System TOR</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" th:href="@{/css/main.css}">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 24px;
+            min-height: 100vh;
+            background-color: #1a1a1a;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* GRID PRINCIPAL DEL PANEL */
+        .admin-dashboard-container {
+            width: 100%;
+            max-width: 1280px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* FILA SUPERIOR: 4 BOTONES DE ACCIÓN */
+        .fila-botones-superiores {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .btn-card-admin {
+            background-color: #3e3e3e;
+            border: 2px solid #b6ff00;
+            border-radius: 14px;
+            height: 120px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            text-decoration: none;
+            color: #b6ff00;
+            font-weight: 900;
+            font-size: 18px;
+            text-transform: uppercase;
+            padding: 10px 16px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+            transition: transform 0.15s ease, background-color 0.15s ease;
+        }
+
+        .btn-card-admin:hover {
+            transform: translateY(-2px);
+            background-color: #484848;
+        }
+
+        /* FILA INFERIOR: FECHAS + TABLA + ACCIONES LATERALES */
+        .fila-inferior-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr 240px;
+            gap: 20px;
+            align-items: stretch;
+        }
+
+        /* 1. PANEL DE FECHAS (IZQUIERDA) */
+        .panel-fechas-admin {
+            background-color: #3e3e3e;
+            border: 2px solid #b6ff00;
+            border-radius: 14px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .card-fecha-bloque {
+            background-color: #333333;
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .fecha-titulo {
+            text-align: center;
+            font-weight: 900;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .partido-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            font-size: 11px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 6px;
+        }
+
+        .partido-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        .partido-equipos {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            font-weight: 800;
+            color: #b6ff00;
+        }
+
+        .partido-horario {
+            color: #ccc;
+            font-size: 10px;
+        }
+
+        /* 2. TABLA DE POSICIONES DINÁMICA (CENTRO) */
+        .panel-tabla-admin {
+            background-color: #3e3e3e;
+            border: 2px solid #b6ff00;
+            border-radius: 14px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tabla-posiciones-admin {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .tabla-posiciones-admin thead {
+            background-color: #b6ff00;
+            color: #000000;
+        }
+
+        .tabla-posiciones-admin th {
+            padding: 10px 8px;
+            font-size: 12px;
+            font-weight: 900;
+            text-transform: uppercase;
+        }
+
+        .tabla-posiciones-admin th.th-equipo,
+        .tabla-posiciones-admin td.td-equipo {
+            text-align: left;
+            padding-left: 16px;
+        }
+
+        .tabla-posiciones-admin td {
+            padding: 12px 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .tabla-posiciones-admin tr:last-child td {
+            border-bottom: none;
+        }
+
+        .td-pts {
+            font-weight: 900;
+        }
+
+        /* 3. COLUMNA ACCIONES DERECHA */
+        .columna-acciones-der {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .btn-card-accion-der {
+            flex: 1;
+            background-color: #3e3e3e;
+            border: 2px solid #b6ff00;
+            border-radius: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            text-decoration: none;
+            color: #b6ff00;
+            font-weight: 900;
+            font-size: 16px;
+            padding: 12px;
+            text-transform: uppercase;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+            transition: transform 0.15s ease, background-color 0.15s ease;
+        }
+
+        .btn-card-accion-der:hover {
+            transform: translateY(-2px);
+            background-color: #484848;
+        }
+
+        /* BOTÓN ROJO DESTRUCTIVO: ELIMINAR TORNEO */
+        .btn-eliminar-torneo {
+            border-color: #ff3b30;
+            color: #ff3b30;
+        }
+
+        .btn-eliminar-torneo:hover {
+            background-color: rgba(255, 59, 48, 0.15);
+        }
+    </style>
+</head>
+<body>
+
+<div class="admin-dashboard-container">
+
+
+    <div class="fila-botones-superiores">
+        <a th:href="@{/editarEquipo(idTorneo=${idTorneoActual})}" class="btn-card-admin">
+            EDITAR EQUIPO
+        </a>
+        <a th:href="@{/agregarSancion(idTorneo=${idTorneoActual})}" class="btn-card-admin">
+            AGREGAR SANCIÓN
+        </a>
+        <a th:href="@{/crearTorneo}" class="btn-card-admin">
+            CREAR NUEVO<br>TORNEO
+        </a>
+        <a th:href="@{/desvincularEquipo(idTorneo=${idTorneoActual})}" class="btn-card-admin">
+            DESVINCULAR<br>EQUIPO
+        </a>
+    </div>
+
+    <!-- FILA INFERIOR -->
+    <div class="fila-inferior-grid">
+
+
+        <div class="panel-fechas-admin">
+
+
+            <div class="card-fecha-bloque">
+                <div class="fecha-titulo" th:text="${fecha1Nombre} ?: 'FECHA 11 DE 30'">FECHA 11 DE 30</div>
+
+                <div class="partido-item">
+                    <div class="partido-equipos">
+                        <span>BARRACAS CENTRAL</span>
+                        <span>BOCA JUNIORS</span>
+                    </div>
+                    <div class="partido-horario">jue, 10 de Sept 20hS</div>
+                </div>
+
+                <div class="partido-item">
+                    <div class="partido-equipos">
+                        <span>DEFENSA Y JUSTICIA</span>
+                        <span>LANÚS</span>
+                    </div>
+                    <div class="partido-horario">jue, 10 de Sept 21hS</div>
+                </div>
+            </div>
+
+            <!-- FECHA 2 -->
+            <div class="card-fecha-bloque">
+                <div class="fecha-titulo" th:text="${fecha2Nombre} ?: 'FECHA 12 DE 30'">FECHA 12 DE 30</div>
+
+                <div class="partido-item">
+                    <div class="partido-equipos">
+                        <span>BARRACAS CENTRAL</span>
+                        <span>BOCA JUNIORS</span>
+                    </div>
+                    <div class="partido-horario">jue, 10 de Sept 20hS</div>
+                </div>
+
+                <div class="partido-item">
+                    <div class="partido-equipos">
+                        <span>DEFENSA Y JUSTICIA</span>
+                        <span>LANÚS</span>
+                    </div>
+                    <div class="partido-horario">jue, 10 de Sept 21hS</div>
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="panel-tabla-admin">
+            <table class="tabla-posiciones-admin">
+                <thead>
+                <tr>
+                    <th style="width: 45px;">Pos</th>
+                    <th class="th-equipo">Equipo</th>
+                    <th>PJ</th>
+                    <th>PG</th>
+                    <th>PE</th>
+                    <th>PP</th>
+                    <th>GF</th>
+                    <th>GC</th>
+                    <th>PTS</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(tablaPosiciones)}">
+                    <td colspan="9" style="padding: 30px; color: #888; font-weight: normal;">
+                        Sin datos cargados en la tabla.
+                    </td>
+                </tr>
+
+
+                <tr th:each="fila, iter : ${tablaPosiciones}" th:if="${iter.count le 6}">
+                    <td th:text="${iter.count}">1</td>
+                    <td class="td-equipo" th:text="${fila.equipo?.nombre}">Defensa y Justicia</td>
+                    <td th:text="${fila.partidosJugados}">10</td>
+                    <td th:text="${fila.partidosGanados}">5</td>
+                    <td th:text="${fila.partidosEmpatados}">2</td>
+                    <td th:text="${fila.partidoPerdidos}">3</td>
+                    <td th:text="${fila.golesAFavor}">13</td>
+                    <td th:text="${fila.golesEnContra}">7</td>
+                    <td class="td-pts" th:text="${fila.puntos}">17</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="columna-acciones-der">
+            <a th:href="@{/elegirTorneoAdmin}" class="btn-card-accion-der">
+                CAMBIAR TORNEO<br>EN CURSO
+            </a>
+            <a th:href="@{/eliminarTorneo(idTorneo=${idTorneoActual})}"
+               class="btn-card-accion-der btn-eliminar-torneo"
+               onclick="return confirm('¿Seguro que deseas eliminar este torneo? Esta acción no se puede deshacer.');">
+                ELIMINAR TORNEO
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

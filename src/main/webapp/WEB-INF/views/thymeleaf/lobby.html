@@ -491,23 +491,44 @@
 
     <!-- 4. ESTADÍSTICAS LATERALES (th:href="@{/estadisticasDeJugadores}") -->
     <div class="columna-derecha-stats">
-
-        <!-- Estadisticas de Jugadores -->
-        <a th:href="@{/estadisticasDeJugadores}" class="link-stat">
+        <a th:href="@{/estadisticasDeJugadores(idTorneo=${idTorneoActual})}" class="link-stat">
             <div class="stat-card-box">
-                <div class="stat-header-bar">Estadisticas de Jugadores</div>
-                <div class="stat-body-content"></div>
+
+                <!-- CABECERA VERDE UNIFICADA (TÍTULO + COLUMNAS) -->
+                <div class="stat-header-bar">
+                    <span class="stat-titulo">Estadísticas de Jugadores</span>
+                    <div class="stat-columnas-header">
+                        <span class="col-jugador">Jugador</span>
+                        <span class="col-stat">Goles</span>
+                        <span class="col-stat">Asist.</span>
+                        <span class="col-stat">Part.</span>
+                        <span class="col-stat">TA</span>
+                        <span class="col-stat">TR</span>
+                    </div>
+                </div>
+
+                <!-- CUERPO OSCURO CON LOS DATOS -->
+                <div class="stat-body-content">
+                    <table class="tabla-stats-lateral">
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(estadisticasJugadores)}">
+                            <td colspan="6" class="sin-stats">Sin estadísticas registradas</td>
+                        </tr>
+
+                        <tr th:each="stat, iter : ${estadisticasJugadores}" th:if="${iter.count le 8}">
+                            <td class="col-jugador" th:text="${stat.jugador.nombre}">Juan perez</td>
+                            <td class="col-stat" th:text="${stat.goles}">0</td>
+                            <td class="col-stat" th:text="${stat.asistencias}">0</td>
+                            <td class="col-stat" th:text="${stat.participacionesGol}">0</td>
+                            <td class="col-stat" th:text="${stat.amarillas}">0</td>
+                            <td class="col-stat" th:text="${stat.rojas}">0</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
             </div>
         </a>
-
-        <!-- Estadisticas de equipo -->
-        <a th:href="@{/estadisticasDeEquipos}" class="link-stat">
-            <div class="stat-card-box">
-                <div class="stat-header-bar">Estadisticas de equipo</div>
-                <div class="stat-body-content"></div>
-            </div>
-        </a>
-
     </div>
 
 </div>

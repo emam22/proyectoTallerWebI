@@ -6,4 +6,5 @@ public interface RepositorioJugador {
   void guardar(Jugador jugador);
   void eliminar(Long idJugador);
   List<Jugador> listarPorEquipo(Long idEquipo);
+  Jugador obtenerJugador(Long idJugador);
 }

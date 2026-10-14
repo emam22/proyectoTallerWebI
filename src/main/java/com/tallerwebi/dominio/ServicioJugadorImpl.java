@@ -50,4 +50,9 @@ public class ServicioJugadorImpl implements ServicioJugador {
     }
     repositorioJugador.eliminar(idJugador);
   }
+
+  @Override
+  public Jugador consultarJugador(long idJugador) {
+    return repositorioJugador.obtenerJugador(idJugador);
+  }
 }

@@ -89,6 +89,19 @@ public class Equipo {
     return jugadores;
   }
 
+  public Jugador BuscarJugador(Long idJugador) {
+    for (Jugador jugador : jugadores) {
+      if (jugadores == null || idJugador == null) {
+        return null;
+      }
+
+      if (jugador.getId() != null && jugador.getId().equals(idJugador)) {
+        return jugador;
+      }
+    }
+    return null;
+  }
+
   public void setJugadores(List<Jugador> jugadores) {
     this.jugadores = jugadores;
   }

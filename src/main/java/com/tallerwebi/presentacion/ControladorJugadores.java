@@ -1,12 +1,8 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.Equipo;
-import com.tallerwebi.dominio.EquipoTorneo;
-import com.tallerwebi.dominio.Jugador;
-import com.tallerwebi.dominio.ServicioEquipoTorneo;
-import com.tallerwebi.dominio.ServicioJugador;
-import com.tallerwebi.dominio.ServicioTorneo;
-import com.tallerwebi.dominio.Torneo;
+import com.tallerwebi.dominio.*;
+import com.tallerwebi.dominio.excepcion.EquipoExistente;
+import com.tallerwebi.dominio.excepcion.JugadorNoExiste;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,16 +26,19 @@ public class ControladorJugadores {
   private final ServicioTorneo servicioTorneo;
   private final ServicioEquipoTorneo servicioEquipoTorneo;
   private final ServicioJugador servicioJugador;
+  private final ServicioEstadisticaJugador servicioEstadisticas;
 
   @Autowired
   public ControladorJugadores(
     ServicioTorneo servicioTorneo,
     ServicioEquipoTorneo servicioEquipoTorneo,
-    ServicioJugador servicioJugador
+    ServicioJugador servicioJugador,
+    ServicioEstadisticaJugador servicioEstadisticas
   ) {
     this.servicioTorneo = servicioTorneo;
     this.servicioEquipoTorneo = servicioEquipoTorneo;
     this.servicioJugador = servicioJugador;
+    this.servicioEstadisticas = servicioEstadisticas;
   }
 
   @RequestMapping(path = "/jugadoresTorneo", method = RequestMethod.GET)
@@ -64,7 +63,7 @@ public class ControladorJugadores {
     @RequestParam(value = "dorsal", required = false) Integer dorsal,
     @RequestParam(value = "puesto", required = false) String puesto,
     RedirectAttributes redirectAttributes
-  ) {
+  ) throws JugadorNoExiste {
     Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
 
     if (torneo == null || !equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
@@ -101,7 +100,14 @@ public class ControladorJugadores {
 
     servicioJugador.agregarJugador(idEquipo, jugador);
 
-    redirectAttributes.addFlashAttribute(OK, "Jugador agregado correctamente.");
+    try {
+      servicioEstadisticas.iniciarEstadisticas(jugador);
+    } catch (JugadorNoExiste e) {
+      redirectAttributes.addFlashAttribute(ERROR, "No se pudo agregar al jugador");
+
+      redirectAttributes.addFlashAttribute(OK, "Jugador agregado correctamente.");
+      return new ModelAndView(REDIRECT_JUGADORES + idTorneo);
+    }
     return new ModelAndView(REDIRECT_JUGADORES + idTorneo);
   }
 
