@@ -8,8 +8,9 @@ import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.*;
-import com.tallerwebi.dominio.excepcion.EquipoYaInscripto;
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -165,109 +166,66 @@ public class ControladorTorneoTest {
     verify(servicioTorneoMock, times(1)).consultarTorneoPorId(8L);
   }
 
- @Test
-  public void guardarEquipoDeberiaRegistrarElEquipoYRedirigir()
-          throws Exception {
-
-    // preparacion
-    Long idTorneo = 5L;
-
+  //metodo verFixture
+  @Test
+  public void finalizarTorneoConTodosLosEquiposDeberiaGenerarFixture() throws Exception {
+    // preparación
     Torneo torneo = new Torneo();
-    torneo.setId(idTorneo);
-    torneo.setCantidadDeEquipos(4);
+    torneo.setId(1L);
+    torneo.setCantidadDeEquipos(2);
 
-    when(servicioTorneoMock.consultarTorneoPorId(idTorneo))
-            .thenReturn(torneo);
+    when(servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(torneo);
+    when(servicioEquipoTorneoMock.contarEquiposPorTorneo(1L)).thenReturn(2);
+    when(servicioTorneoMock.obtenerJornadasPorTorneo(1L)).thenReturn(new ArrayList<>());
 
-    when(servicioEquipoTorneoMock.contarEquiposPorTorneo(idTorneo))
-            .thenReturn(0);
+    Equipo equipo1 = mock(Equipo.class);
+    Equipo equipo2 = mock(Equipo.class);
+
+    when(equipo1.getId()).thenReturn(10L);
+    when(equipo2.getId()).thenReturn(20L);
+
+    EquipoTorneo agregarEquipo1 = mock(EquipoTorneo.class);
+    EquipoTorneo agregarEquipo2 = mock(EquipoTorneo.class);
+
+    when(agregarEquipo1.getEquipo()).thenReturn(equipo1);
+    when(agregarEquipo2.getEquipo()).thenReturn(equipo2);
+
+    when(servicioEquipoTorneoMock.obtenerEquiposPorTorneo(1L))
+      .thenReturn(Arrays.asList(agregarEquipo1, agregarEquipo2));
 
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
-    // ejecucion
-    ModelAndView mav = controladorTorneo.guardarEquipo(
-            idTorneo,
-            "Los Leones",
-            "#ff0000",
-            "#ffffff",
-            "#0000ff",
-            "#ffffff",
-            redirectAttributes
-    );
+    // ejecución
+    ModelAndView mav = controladorTorneo.finalizarTorneo(1L, redirectAttributes);
 
-    // validacion
-    assertThat(
-            mav.getViewName(),
-            equalTo("redirect:/creacion-equipo?idTorneo=5")
-    );
+    // validación
 
-    verify(servicioEquipoTorneoMock, times(1))
-            .crearEquipoEInscribirlo(any(Equipo.class), eq(torneo));
+    verify(servicioTorneoMock).crearTorneoConFixture(eq(torneo), eq(Arrays.asList(10L, 20L)));
   }
 
   @Test
-  public void listarEquiposDeberiaMostrarLaVistaConLosEquiposYElIdDelTorneo() {
-    // preparacion
-    Long idTorneo = 5L;
+  public void verFixtureDeberiaMostrarTorneoYJornadas() throws Exception {
+    //preparacion
 
-    List<Equipo> equipos = List.of(
-            new Equipo(),
-            new Equipo()
-    );
-
-    when(servicioEquipoMock.obtenerEquipos()).thenReturn(equipos);
-
-    // ejecucion
-    ModelAndView mav = controladorTorneo.listarEquipos(idTorneo);
-
-    // validacion
-    assertThat(mav.getViewName(), equalTo("lista-equipos"));
-
-    assertThat(mav.getModel().get("idTorneo"), equalTo(idTorneo));
-
-    assertThat(mav.getModel().get("equipos"), equalTo(equipos));
-
-    verify(servicioEquipoMock, times(1)).obtenerEquipos();
-  }
-
-  @Test
-  public void cargarEquipoExistenteDeberiaInscribirEquipoYRedirigir() throws EquipoYaInscripto {
-    // preparacion
-    Long idEquipo = 2L;
-    Long idTorneo = 5L;
-
-    Equipo equipo = new Equipo();
     Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    torneo.setNombre("Mega Futbol");
 
-    when(servicioEquipoMock.consultarEquipoPorId(idEquipo))
-            .thenReturn(equipo);
+    Jornada jornada = new Jornada();
+    jornada.setNumero(1);
 
-    when(servicioTorneoMock.consultarTorneoPorId(idTorneo))
-            .thenReturn(torneo);
+    List<Jornada> jornadas = new ArrayList<>();
+    jornadas.add(jornada);
 
-    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+    when(servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(torneo);
+    when(servicioTorneoMock.obtenerJornadasPorTorneo(1L)).thenReturn(jornadas);
 
-    // ejecucion
-    ModelAndView mav = controladorTorneo.cargarEquipoExistente(
-            idEquipo,
-            idTorneo,
-            redirectAttributes
-    );
+    //ejecucion
+    ModelAndView mav = controladorTorneo.verFixture(1L);
 
-    // validacion
-    assertThat(
-            mav.getViewName(),
-            equalTo("redirect:/creacion-equipo?idTorneo=5")
-    );
-
-    verify(servicioEquipoMock, times(1))
-            .consultarEquipoPorId(idEquipo);
-
-    verify(servicioTorneoMock, times(1))
-            .consultarTorneoPorId(idTorneo);
-
-    verify(servicioEquipoTorneoMock, times(1))
-            .inscribirEquipoExistente(equipo, torneo);
+    //validacion
+    assertThat(mav.getViewName(), equalTo("fixtureTorneo"));
+    assertThat(mav.getModel().get("torneo"), equalTo(torneo));
+    assertThat(mav.getModel().get("jornadas"), equalTo(jornadas));
   }
-
 }

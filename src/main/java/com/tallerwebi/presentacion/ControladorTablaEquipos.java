@@ -2,6 +2,8 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.EquipoTorneo;
 import com.tallerwebi.dominio.ServicioEquipoTorneo;
+import com.tallerwebi.dominio.ServicioTorneo;
+import com.tallerwebi.dominio.Torneo;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Controller;
@@ -14,9 +16,14 @@ import org.springframework.web.servlet.ModelAndView;
 public class ControladorTablaEquipos {
 
   private final ServicioEquipoTorneo servicioEquipoTorneo;
+  private final ServicioTorneo servicioTorneo;
 
-  public ControladorTablaEquipos(ServicioEquipoTorneo servicioEquipoTorneo) {
+  public ControladorTablaEquipos(
+    ServicioEquipoTorneo servicioEquipoTorneo,
+    ServicioTorneo servicioTorneo
+  ) {
     this.servicioEquipoTorneo = servicioEquipoTorneo;
+    this.servicioTorneo = servicioTorneo;
   }
 
   @RequestMapping("/tablaEquipos")
@@ -25,12 +32,11 @@ public class ControladorTablaEquipos {
   ) {
     Map<String, Object> model = new ModelMap();
 
-    Long idTorneoABuscar = 1L;
-    if (idTorneo != null) {
-      idTorneoABuscar = idTorneo;
-    }
+    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
 
-    List<EquipoTorneo> tabla = servicioEquipoTorneo.obtenerEstadisticas(idTorneoABuscar);
+    List<EquipoTorneo> tabla = servicioEquipoTorneo.obtenerEstadisticas(idTorneo);
+
+    model.put("torneo", torneo);
     model.put("tablaPosiciones", tabla);
 
     return new ModelAndView("tablaEquipos", model);

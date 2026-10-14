@@ -76,6 +76,21 @@ public class ServicioTorneoImpl implements ServicioTorneo {
     }
   }
 
+  @Override
+  public long contarFechasFinalizadas(Long idTorneo) {
+    Torneo torneo = consultarTorneoPorId(idTorneo);
+
+    if (torneo == null || torneo.getJornadas() == null) {
+      return 0;
+    }
+
+    return torneo
+      .getJornadas()
+      .stream()
+      .filter(jornada -> "Finalizada".equalsIgnoreCase(jornada.getEstado()))
+      .count();
+  }
+
   private void validarDatosFixture(Torneo torneo, List<Long> idsEquipos) {
     if (idsEquipos == null || idsEquipos.size() < 2) {
       throw new IllegalArgumentException("Debe tener al menos dos equipos");

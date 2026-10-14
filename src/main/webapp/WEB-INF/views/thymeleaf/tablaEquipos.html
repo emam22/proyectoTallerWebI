@@ -215,6 +215,18 @@
     }
 
 
+    .boton-volver {
+        display: inline-block;
+        padding: 12px 20px;
+        background: #b6ff00;
+        color: #232323;
+        text-decoration: none;
+        font-weight: 900;
+        border-radius: 10px;
+        transition: 0.2s ease;
+    }
+
+
     /* =========================
        ESTADISTICAS
     ========================= */
@@ -379,6 +391,13 @@
 </div>
 
 <main>
+
+    <header>
+        <a th:href="@{/lobby(idTorneo=${torneo.id})}"
+           class="boton-volver">
+            Volver al lobby
+        </a>
+    </header>
     <div class="panel-tabla">
         <table>
             <thead>

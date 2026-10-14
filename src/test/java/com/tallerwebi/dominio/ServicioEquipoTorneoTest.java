@@ -152,4 +152,29 @@ public class ServicioEquipoTorneoTest {
 
     verify(repositorioEquipoTorneoMock).obtenerTablaPosiciones(idTorneo);
   }
+
+  @Test
+  public void obtenerEstadisticasDevuelveLaTablaDePosiciones() {
+    // preparacion
+    Long idTorneo = 1L;
+
+    List<EquipoTorneo> estadisticasEsperadas = new ArrayList<>();
+
+    EquipoTorneo et1 = new EquipoTorneo();
+    EquipoTorneo et2 = new EquipoTorneo();
+
+    estadisticasEsperadas.add(et1);
+    estadisticasEsperadas.add(et2);
+
+    when(repositorioEquipoTorneoMock.obtenerTablaPosiciones(idTorneo))
+      .thenReturn(estadisticasEsperadas);
+
+    // ejecucion
+    List<EquipoTorneo> resultado = servicioEquipoTorneo.obtenerEstadisticas(idTorneo);
+
+    // verificacion
+    assertThat(resultado, is(estadisticasEsperadas));
+
+    verify(repositorioEquipoTorneoMock).obtenerTablaPosiciones(idTorneo);
+  }
 }

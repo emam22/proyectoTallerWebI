@@ -383,7 +383,7 @@
                 <div class="proxima-fecha-valor" th:text="${proximaFechaNombre} ?: 'Fecha 11'">Fecha 11</div>
             </div>
 
-            <div class="avanzar-col-der">
+            <!--<div class="avanzar-col-der">
                 <div class="destacado-partido">
                     <div class="destacado-equipos">
                         <span th:text="${partido1Local} ?: 'BARRACAS CENTRAL'">BARRACAS CENTRAL</span>
@@ -394,9 +394,11 @@
                         <span th:text="${partido1Dia} ?: 'Jue, 10 de Sept'">Jue, 10 de Sept</span>
                         <span th:text="${partido1Hora} ?: '20hs'">20hs</span>
                     </div>
-                </div>
+                </div>-->
 
-                <div class="destacado-partido">
+
+
+               <!-- <div class="destacado-partido">
                     <div class="destacado-equipos">
                         <span th:text="${partido2Local} ?: 'DEFENSA Y JUSTICIA'">DEFENSA Y JUSTICIA</span>
                         <span class="vs">vs.</span>
@@ -406,27 +408,30 @@
                         <span th:text="${partido2Dia} ?: 'Jue, 10 de Sept'">Jue, 10 de Sept</span>
                         <span th:text="${partido2Hora} ?: '21hs'">21hs</span>
                     </div>
-                </div>
+                </div>-->
+
             </div>
-        </div>
+
     </a>
 
 
     <!-- 2. TOTALES -->
-    <div class="card-totales">
+
+<div class="card-totales">
         <div class="total-item">
             <span>TOTAL EQUIPOS:</span>
-            <strong th:text="${totalEquipos} ?: '30'">30</strong>
+            <strong th:text="${totalEquipos}">0</strong>
         </div>
-        <div class="total-item">
+       <!-- <div class="total-item">
             <span>TOTAL JUGADORES:</span>
             <strong th:text="${totalJugadores} ?: '660'">660</strong>
-        </div>
+        </div>-->
         <div class="total-item">
             <span>FECHAS JUGADAS :</span>
-            <strong th:text="${fechasJugadas} ?: '10'">10</strong>
+            <strong th:text="${fechasJugadas}">0</strong>
         </div>
     </div>
+
 
 
     <!-- 3. FIXTURE + TABLA -->
@@ -440,51 +445,8 @@
                 FIXTURE
             </a>
 
-            <!-- FECHA 11 -->
-            <div class="card-fecha-box">
-                <h3 th:text="${tituloFechaActual} ?: 'FECHA 11 DE 30'">FECHA 11 DE 30</h3>
 
-                <div class="partido-fila">
-                    <div class="mini-equipos">
-                        <span>BARRACAS CENTRAL</span>
-                        <span class="mini-vs">vs.</span>
-                        <span>BOCA JUNIORS</span>
-                    </div>
-                    <div class="partido-fecha">Jue, 10 de Sept • 20hs</div>
-                </div>
 
-                <div class="partido-fila">
-                    <div class="mini-equipos">
-                        <span>DEFENSA Y JUSTICIA</span>
-                        <span class="mini-vs">vs.</span>
-                        <span>LANÚS</span>
-                    </div>
-                    <div class="partido-fecha">Jue, 10 de Sept • 21hs</div>
-                </div>
-            </div>
-
-            <!-- FECHA 12 -->
-            <div class="card-fecha-box">
-                <h3 th:text="${tituloFechaSiguiente} ?: 'FECHA 12 DE 30'">FECHA 12 DE 30</h3>
-
-                <div class="partido-fila">
-                    <div class="mini-equipos">
-                        <span>BARRACAS CENTRAL</span>
-                        <span class="mini-vs">vs.</span>
-                        <span>BOCA JUNIORS</span>
-                    </div>
-                    <div class="partido-fecha">Jue, 10 de Sept • 20hs</div>
-                </div>
-
-                <div class="partido-fila">
-                    <div class="mini-equipos">
-                        <span>DEFENSA Y JUSTICIA</span>
-                        <span class="mini-vs">vs.</span>
-                        <span>LANÚS</span>
-                    </div>
-                    <div class="partido-fecha">Jue, 10 de Sept • 21hs</div>
-                </div>
-            </div>
 
         </div>
 
