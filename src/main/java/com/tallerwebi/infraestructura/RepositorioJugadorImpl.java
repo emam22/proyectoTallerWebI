@@ -23,6 +23,14 @@ public class RepositorioJugadorImpl implements RepositorioJugador {
   }
 
   @Override
+  public void eliminar(Long idJugador) {
+    Jugador jugador = sessionFactory.getCurrentSession().get(Jugador.class, idJugador);
+    if (jugador != null) {
+      sessionFactory.getCurrentSession().remove(jugador);
+    }
+  }
+
+  @Override
   public List<Jugador> listarPorEquipo(Long idEquipo) {
     return sessionFactory
       .getCurrentSession()

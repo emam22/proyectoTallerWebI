@@ -235,6 +235,64 @@ public class ControladorJugadoresTest {
     assertThat(mav.getViewName(), is("redirect:/jugadoresTorneo?idTorneo=1"));
   }
 
+  @Test
+  public void deberiaEliminarElJugadorYRedirigir() {
+    // preparacion
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    torneo.setCantidadMinJugadores(1);
+    inscribirEquipoEnTorneo(1L, 10L, torneo);
+    when(this.servicioJugadorMock.obtenerJugadores(10L))
+      .thenReturn(List.of(new Jugador(), new Jugador()));
+
+    // ejecucion
+    ModelAndView mav = this.controlador.eliminarJugador(1L, 10L, 99L, redirectAttributesMock);
+
+    // verificacion
+    verify(this.servicioJugadorMock).eliminarJugador(eq(10L), eq(99L));
+    verify(redirectAttributesMock).addFlashAttribute(eq("ok"), anyString());
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneo?idTorneo=1"));
+  }
+
+  @Test
+  public void noDeberiaEliminarSiElEquipoNoEstaInscriptoEnElTorneo() {
+    // preparacion
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    when(this.servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(torneo);
+    when(this.servicioEquipoTorneoMock.obtenerEquiposPorTorneo(1L)).thenReturn(new ArrayList<>());
+
+    // ejecucion
+    ModelAndView mav = this.controlador.eliminarJugador(1L, 99L, 5L, redirectAttributesMock);
+
+    // verificacion
+    verify(this.servicioJugadorMock, never()).eliminarJugador(any(), any());
+    verify(redirectAttributesMock).addFlashAttribute(eq("error"), anyString());
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneo?idTorneo=1"));
+  }
+
+  @Test
+  public void noDeberiaEliminarSiElEquipoAlcanzoElMinimoDeJugadores() {
+    // preparacion
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    torneo.setCantidadMinJugadores(2);
+    inscribirEquipoEnTorneo(1L, 10L, torneo);
+    when(this.servicioJugadorMock.obtenerJugadores(10L))
+      .thenReturn(List.of(new Jugador(), new Jugador()));
+
+    // ejecucion
+    ModelAndView mav = this.controlador.eliminarJugador(1L, 10L, 99L, redirectAttributesMock);
+
+    // verificacion
+    verify(this.servicioJugadorMock, never()).eliminarJugador(any(), any());
+    verify(redirectAttributesMock).addFlashAttribute(eq("error"), anyString());
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneo?idTorneo=1"));
+  }
+
   private void inscribirEquipoEnTorneo(Long idTorneo, Long idEquipo, Torneo torneo) {
     when(this.servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
     Equipo equipo = new Equipo();

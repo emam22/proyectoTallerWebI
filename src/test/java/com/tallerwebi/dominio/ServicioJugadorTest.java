@@ -83,4 +83,22 @@ public class ServicioJugadorTest {
     assertThat(resultado, is(jugadores));
     verify(this.repositorioJugadorMock).listarPorEquipo(5L);
   }
+
+  @Test
+  public void deberiaEliminarElJugadorYQuitarloDelEquipo() {
+    // preparacion
+    Equipo equipo = new Equipo();
+    Jugador jugador = new Jugador();
+    jugador.setId(7L);
+    equipo.setJugadores(new ArrayList<>(List.of(jugador)));
+    when(this.repositorioEquipoMock.buscarPorId(1L)).thenReturn(equipo);
+
+    // ejecucion
+    this.servicioJugador.eliminarJugador(1L, 7L);
+
+    // verificacion
+    assertThat(equipo.getJugadores(), hasSize(0));
+    verify(this.repositorioEquipoMock).guardar(equipo);
+    verify(this.repositorioJugadorMock).eliminar(7L);
+  }
 }

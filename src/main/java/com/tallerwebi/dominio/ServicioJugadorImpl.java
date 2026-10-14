@@ -40,4 +40,14 @@ public class ServicioJugadorImpl implements ServicioJugador {
       repositorioEquipo.guardar(equipo);
     }
   }
+
+  @Override
+  public void eliminarJugador(Long idEquipo, Long idJugador) {
+    Equipo equipo = repositorioEquipo.buscarPorId(idEquipo);
+    if (equipo != null && equipo.getJugadores() != null) {
+      equipo.getJugadores().removeIf(jugador -> idJugador.equals(jugador.getId()));
+      repositorioEquipo.guardar(equipo);
+    }
+    repositorioJugador.eliminar(idJugador);
+  }
 }

@@ -65,6 +65,12 @@
             color: var(--accent);
         }
 
+        .mensaje.error {
+            background: var(--error-bg);
+            border: 1px solid var(--error);
+            color: var(--error-soft);
+        }
+
         .seccion {
             background: var(--surface-3);
             border-radius: var(--radius-lg);
@@ -160,6 +166,23 @@
             background: var(--accent-hover);
         }
 
+        .btn-eliminar {
+            background: var(--error-bg);
+            border: 1px solid var(--error);
+            color: var(--error-soft);
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background var(--dur-fast), color var(--dur-fast);
+        }
+
+        .btn-eliminar:hover {
+            background: var(--error);
+            color: var(--bg);
+        }
+
         .btn-jugadores {
             background: var(--surface-2);
             border: 2px solid var(--accent);
@@ -210,6 +233,7 @@
 
     <!-- MENSAJES -->
     <div class="mensaje ok" th:if="${ok}" th:text="${ok}">Ok</div>
+    <div class="mensaje error" th:if="${error}" th:text="${error}">Error</div>
 
     <!-- EQUIPOS Y PLANTELES -->
     <div class="aviso" th:if="${#lists.isEmpty(equipos)}">
@@ -226,6 +250,7 @@
                 <th>NOMBRE</th>
                 <th>APELLIDO</th>
                 <th>PUESTO</th>
+                <th>ACCIONES</th>
             </tr>
             </thead>
             <tbody>
@@ -234,9 +259,16 @@
                 <td class="campo" th:text="${jugador.nombre}">Nombre</td>
                 <td th:text="${jugador.apellido}">Apellido</td>
                 <td th:text="${jugador.puesto}">Puesto</td>
+                <td>
+                    <form th:action="@{/jugadoresTorneo/eliminar(idTorneo=${torneo.id})}" method="post">
+                        <input type="hidden" name="idEquipo" th:value="${filaEquipo.equipo.id}"/>
+                        <input type="hidden" name="idJugador" th:value="${jugador.id}"/>
+                        <button type="submit" class="btn-eliminar">Eliminar</button>
+                    </form>
+                </td>
             </tr>
             <tr th:if="${#lists.isEmpty(filaEquipo.jugadores)}">
-                <td colspan="4" class="aviso">Sin jugadores cargados.</td>
+                <td colspan="5" class="aviso">Sin jugadores cargados.</td>
             </tr>
             </tbody>
         </table>

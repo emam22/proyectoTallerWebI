@@ -105,6 +105,39 @@ public class ControladorJugadores {
     return new ModelAndView(REDIRECT_JUGADORES + idTorneo);
   }
 
+  @RequestMapping(path = "/jugadoresTorneo/eliminar", method = RequestMethod.POST)
+  public ModelAndView eliminarJugador(
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    @RequestParam("idEquipo") Long idEquipo,
+    @RequestParam("idJugador") Long idJugador,
+    RedirectAttributes redirectAttributes
+  ) {
+    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+
+    if (torneo == null || !equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
+      return rechazar(
+        REDIRECT_JUGADORES + idTorneo,
+        "El equipo no esta inscripto en este torneo.",
+        redirectAttributes
+      );
+    }
+
+    List<Jugador> jugadores = servicioJugador.obtenerJugadores(idEquipo);
+
+    if (alcanzaMinimo(jugadores, torneo)) {
+      return rechazar(
+        REDIRECT_JUGADORES + idTorneo,
+        "El equipo no puede quedar por debajo del minimo de jugadores.",
+        redirectAttributes
+      );
+    }
+
+    servicioJugador.eliminarJugador(idEquipo, idJugador);
+
+    redirectAttributes.addFlashAttribute(OK, "Jugador eliminado correctamente.");
+    return new ModelAndView(REDIRECT_JUGADORES + idTorneo);
+  }
+
   private ModelAndView rechazar(
     String vista,
     String motivo,
@@ -127,6 +160,11 @@ public class ControladorJugadores {
   private boolean superaMaximo(List<Jugador> jugadores, Torneo torneo) {
     Integer maximo = torneo.getCantidadMaxJugadores();
     return maximo != null && jugadores.size() >= maximo;
+  }
+
+  private boolean alcanzaMinimo(List<Jugador> jugadores, Torneo torneo) {
+    Integer minimo = torneo.getCantidadMinJugadores();
+    return minimo != null && jugadores.size() <= minimo;
   }
 
   private boolean tieneDorsal(List<Jugador> jugadores, Integer dorsal) {

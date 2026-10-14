@@ -3,6 +3,7 @@ package com.tallerwebi.infraestructura;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 import com.tallerwebi.dominio.Equipo;
 import com.tallerwebi.dominio.Jugador;
@@ -85,5 +86,23 @@ public class RepositorioJugadorTest {
 
     // verificacion
     assertThat(jugadores, hasSize(0));
+  }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void deberiaEliminarUnJugador() {
+    // preparacion
+    Jugador jugador = new Jugador();
+    jugador.setNombre("Borrar");
+    this.sessionFactory.getCurrentSession().persist(jugador);
+    Long id = jugador.getId();
+
+    // ejecucion
+    this.repositorioJugador.eliminar(id);
+
+    // verificacion
+    Jugador obtenido = this.sessionFactory.getCurrentSession().get(Jugador.class, id);
+    assertThat(obtenido, is(nullValue()));
   }
 }
