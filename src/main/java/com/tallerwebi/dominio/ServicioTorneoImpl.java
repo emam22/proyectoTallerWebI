@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class ServicioTorneoImpl implements ServicioTorneo {
 
+  /*Injectar servicio, no repositorio*/
+
   private final RepositorioEquipoImpl repositorioEquipo;
   private RepositorioTorneo repositorioTorneo;
   private RepositorioJornada repositorioJornada;

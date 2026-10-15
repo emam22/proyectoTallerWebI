@@ -90,15 +90,27 @@ public class ControladorTorneo {
 
     int cantidadEquiposActuales = servicioEquipoTorneo.contarEquiposPorTorneo(id);
 
-    int cantidadEquiposNecesarios = torneoEnCurso.getCantidadDeEquipos();
+    int cantidadEquiposNecesarios = 0;
+    int minJugadores = 11;
+    int maxJugadores = 23;
+
+    if (torneoEnCurso != null) {
+      cantidadEquiposNecesarios = torneoEnCurso.getCantidadDeEquipos();
+
+      minJugadores = torneoEnCurso.getCantidadMinJugadores();
+      maxJugadores = torneoEnCurso.getCantidadMaxJugadores();
+    }
 
     model.put(ID_TORNEO, id);
     model.put("cantidadEquiposActuales", cantidadEquiposActuales);
     model.put("cantidadEquiposNecesarios", cantidadEquiposNecesarios);
+    model.put("minJugadores", minJugadores);
+    model.put("maxJugadores", maxJugadores);
 
     return new ModelAndView("creacion-equipo", model);
   }
 
+  /*Los parametros deben llegar por ModelAttribute*/
   @RequestMapping(path = "/guardarEquipo", method = RequestMethod.POST)
   public ModelAndView guardarEquipo(
     @RequestParam(ID_TORNEO) Long idTorneo,
@@ -180,13 +192,15 @@ public class ControladorTorneo {
       return new ModelAndView("redirect:/lobbyAdmin");
     }
 
+    /* Deberia estar en un metodo del servicio
     int cantidadActual = servicioEquipoTorneo.contarEquiposPorTorneo(idTorneo);
 
     int cantidadNecesaria = torneo.getCantidadDeEquipos();
 
+
     if (cantidadActual < cantidadNecesaria) {
       return new ModelAndView("redirect:/creacion-equipo?idTorneo=" + idTorneo);
-    }
+    }*/
 
     try {
       // Comprobamos si el fixture ya fue generado.

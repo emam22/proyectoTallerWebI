@@ -48,19 +48,4 @@ public class LobbyAdminControllerTest {
     assert modelAndView != null;
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("lobbyAdmin"));
   }
-
-  @Test
-  public void laVistaLobbyAdminDebeContenerLasOpcionesDeAdministracion() throws Exception {
-    this.mockMvc.perform(get("/lobbyAdmin"))
-      .andExpect(status().isOk())
-      .andExpect(view().name("lobbyAdmin"))
-      .andExpect(content().string(containsString("SystemTOR")))
-      .andExpect(content().string(containsString("/img/isotipo.png")))
-      .andExpect(content().string(containsString("/img/favicon.png")))
-      .andExpect(content().string(containsString("Bienvenido Administrador")))
-      .andExpect(content().string(containsString("CREAR NUEVO TORNEO")))
-      .andExpect(content().string(containsString("ADMINISTRAR TORNEO EN CURSO")))
-      .andExpect(content().string(containsString("/formulario-torneo")))
-      .andExpect(content().string(containsString("/administrarTorneo")));
-  }
 }

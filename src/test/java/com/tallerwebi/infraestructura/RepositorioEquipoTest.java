@@ -74,16 +74,12 @@ public class RepositorioEquipoTest {
     Equipo equipo = new Equipo();
 
     //ejecucion
-    repositorioEquipo.guardar(equipo);
+    sessionFactory.getCurrentSession().persist(equipo);
 
     Long id = equipo.getId();
 
     //validacion
-    Equipo equipoObtenido = sessionFactory
-      .getCurrentSession()
-      .createQuery("from Equipo where id = :id", Equipo.class)
-      .setParameter("id", id)
-      .uniqueResult();
+    Equipo equipoObtenido = repositorioEquipo.buscarPorId(id);
 
     assertThat(equipoObtenido.getId(), is(equalTo(id)));
   }
@@ -96,11 +92,7 @@ public class RepositorioEquipoTest {
     Long id = 999999L;
 
     // ejecucion
-    Equipo equipoObtenido = sessionFactory
-      .getCurrentSession()
-      .createQuery("from Equipo where id = :id", Equipo.class)
-      .setParameter("id", id)
-      .uniqueResult();
+    Equipo equipoObtenido = repositorioEquipo.buscarPorId(id);
 
     // validacion
     assertThat(equipoObtenido, is(nullValue()));

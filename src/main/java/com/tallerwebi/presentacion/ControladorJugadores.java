@@ -103,11 +103,13 @@ public class ControladorJugadores {
     try {
       servicioEstadisticas.iniciarEstadisticas(jugador);
     } catch (JugadorNoExiste e) {
-      redirectAttributes.addFlashAttribute(ERROR, "No se pudo agregar al jugador");
+      redirectAttributes.addFlashAttribute(ERROR, "No se pudo agregar al jugador.");
 
-      redirectAttributes.addFlashAttribute(OK, "Jugador agregado correctamente.");
       return new ModelAndView(REDIRECT_JUGADORES + idTorneo);
     }
+
+    redirectAttributes.addFlashAttribute(OK, "Jugador agregado correctamente.");
+
     return new ModelAndView(REDIRECT_JUGADORES + idTorneo);
   }
 

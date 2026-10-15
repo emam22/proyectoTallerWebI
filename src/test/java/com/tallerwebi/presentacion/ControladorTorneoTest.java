@@ -38,15 +38,17 @@ public class ControladorTorneoTest {
 
   @Test
   public void alCrearTorneoSeDebeCrearTorneoYRedirigirACreacionDeEquipo() throws Exception {
-    // preparación
+    // preparacion
     when(torneoMock.getId()).thenReturn(5L);
+    when(torneoMock.getCantidadMinJugadores()).thenReturn(11);
+    when(torneoMock.getCantidadMaxJugadores()).thenReturn(23);
 
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
-    // ejecución
+    // ejecucion
     ModelAndView mav = controladorTorneo.crearTorneo(torneoMock, redirectAttributes);
 
-    // validación
+    // validacion
     assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/creacion-equipo?idTorneo=5"));
 
     verify(servicioTorneoMock, times(1)).registrarTorneo(torneoMock);
@@ -54,18 +56,22 @@ public class ControladorTorneoTest {
 
   @Test
   public void siElTorneoYaExisteSeDebeVolverALFormulario() throws Exception {
-    //preparacion
+    // Preparación
+    when(torneoMock.getCantidadMinJugadores()).thenReturn(11);
+    when(torneoMock.getCantidadMaxJugadores()).thenReturn(23);
+
     doThrow(TorneoExistente.class).when(servicioTorneoMock).registrarTorneo(torneoMock);
 
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
-    //ejecucion
+    // Ejecución
     ModelAndView mav = controladorTorneo.crearTorneo(torneoMock, redirectAttributes);
 
-    //validacion
-    assertThat(mav.getViewName(), equalToIgnoringCase("formulario-torneo"));
+    // Validación
+    assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/formulario-torneo"));
+
     assertThat(
-      mav.getModel().get("error").toString(),
+      redirectAttributes.getFlashAttributes().get("error").toString(),
       equalToIgnoringCase("Ya existe un torneo con este nombre")
     );
   }
@@ -73,6 +79,9 @@ public class ControladorTorneoTest {
   @Test
   public void errorEnRegistrarTorneoDeberiaVolverAFormularioTorneoYMostrarError() throws Exception {
     // preparacion
+    when(torneoMock.getCantidadMinJugadores()).thenReturn(11);
+    when(torneoMock.getCantidadMaxJugadores()).thenReturn(23);
+
     doThrow(RuntimeException.class).when(servicioTorneoMock).registrarTorneo(torneoMock);
 
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
@@ -81,9 +90,10 @@ public class ControladorTorneoTest {
     ModelAndView modelAndView = controladorTorneo.crearTorneo(torneoMock, redirectAttributes);
 
     // validacion
-    assertThat(modelAndView.getViewName(), equalToIgnoringCase("formulario-torneo"));
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/formulario-torneo"));
+
     assertThat(
-      modelAndView.getModel().get("error").toString(),
+      redirectAttributes.getFlashAttributes().get("error").toString(),
       equalToIgnoringCase("Error al crear el torneo")
     );
   }
@@ -93,6 +103,7 @@ public class ControladorTorneoTest {
     // preparacion
     Torneo torneo = new Torneo();
     torneo.setId(1L);
+    torneo.setCantidadDeEquipos(8);
     torneo.setCantidadMinJugadores(10);
     torneo.setCantidadMaxJugadores(15);
     when(servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(torneo);
@@ -126,6 +137,9 @@ public class ControladorTorneoTest {
     Torneo torneo = new Torneo();
     torneo.setId(5L);
     torneo.setNombre("MegaFutbol");
+    torneo.setCantidadMaxJugadores(23);
+    torneo.setCantidadMinJugadores(11);
+    torneo.setCantidadDeEquipos(8);
 
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
@@ -141,6 +155,9 @@ public class ControladorTorneoTest {
     // preparacion
     Torneo torneo = new Torneo();
     torneo.setId(5L);
+    torneo.setCantidadDeEquipos(8);
+    torneo.setCantidadMinJugadores(11);
+    torneo.setCantidadMaxJugadores(23);
 
     when(servicioTorneoMock.consultarTorneoPorId(5L)).thenReturn(torneo);
 
@@ -156,13 +173,16 @@ public class ControladorTorneoTest {
     // preparacion
     Torneo torneo = new Torneo();
     torneo.setId(8L);
+    torneo.setCantidadDeEquipos(8);
+    torneo.setCantidadMinJugadores(11);
+    torneo.setCantidadMaxJugadores(23);
 
     when(servicioTorneoMock.consultarTorneoPorId(8L)).thenReturn(torneo);
 
     // ejecucion
     controladorTorneo.crearEquipo(8L);
 
-    // validacion
+    // verificacion
     verify(servicioTorneoMock, times(1)).consultarTorneoPorId(8L);
   }
 

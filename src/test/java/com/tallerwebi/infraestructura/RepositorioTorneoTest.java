@@ -39,8 +39,10 @@ public class RepositorioTorneoTest {
     //preparacion
     Torneo torneo = new Torneo();
     torneo.setNombre(nombreTorneo);
+
     //ejecucion
     repositorioTorneo.guardar(torneo);
+
     //validacion
     Torneo torneoObtenido = sessionFactory
       .getCurrentSession()
@@ -73,16 +75,12 @@ public class RepositorioTorneoTest {
     torneo.setNombre("MegaFutbol");
 
     //ejecucion
-    repositorioTorneo.guardar(torneo);
+    sessionFactory.getCurrentSession().persist(torneo);
 
     Long id = torneo.getId();
 
     //validacion
-    Torneo torneoObtenido = sessionFactory
-      .getCurrentSession()
-      .createQuery("from Torneo where id = :id", Torneo.class)
-      .setParameter("id", id)
-      .uniqueResult();
+    Torneo torneoObtenido = repositorioTorneo.buscarTorneoPorId(id);
 
     assertThat(torneoObtenido.getId(), is(equalTo(id)));
   }
@@ -95,12 +93,7 @@ public class RepositorioTorneoTest {
     Long id = 999999L;
 
     // ejecución
-    Torneo torneoObtenido = sessionFactory
-      .getCurrentSession()
-      .createQuery("from Torneo where id = :id", Torneo.class)
-      .setParameter("id", id)
-      .uniqueResult();
-
+    Torneo torneoObtenido = repositorioTorneo.buscarTorneoPorId(id);
     // validación
     assertThat(torneoObtenido, is(nullValue()));
   }
