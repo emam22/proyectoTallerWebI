@@ -91,7 +91,6 @@ public class RepositorioEquipoTorneoTest {
     // ejecucion
     int cantidad = repositorioEquipoTorneo.contarEquiposPorTorneo(idTorneo);
 
-
     // verificacion
     assertThat(cantidad, is(equalTo(0)));
   }

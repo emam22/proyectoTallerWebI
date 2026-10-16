@@ -216,12 +216,6 @@ public class ControladorTorneo {
           .map(inscripcion -> inscripcion.getEquipo().getId())
           .toList();
 
-        if (LOGGER.isLoggable(Level.INFO)) {
-          LOGGER.info("ID DEL TORNEO: " + idTorneo);
-          LOGGER.info("EQUIPOS RECUPERADOS: " + idsEquipos.size());
-          LOGGER.info("IDS DE EQUIPOS: " + idsEquipos);
-        }
-
         // Generamos y guardamos las jornadas y sus partidos.
         servicioTorneo.crearTorneoConFixture(torneo, idsEquipos);
       }
@@ -237,36 +231,6 @@ public class ControladorTorneo {
       return new ModelAndView("redirect:/lobbyAdmin");
     }
   }
-
-  /*
-  @RequestMapping(path = "/finalizarTorneo", method = RequestMethod.POST)
-  public ModelAndView finalizarTorneo(@RequestParam(ID_TORNEO) Long idTorneo) {
-    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
-
-    int cantidadActual = servicioEquipoTorneo.contarEquiposPorTorneo(idTorneo);
-
-    int cantidadNecesaria = torneo.getCantidadDeEquipos();
-
-    if (cantidadActual < cantidadNecesaria) {
-      return new ModelAndView(REDIRECT_CREACION_EQUIPO + idTorneo);
-    }
-
-    return new ModelAndView("redirect:/lobbyAdmin");
-  }*/
-
-  /*
-  @RequestMapping(path = "/fixtureTorneo", method = RequestMethod.GET)
-  public ModelAndView verFixture(@RequestParam(ID_TORNEO) Long idTorneo) {
-    Map<String, Object> model = new HashMap<>();
-
-    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
-    List<Jornada> jornadas = servicioTorneo.obtenerJornadasPorTorneo(idTorneo);
-
-    model.put("torneo", torneo);
-    model.put("jornadas", jornadas);
-
-    return new ModelAndView("fixtureTorneo", model);
-  }*/
 
   @RequestMapping(path = "/fixtureTorneo", method = RequestMethod.GET)
   public ModelAndView verFixture(@RequestParam(ID_TORNEO) Long idTorneo) {

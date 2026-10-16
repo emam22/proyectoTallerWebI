@@ -91,7 +91,7 @@ public class ControladorLoginTest {
   }
 
   @Test
-  public void loginDeUsuarioCorrectoDeberiaLlevarALobby() {
+  public void loginDeUsuarioCorrectoDeberiaLlevarAElegirTorneo() {
     // preparacion
     Usuario usuarioEncontradoMock = mock(Usuario.class);
     when(usuarioEncontradoMock.getRol()).thenReturn("usuario");
@@ -104,7 +104,7 @@ public class ControladorLoginTest {
     ModelAndView modelAndView = controladorLogin.validarLogin(datosLoginMock, requestMock);
 
     // validacion
-    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/lobby"));
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/elegirTorneo"));
     verify(sessionMock, times(1)).setAttribute("ROL", usuarioEncontradoMock.getRol());
   }
 

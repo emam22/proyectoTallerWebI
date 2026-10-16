@@ -8,6 +8,7 @@ import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.*;
+import com.tallerwebi.dominio.excepcion.EquipoExistente;
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -247,5 +248,90 @@ public class ControladorTorneoTest {
     assertThat(mav.getViewName(), equalTo("fixtureTorneo"));
     assertThat(mav.getModel().get("torneo"), equalTo(torneo));
     assertThat(mav.getModel().get("jornadas"), equalTo(jornadas));
+  }
+
+  //mas test para seguir validando metodos
+
+  @Test
+  public void siLaCantidadMaximaNoEsValidaDebeVolverAlFormulario() throws Exception {
+    // preparación
+    when(torneoMock.getCantidadMinJugadores()).thenReturn(11);
+    when(torneoMock.getCantidadMaxJugadores()).thenReturn(11);
+
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    // ejecución
+    ModelAndView mav = controladorTorneo.crearTorneo(torneoMock, redirectAttributes);
+
+    // validación
+    assertThat(mav.getViewName(), equalTo("redirect:/formulario-torneo"));
+    assertThat(
+      redirectAttributes.getFlashAttributes().get("error"),
+      equalTo("La cantidad máxima de jugadores debe ser mayor que la mínima")
+    );
+
+    verify(servicioTorneoMock, never()).registrarTorneo(torneoMock);
+  }
+
+  @Test
+  public void alIrAlFormularioTorneoDebeMostrarLaVistaYCrearUnTorneo() {
+    // ejecución
+    ModelAndView mav = controladorTorneo.irAFormularioTorneo();
+
+    // Validación
+    assertThat(mav.getViewName(), equalTo("formulario-torneo"));
+    assertThat(mav.getModel().containsKey("torneo"), equalTo(true));
+  }
+
+  @Test
+  public void alListarEquiposDebeMostrarLaVistaYConsultarLosEquipos() {
+    // preparación
+    Long idTorneo = 5L;
+    List<Equipo> equipos = new ArrayList<>();
+
+    when(servicioEquipoMock.obtenerEquipos()).thenReturn(equipos);
+
+    // ejecución
+    ModelAndView mav = controladorTorneo.listarEquipos(idTorneo);
+
+    // validación
+    assertThat(mav.getViewName(), equalTo("lista-equipos"));
+    assertThat(mav.getModel().get("equipos"), equalTo(equipos));
+    verify(servicioEquipoMock, times(1)).obtenerEquipos();
+  }
+
+  @Test
+  public void alGuardarEquipoExistenteDebeMostrarErrorYRedirigir() throws EquipoExistente {
+    // preparación
+    Long idTorneo = 1L;
+
+    Torneo torneo = mock(Torneo.class);
+    when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+    when(torneo.getCantidadDeEquipos()).thenReturn(4);
+    when(servicioEquipoTorneoMock.contarEquiposPorTorneo(idTorneo)).thenReturn(0);
+
+    doThrow(new EquipoExistente())
+      .when(servicioEquipoTorneoMock)
+      .crearEquipoEInscribirlo(any(Equipo.class), any(Torneo.class));
+
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    // ejecución
+    ModelAndView mav = controladorTorneo.guardarEquipo(
+      idTorneo,
+      "Los Leones",
+      "#FF0000",
+      "#FFFFFF",
+      "#0000FF",
+      "#FFFFFF",
+      redirectAttributes
+    );
+
+    // validación
+    assertThat(mav.getViewName(), equalTo("redirect:/creacion-equipo?idTorneo=1"));
+    assertThat(
+      redirectAttributes.getFlashAttributes().get("error"),
+      equalTo("Ya existe un equipo con ese nombre")
+    );
   }
 }

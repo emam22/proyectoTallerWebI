@@ -146,6 +146,9 @@ public class ServicioTorneoImpl implements ServicioTorneo {
       equiposFechaLibreIda.add(jornada.getEquipoFechaLibre());
 
       partidosDeIda.add(enfrentamientos);
+
+      torneo.agregarJornada(jornada); //se agrega esta linea para agregar la jornada al torneo
+
       repositorioJornada.guardar(jornada);
 
       rotarEquipos(equipos);
@@ -204,6 +207,7 @@ public class ServicioTorneoImpl implements ServicioTorneo {
         jornada.agregarPartido(partido);
       }
 
+      torneo.agregarJornada(jornada);
       repositorioJornada.guardar(jornada);
     }
   }

@@ -2,6 +2,7 @@ package com.tallerwebi.integracion;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -47,5 +48,23 @@ public class LobbyAdminControllerTest {
     ModelAndView modelAndView = result.getModelAndView();
     assert modelAndView != null;
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("lobbyAdmin"));
+  }
+
+  @Test
+  public void administrarTorneoDeberiaMostrarLaVistaYElIdDelTorneo() throws Exception {
+    // preparacion
+    Long idTorneo = 5L;
+
+    // ejecucion
+    MvcResult result =
+      this.mockMvc.perform(get("/administrarTorneoAdmin/" + idTorneo))
+        .andExpect(status().isOk())
+        .andReturn();
+
+    ModelAndView modelAndView = result.getModelAndView();
+
+    // validacion
+    assert modelAndView != null;
+    assertThat(modelAndView.getModel().get("idTorneoActual"), equalTo(idTorneo));
   }
 }
