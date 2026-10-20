@@ -159,9 +159,14 @@
     <img th:src="@{/img/isotipo.png?v=2}" alt="Logo" class="isotipo-header">
     <h1 class="titulo-pagina">ESTADÍSTICAS DE JUGADORES</h1>
 
-    <div class="btn-menu-hamburguesa" aria-label="Menú">
-        <span></span>
-        <span></span>
+    <div class="menu-usuario">
+        <button type="button" class="btn-menu-hamburguesa" id="btnMenuUsuario" aria-label="Abrir menú">
+            <span></span>
+            <span></span>
+        </button>
+        <div class="menu-usuario-opciones" id="menuUsuarioOpciones">
+            <a th:href="@{/logout}">Cerrar sesión</a>
+        </div>
     </div>
 </header>
 
@@ -176,7 +181,8 @@
             <thead>
             <tr>
                 <th style="width: 50px;">#</th>
-                <th class="th-jugador">Jugador</th>
+                <th class="th-jugador">Nombre</th>
+                <th class="th-jugador">Apellido</th>
                 <th>PJ</th>
                 <th>Goles</th>
                 <th>Asist.</th>
@@ -194,7 +200,8 @@
             <!-- Iteración dinámica -->
             <tr th:each="stat, iter : ${estadisticasDeJugadores}">
                 <td th:text="${iter.count}">1</td>
-                <td class="td-jugador" th:text="${stat.jugador?.nombre}">Juan perez</td>
+                <td class="td-jugador" th:text="${stat.jugador?.nombre}">Juan</td>
+                <td class="td-jugador" th:text="${stat.jugador?.apellido}">Perez</td>
                 <td th:text="${stat.partidosJugados} ?: 0">0</td>
                 <td th:text="${stat.goles} ?: 0">0</td>
                 <td th:text="${stat.asistencias} ?: 0">0</td>
@@ -206,6 +213,8 @@
         </table>
     </div>
 </main>
+
+<script th:src="@{/js/menu.js}"></script>
 
 </body>
 </html>

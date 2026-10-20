@@ -140,6 +140,7 @@ public class ControladorJugadores {
       );
     }
 
+    servicioEstadisticas.eliminarEstadisticas(idJugador);
     servicioJugador.eliminarJugador(idEquipo, idJugador);
 
     redirectAttributes.addFlashAttribute(OK, "Jugador eliminado correctamente.");

@@ -14,9 +14,14 @@ import org.springframework.web.servlet.ModelAndView;
 public class LobbyAdminController {
 
   private final ServicioEquipoTorneo servicioEquipoTorneo;
+  private final ServicioTorneo servicioTorneo;
 
-  public LobbyAdminController(ServicioEquipoTorneo servicioEquipoTorneo) {
+  public LobbyAdminController(
+    ServicioEquipoTorneo servicioEquipoTorneo,
+    ServicioTorneo servicioTorneo
+  ) {
     this.servicioEquipoTorneo = servicioEquipoTorneo;
+    this.servicioTorneo = servicioTorneo;
   }
 
   @GetMapping("/lobbyAdmin")
@@ -36,6 +41,14 @@ public class LobbyAdminController {
   @GetMapping("/administrarTorneoAdmin/{idTorneo}")
   public ModelAndView administrarTorneo(@PathVariable("idTorneo") Long idTorneo) {
     Map<String, Object> model = new ModelMap();
+
+    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+
+    if (torneo == null) {
+      return new ModelAndView("redirect:/lobbyAdmin");
+    }
+
+    model.put("torneo", torneo);
 
     List<EquipoTorneo> tabla = servicioEquipoTorneo.obtenerEstadisticas(idTorneo);
     model.put("tablaPosiciones", tabla);

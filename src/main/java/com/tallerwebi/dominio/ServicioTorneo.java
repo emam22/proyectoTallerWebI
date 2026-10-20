@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.dominio.excepcion.FechaLimiteEditarTorneo;
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
 import java.util.List;
 
@@ -12,4 +13,5 @@ public interface ServicioTorneo {
   void crearTorneoConFixture(Torneo torneo, List<Long> idsEquipos)
     throws TorneoExistente, Exception;
   long contarFechasFinalizadas(Long idTorneo);
+  boolean consultarAunEnFechaParaEditar(Long idTorneo);
 }

@@ -44,4 +44,9 @@ public class ServicioEstadisticaJugadorImpl implements ServicioEstadisticaJugado
     List<EstadisticaJugador> estadisticas = repoEstadisticas.obtenerEstadisticas();
     return estadisticas;
   }
+
+  @Override
+  public void eliminarEstadisticas(Long idJugador) {
+    repoEstadisticas.eliminarFilaEstadistica(idJugador);
+  }
 }

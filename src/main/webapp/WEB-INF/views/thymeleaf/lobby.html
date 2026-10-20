@@ -498,7 +498,8 @@
                 <div class="stat-header-bar">
                     <span class="stat-titulo">Estadísticas de Jugadores</span>
                     <div class="stat-columnas-header">
-                        <span class="col-jugador">Jugador</span>
+                        <span class="col-jugador">Nombre</span>
+                        <span class="col-apellido">Apellido</span>
                         <span class="col-stat">Goles</span>
                         <span class="col-stat">Asist.</span>
                         <span class="col-stat">Part.</span>
@@ -516,7 +517,8 @@
                         </tr>
 
                         <tr th:each="stat, iter : ${estadisticasJugadores}" th:if="${iter.count le 8}">
-                            <td class="col-jugador" th:text="${stat.jugador.nombre}">Juan perez</td>
+                            <td class="col-jugador" th:text="${stat.jugador.nombre}">Juan</td>
+                            <td class="col-apellido" th:text="${stat.jugador.apellido}">perez</td>
                             <td class="col-stat" th:text="${stat.goles}">0</td>
                             <td class="col-stat" th:text="${stat.asistencias}">0</td>
                             <td class="col-stat" th:text="${stat.participacionesGol}">0</td>

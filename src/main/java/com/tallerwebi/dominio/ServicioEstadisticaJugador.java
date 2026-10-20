@@ -6,4 +6,5 @@ import java.util.List;
 public interface ServicioEstadisticaJugador {
   void iniciarEstadisticas(Jugador Jugador) throws JugadorNoExiste;
   List<EstadisticaJugador> obtenerEstadisticas();
+  void eliminarEstadisticas(Long idJugador);
 }

@@ -224,6 +224,12 @@
 
 <div class="admin-dashboard-container">
 
+    <div class="fechaLimite"
+         th:text="${torneo?.getFechaLimite() != null} ?
+              'Límite de edición: ' + ${#temporals.format(torneo.getFechaLimite(), 'dd/MM/yyyy HH:mm')} :
+              'Sin fecha límite definida'">
+        FECHA LÍMITE
+    </div>
 
     <div class="fila-botones-superiores">
         <a th:href="@{/editarEquipo(idTorneo=${idTorneoActual})}" class="btn-card-admin">

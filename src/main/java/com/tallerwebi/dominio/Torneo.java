@@ -1,10 +1,12 @@
 package com.tallerwebi.dominio;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 public class Torneo {
@@ -14,6 +16,10 @@ public class Torneo {
   private Long id;
 
   private String nombre;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private LocalDateTime fechaInicio;
+
   private Integer cantidadDeEquipos;
   private Integer cantidadMinJugadores;
   private Integer cantidadMaxJugadores;
@@ -37,6 +43,19 @@ public class Torneo {
 
   public void setNombre(String nombre) {
     this.nombre = nombre;
+  }
+
+  public LocalDateTime getFechaInicio() {
+    return this.fechaInicio;
+  }
+
+  public void setFechaInicio(LocalDateTime fecha) {
+    this.fechaInicio = fecha;
+  }
+
+  @Transient
+  public LocalDateTime getFechaLimite() {
+    return this.fechaInicio.minusHours(24);
   }
 
   public Integer getCantidadDeEquipos() {
@@ -116,5 +135,11 @@ public class Torneo {
     }
 
     return enfrentamientos.size();
+  }
+
+  @Transient
+  public boolean permiteModificaciones() {
+    LocalDateTime fechaLimite = fechaInicio.minusHours(24);
+    return LocalDateTime.now().isBefore(fechaLimite);
   }
 }

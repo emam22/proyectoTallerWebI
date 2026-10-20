@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.dominio.excepcion.FechaLimiteEditarTorneo;
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
 import com.tallerwebi.infraestructura.RepositorioEquipoImpl;
 import jakarta.transaction.Transactional;
@@ -56,6 +57,15 @@ public class ServicioTorneoImpl implements ServicioTorneo {
   @Override
   public List<Torneo> obtenerTorneos() {
     return repositorioTorneo.listar();
+  }
+
+  @Override
+  public boolean consultarAunEnFechaParaEditar(Long idTorneo) {
+    Torneo torneoActual = repositorioTorneo.buscarTorneoPorId(idTorneo);
+    if (torneoActual.permiteModificaciones() == false) {
+      return false;
+    }
+    return true;
   }
 
   @Override

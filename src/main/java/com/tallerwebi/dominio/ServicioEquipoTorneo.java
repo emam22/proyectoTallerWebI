@@ -9,6 +9,5 @@ public interface ServicioEquipoTorneo {
   int contarEquiposPorTorneo(Long idTorneo);
   void inscribirEquipoExistente(Equipo equipo, Torneo torneo) throws EquipoYaInscripto;
   List<EquipoTorneo> obtenerEstadisticas(Long idTorneo);
-
   List<EquipoTorneo> obtenerEquiposPorTorneo(Long idTorneo);
 }

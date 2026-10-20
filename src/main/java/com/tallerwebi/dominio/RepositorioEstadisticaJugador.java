@@ -5,4 +5,5 @@ import java.util.List;
 public interface RepositorioEstadisticaJugador {
   void guardar(EstadisticaJugador estadisticaJugador);
   List<EstadisticaJugador> obtenerEstadisticas();
+  void eliminarFilaEstadistica(Long idJugador);
 }

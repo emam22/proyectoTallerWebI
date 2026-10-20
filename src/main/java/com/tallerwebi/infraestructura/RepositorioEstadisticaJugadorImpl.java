@@ -27,4 +27,13 @@ public class RepositorioEstadisticaJugadorImpl implements RepositorioEstadistica
   public List<EstadisticaJugador> obtenerEstadisticas() {
     return sf.getCurrentSession().createQuery("Select e from EstadisticaJugador e").getResultList();
   }
+
+  @Override
+  public void eliminarFilaEstadistica(Long idJugador) {
+    sf
+      .getCurrentSession()
+      .createQuery("Delete From EstadisticaJugador e Where e.jugador.id = :idJugador")
+      .setParameter("idJugador", idJugador)
+      .executeUpdate();
+  }
 }
