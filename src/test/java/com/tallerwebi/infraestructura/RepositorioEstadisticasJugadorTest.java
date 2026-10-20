@@ -1,8 +1,9 @@
 package com.tallerwebi.infraestructura;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.tallerwebi.dominio.*;
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
 import jakarta.transaction.Transactional;
@@ -94,7 +95,8 @@ public class RepositorioEstadisticasJugadorTest {
 
     repositorioEstadisticaJugador.eliminarFilaEstadistica(est1.getJugador().getId());
 
-    List<EstadisticaJugador> estadisticasActualizadas = repositorioEstadisticaJugador.obtenerEstadisticas();
+    List<EstadisticaJugador> estadisticasActualizadas =
+      repositorioEstadisticaJugador.obtenerEstadisticas();
 
     assertNotNull(estadisticasActualizadas);
     assertTrue(!estadisticasActualizadas.isEmpty());

@@ -1,26 +1,28 @@
 package com.tallerwebi.integracion;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
+import com.tallerwebi.dominio.Torneo;
 import com.tallerwebi.integracion.config.HibernateTestConfig;
 import com.tallerwebi.integracion.config.SpringWebTestConfig;
+import java.time.LocalDateTime;
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -32,6 +34,9 @@ public class LobbyAdminControllerTest {
 
   @Autowired
   private WebApplicationContext wac;
+
+  @Autowired
+  private SessionFactory sessionFactory;
 
   private MockMvc mockMvc;
 
@@ -51,11 +56,19 @@ public class LobbyAdminControllerTest {
   }
 
   @Test
+  @Transactional
+  @Rollback
   public void administrarTorneoDeberiaMostrarLaVistaYElIdDelTorneo() throws Exception {
-    // preparacion
-    Long idTorneo = 5L;
+    // 1. Preparación: Creamos y guardamos un torneo real en la BD de test
+    Torneo torneo = new Torneo();
+    torneo.setNombre("Torneo Clausura");
+    torneo.setFechaInicio(LocalDateTime.now().plusDays(5));
 
-    // ejecucion
+    this.sessionFactory.getCurrentSession().save(torneo);
+
+    Long idTorneo = torneo.getId();
+
+    // 2. Ejecución: Petición HTTP al endpoint con el ID real generado
     MvcResult result =
       this.mockMvc.perform(get("/administrarTorneoAdmin/" + idTorneo))
         .andExpect(status().isOk())
@@ -63,8 +76,9 @@ public class LobbyAdminControllerTest {
 
     ModelAndView modelAndView = result.getModelAndView();
 
-    // validacion
+    // 3. Validación
     assert modelAndView != null;
     assertThat(modelAndView.getModel().get("idTorneoActual"), equalTo(idTorneo));
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("administrarTorneoAdmin"));
   }
 }
