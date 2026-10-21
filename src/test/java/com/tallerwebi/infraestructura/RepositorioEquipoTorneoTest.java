@@ -225,4 +225,74 @@ public class RepositorioEquipoTorneoTest {
 
     assertThat(resultado.get(2).getEquipo().getNombre(), equalTo("Equipo A"));
   }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void deberiaBuscarEquipoTorneoPorId() {
+    // preparacion
+    Torneo torneo = new Torneo();
+    torneo.setNombre("Torneo de prueba");
+    sessionFactory.getCurrentSession().persist(torneo);
+
+    Equipo equipo = new Equipo();
+    equipo.setNombre("Equipo de prueba");
+    sessionFactory.getCurrentSession().persist(equipo);
+
+    EquipoTorneo equipoTorneo = new EquipoTorneo();
+    equipoTorneo.setTorneo(torneo);
+    equipoTorneo.setEquipo(equipo);
+
+    sessionFactory.getCurrentSession().persist(equipoTorneo);
+    sessionFactory.getCurrentSession().flush();
+
+    Long idEquipo = equipo.getId();
+    Long idTorneo = torneo.getId();
+
+    // ejecucion
+    EquipoTorneo equipoTorneoObtenido = repositorioEquipoTorneo.buscarEquipoTorneoPorId(
+      idEquipo,
+      idTorneo
+    );
+
+    // validacion
+    assertThat(equipoTorneoObtenido, is(notNullValue()));
+    assertThat(equipoTorneoObtenido.getEquipo().getId(), is(equalTo(idEquipo)));
+    assertThat(equipoTorneoObtenido.getTorneo().getId(), is(equalTo(idTorneo)));
+  }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void deberiaEliminarUnEquipoTorneo() {
+    // preparacion
+    Torneo torneo = new Torneo();
+    torneo.setNombre("Torneo de prueba");
+    sessionFactory.getCurrentSession().persist(torneo);
+
+    Equipo equipo = new Equipo();
+    equipo.setNombre("Equipo de prueba");
+    sessionFactory.getCurrentSession().persist(equipo);
+
+    EquipoTorneo equipoTorneo = new EquipoTorneo();
+    equipoTorneo.setEquipo(equipo);
+    equipoTorneo.setTorneo(torneo);
+
+    sessionFactory.getCurrentSession().persist(equipoTorneo);
+    sessionFactory.getCurrentSession().flush();
+
+    Long idEquipoTorneo = equipoTorneo.getId();
+
+    // ejecucion
+    repositorioEquipoTorneo.eliminar(equipoTorneo);
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
+
+    // validacion
+    EquipoTorneo equipoTorneoEliminado = sessionFactory
+      .getCurrentSession()
+      .get(EquipoTorneo.class, idEquipoTorneo);
+
+    assertThat(equipoTorneoEliminado, is(nullValue()));
+  }
 }

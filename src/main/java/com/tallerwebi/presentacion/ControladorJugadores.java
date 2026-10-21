@@ -1,7 +1,6 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.*;
-import com.tallerwebi.dominio.excepcion.EquipoExistente;
 import com.tallerwebi.dominio.excepcion.JugadorNoExiste;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +18,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class ControladorJugadores {
 
   private static final String ID_TORNEO = "idTorneo";
+  private static final String ID_EQUIPO = "idEquipo";
   private static final String REDIRECT_JUGADORES = "redirect:/jugadoresTorneo?idTorneo=";
+  private static final String REDIRECT_JUGADORES_ADMIN = "redirect:/jugadoresTorneoAdmin?idTorneo=";
+
   private static final String OK = "ok";
   private static final String ERROR = "error";
 
@@ -41,9 +43,23 @@ public class ControladorJugadores {
     this.servicioEstadisticas = servicioEstadisticas;
   }
 
+  // =========================
+  // MOSTRAR JUGADORES
+  // =========================
+
   @RequestMapping(path = "/jugadoresTorneo", method = RequestMethod.GET)
   public ModelAndView gestionarJugadores(@RequestParam(ID_TORNEO) Long idTorneo) {
+    return gestionarJugadoresComun(idTorneo, "jugadoresTorneo");
+  }
+
+  @RequestMapping(path = "/jugadoresTorneoAdmin", method = RequestMethod.GET)
+  public ModelAndView gestionarJugadoresAdmin(@RequestParam(ID_TORNEO) Long idTorneo) {
+    return gestionarJugadoresComun(idTorneo, "jugadoresTorneoAdmin");
+  }
+
+  private ModelAndView gestionarJugadoresComun(Long idTorneo, String vista) {
     Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+
     if (torneo == null) {
       return new ModelAndView("redirect:/lobbyAdmin");
     }
@@ -51,24 +67,74 @@ public class ControladorJugadores {
     Map<String, Object> model = new ModelMap();
     model.put("torneo", torneo);
     model.put("equipos", equiposConJugadores(idTorneo));
-    return new ModelAndView("jugadoresTorneo", model);
+    model.put(ID_TORNEO, idTorneo);
+
+    return new ModelAndView(vista, model);
   }
+
+  // =========================
+  // AGREGAR JUGADOR
+  // =========================
 
   @RequestMapping(path = "/jugadoresTorneo/agregar", method = RequestMethod.POST)
   public ModelAndView agregarJugador(
     @RequestParam(ID_TORNEO) Long idTorneo,
-    @RequestParam("idEquipo") Long idEquipo,
+    @RequestParam(ID_EQUIPO) Long idEquipo,
     @RequestParam("nombre") String nombre,
     @RequestParam("apellido") String apellido,
     @RequestParam(value = "dorsal", required = false) Integer dorsal,
     @RequestParam(value = "puesto", required = false) String puesto,
     RedirectAttributes redirectAttributes
   ) throws JugadorNoExiste {
+    return agregarJugadorComun(
+      idTorneo,
+      idEquipo,
+      nombre,
+      apellido,
+      dorsal,
+      puesto,
+      redirectAttributes,
+      REDIRECT_JUGADORES + idTorneo
+    );
+  }
+
+  @RequestMapping(path = "/jugadoresTorneoAdmin/agregar", method = RequestMethod.POST)
+  public ModelAndView agregarJugadorAdmin(
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    @RequestParam(ID_EQUIPO) Long idEquipo,
+    @RequestParam("nombre") String nombre,
+    @RequestParam("apellido") String apellido,
+    @RequestParam(value = "dorsal", required = false) Integer dorsal,
+    @RequestParam(value = "puesto", required = false) String puesto,
+    RedirectAttributes redirectAttributes
+  ) throws JugadorNoExiste {
+    return agregarJugadorComun(
+      idTorneo,
+      idEquipo,
+      nombre,
+      apellido,
+      dorsal,
+      puesto,
+      redirectAttributes,
+      REDIRECT_JUGADORES_ADMIN + idTorneo
+    );
+  }
+
+  private ModelAndView agregarJugadorComun(
+    Long idTorneo,
+    Long idEquipo,
+    String nombre,
+    String apellido,
+    Integer dorsal,
+    String puesto,
+    RedirectAttributes redirectAttributes,
+    String redireccion
+  ) throws JugadorNoExiste {
     Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
 
     if (torneo == null || !equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
       return rechazar(
-        REDIRECT_JUGADORES + idTorneo,
+        redireccion,
         "El equipo no esta inscripto en este torneo.",
         redirectAttributes
       );
@@ -78,7 +144,7 @@ public class ControladorJugadores {
 
     if (superaMaximo(jugadores, torneo)) {
       return rechazar(
-        REDIRECT_JUGADORES + idTorneo,
+        redireccion,
         "El equipo ya alcanzo la cantidad maxima de jugadores.",
         redirectAttributes
       );
@@ -86,7 +152,7 @@ public class ControladorJugadores {
 
     if (dorsal != null && tieneDorsal(jugadores, dorsal)) {
       return rechazar(
-        REDIRECT_JUGADORES + idTorneo,
+        redireccion,
         "Ya hay un jugador con el dorsal " + dorsal + " en este equipo.",
         redirectAttributes
       );
@@ -105,26 +171,62 @@ public class ControladorJugadores {
     } catch (JugadorNoExiste e) {
       redirectAttributes.addFlashAttribute(ERROR, "No se pudo agregar al jugador.");
 
-      return new ModelAndView(REDIRECT_JUGADORES + idTorneo);
+      return new ModelAndView(redireccion);
     }
 
     redirectAttributes.addFlashAttribute(OK, "Jugador agregado correctamente.");
 
-    return new ModelAndView(REDIRECT_JUGADORES + idTorneo);
+    return new ModelAndView(redireccion);
   }
+
+  // =========================
+  // ELIMINAR JUGADOR
+  // =========================
 
   @RequestMapping(path = "/jugadoresTorneo/eliminar", method = RequestMethod.POST)
   public ModelAndView eliminarJugador(
     @RequestParam(ID_TORNEO) Long idTorneo,
-    @RequestParam("idEquipo") Long idEquipo,
+    @RequestParam(ID_EQUIPO) Long idEquipo,
     @RequestParam("idJugador") Long idJugador,
     RedirectAttributes redirectAttributes
+  ) {
+    return eliminarJugadorComun(
+      idTorneo,
+      idEquipo,
+      idJugador,
+      redirectAttributes,
+      REDIRECT_JUGADORES + idTorneo
+    );
+  }
+
+  @RequestMapping(path = "/jugadoresTorneoAdmin/eliminar", method = RequestMethod.POST)
+  public ModelAndView eliminarJugadorAdmin(
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    @RequestParam(ID_EQUIPO) Long idEquipo,
+    @RequestParam("idJugador") Long idJugador,
+    RedirectAttributes redirectAttributes
+  ) {
+    return eliminarJugadorComun(
+      idTorneo,
+      idEquipo,
+      idJugador,
+      redirectAttributes,
+      REDIRECT_JUGADORES_ADMIN + idTorneo
+    );
+  }
+
+  private ModelAndView eliminarJugadorComun(
+    Long idTorneo,
+    Long idEquipo,
+    Long idJugador,
+    RedirectAttributes redirectAttributes,
+    String redireccion
   ) {
     Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
 
     if (torneo == null || !equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
       return rechazar(
-        REDIRECT_JUGADORES + idTorneo,
+        redireccion,
         "El equipo no esta inscripto en este torneo.",
         redirectAttributes
       );
@@ -134,7 +236,7 @@ public class ControladorJugadores {
 
     if (alcanzaMinimo(jugadores, torneo)) {
       return rechazar(
-        REDIRECT_JUGADORES + idTorneo,
+        redireccion,
         "El equipo no puede quedar por debajo del minimo de jugadores.",
         redirectAttributes
       );
@@ -144,8 +246,13 @@ public class ControladorJugadores {
     servicioJugador.eliminarJugador(idEquipo, idJugador);
 
     redirectAttributes.addFlashAttribute(OK, "Jugador eliminado correctamente.");
-    return new ModelAndView(REDIRECT_JUGADORES + idTorneo);
+
+    return new ModelAndView(redireccion);
   }
+
+  // =========================
+  // MÉTODOS AUXILIARES
+  // =========================
 
   private ModelAndView rechazar(
     String vista,
@@ -153,26 +260,31 @@ public class ControladorJugadores {
     RedirectAttributes redirectAttributes
   ) {
     redirectAttributes.addFlashAttribute(ERROR, motivo);
+
     return new ModelAndView(vista);
   }
 
   private boolean equipoInscriptoEnTorneo(Long idTorneo, Long idEquipo) {
     for (EquipoTorneo equipoTorneo : servicioEquipoTorneo.obtenerEquiposPorTorneo(idTorneo)) {
       Equipo equipo = equipoTorneo.getEquipo();
+
       if (equipo != null && idEquipo.equals(equipo.getId())) {
         return true;
       }
     }
+
     return false;
   }
 
   private boolean superaMaximo(List<Jugador> jugadores, Torneo torneo) {
     Integer maximo = torneo.getCantidadMaxJugadores();
+
     return maximo != null && jugadores.size() >= maximo;
   }
 
   private boolean alcanzaMinimo(List<Jugador> jugadores, Torneo torneo) {
     Integer minimo = torneo.getCantidadMinJugadores();
+
     return minimo != null && jugadores.size() <= minimo;
   }
 
@@ -182,17 +294,21 @@ public class ControladorJugadores {
         return true;
       }
     }
+
     return false;
   }
 
   private List<EquipoJugadores> equiposConJugadores(Long idTorneo) {
     List<EquipoJugadores> equipos = new ArrayList<>();
+
     for (EquipoTorneo equipoTorneo : servicioEquipoTorneo.obtenerEquiposPorTorneo(idTorneo)) {
       Equipo equipo = equipoTorneo.getEquipo();
+
       if (equipo != null) {
         equipos.add(new EquipoJugadores(equipo, servicioJugador.obtenerJugadores(equipo.getId())));
       }
     }
+
     return equipos;
   }
 }

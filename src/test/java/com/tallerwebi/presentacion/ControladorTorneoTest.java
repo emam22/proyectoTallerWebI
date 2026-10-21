@@ -5,6 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.*;
@@ -332,6 +333,28 @@ public class ControladorTorneoTest {
     assertThat(
       redirectAttributes.getFlashAttributes().get("error"),
       equalTo("Ya existe un equipo con ese nombre")
+    );
+  }
+
+  @Test
+  public void desvincularEquipoDeberiaDesvincularEquipoYRedirigir() {
+    // preparacion
+    Long idEquipo = 3L;
+    Long idTorneo = 8L;
+
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    // ejecucion
+    ModelAndView mav = controladorTorneo.desvincularEquipo(idEquipo, idTorneo, redirectAttributes);
+
+    // verificacion
+    verify(servicioEquipoTorneoMock).desvincularEquipo(idEquipo, idTorneo);
+
+    assertEquals("redirect:/desvincular-equipo?idTorneo=8", mav.getViewName());
+
+    assertEquals(
+      "Equipo desvinculado correctamente",
+      redirectAttributes.getFlashAttributes().get("mensaje")
     );
   }
 }

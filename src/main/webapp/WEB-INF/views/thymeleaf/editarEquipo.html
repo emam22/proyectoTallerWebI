@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/app.css}"/>
+    <link rel="icon" type="image/png" th:href="@{/img/favicon.png?v=2}"/>
+
+    <title>Editar equipos</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #1f1f1f;
+            color: white;
+            min-height: 100vh;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* CONTENEDOR PRINCIPAL */
+        .form-card {
+            display: block;
+            width: 100%;
+            max-width: 850px;
+            min-width: 0;
+            background: #444444;
+            border: 2px solid #b6ff00;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        /* ENCABEZADO */
+        .form-header {
+            width: 100%;
+            background: #b6ff00;
+            color: #111;
+            padding: 12px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* CUERPO */
+        .form-body {
+            display: block;
+            width: 100%;
+            min-width: 0;
+            padding: 25px;
+        }
+
+        .descripcion {
+            color: #efefef;
+            font-size: 14px;
+            text-align: center;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        /* MENSAJES */
+        .mensaje {
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+            margin-bottom: 18px;
+        }
+
+        .mensaje.ok {
+            color: #b6ff00;
+        }
+
+        .mensaje.error {
+            color: #ff6b6b;
+        }
+
+        /* EQUIPOS */
+        .equipo-item {
+            display: flex;
+            width: 100%;
+            min-width: 0;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            background: #333333;
+            border: 1px solid #666666;
+            border-radius: 8px;
+            padding: 15px 18px;
+            margin-bottom: 12px;
+        }
+
+        .equipo-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .equipo-item > div {
+            flex: 1;
+            min-width: 0;
+        }
+
+        /* NOMBRE DEL EQUIPO */
+        .equipo-item strong {
+            display: block;
+            color: white;
+            font-size: 15px;
+            overflow-wrap: anywhere;
+        }
+
+        /* FORMULARIO */
+        .equipo-item form {
+            flex-shrink: 0;
+            margin: 0;
+        }
+
+        /* BOTÓN GENERAL */
+        .btn {
+            display: inline-block;
+            box-sizing: border-box;
+            max-width: 100%;
+            padding: 12px 20px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s,
+            transform 0.1s;
+            text-decoration: none;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        /* BOTÓN EDITAR */
+        .btn-editar {
+            background: #b6ff00;
+            color: #111111;
+            border-color: #b6ff00;
+        }
+
+        .btn-editar:hover {
+            background: #1f1f1f;
+            color: #b6ff00;
+            border-color: #b6ff00;
+        }
+
+        /* CONTENEDOR VOLVER */
+        .acciones-volver {
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        /* BOTÓN VOLVER */
+        a.volver-lobby,
+        a.volver-lobby:link,
+        a.volver-lobby:visited {
+            display: block;
+            width: 100%;
+            padding: 12px 10px;
+            box-sizing: border-box;
+            background: #1f1f1f;
+            color: #b6ff00;
+            border: 2px solid #b6ff00;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 1.4;
+            overflow-wrap: anywhere;
+            transition: background 0.2s, color 0.2s,
+            transform 0.1s;
+        }
+
+        a.volver-lobby:hover {
+            background: #b6ff00;
+            color: #111111;
+            transform: translateY(-1px);
+        }
+
+        /* SIN EQUIPOS */
+        .sin-equipos {
+            display: block;
+            width: 100%;
+            text-align: center;
+            color: #efefef;
+            font-size: 14px;
+            line-height: 1.5;
+            padding: 20px;
+            background: #333333;
+            border-radius: 8px;
+            overflow-wrap: anywhere;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 700px) {
+            body {
+                padding: 20px 12px;
+                align-items: flex-start;
+            }
+
+            .form-card {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .form-body {
+                padding: 18px;
+            }
+
+            .equipo-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 12px;
+                padding: 15px;
+            }
+
+            .equipo-item > div,
+            .equipo-item form {
+                width: 100%;
+            }
+
+            .equipo-item .btn {
+                display: block;
+                width: 100%;
+                max-width: 100%;
+            }
+        }
+
+        @media (max-width: 350px) {
+            body {
+                padding: 15px 8px;
+            }
+
+            .form-body {
+                padding: 12px;
+            }
+
+            .equipo-item {
+                padding: 12px;
+            }
+
+            .form-header {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="form-card">
+
+    <div class="form-header">
+        EDITAR EQUIPOS
+    </div>
+
+    <div class="form-body">
+
+        <p class="descripcion">
+            Seleccioná el equipo que querés editar.
+        </p>
+
+        <p class="mensaje ok"
+           th:if="${mensaje}"
+           th:text="${mensaje}">
+        </p>
+
+        <p class="mensaje error"
+           th:if="${error}"
+           th:text="${error}">
+        </p>
+
+        <!-- CUANDO NO HAY EQUIPOS -->
+        <div class="sin-equipos"
+             th:if="${#lists.isEmpty(equipos)}">
+            <p>No hay equipos inscriptos en este torneo.</p>
+        </div>
+
+        <!-- LISTA DE EQUIPOS -->
+        <div th:each="equipoTorneo : ${equipos}">
+
+            <div class="equipo-item">
+
+                <div>
+                    <strong th:text="${equipoTorneo.equipo.nombre}">
+                        Nombre del equipo
+                    </strong>
+                </div>
+
+                <form th:action="@{/editar-equipo/detalle}"
+                      method="get">
+
+                    <input type="hidden"
+                           name="idEquipo"
+                           th:value="${equipoTorneo.equipo.id}"/>
+
+                    <input type="hidden"
+                           name="idTorneo"
+                           th:value="${idTorneo}"/>
+
+                    <button type="submit"
+                            class="btn btn-editar">
+                        Editar
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+        <!-- VOLVER AL LOBBY -->
+        <div class="acciones-volver">
+            <a th:href="@{/administrarTorneoAdmin/{idTorneo}(idTorneo=${idTorneo})}"
+               class="volver-lobby">
+                Volver al lobby
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<!-- LOGO DE MARCA -->
+<img class="logo-marca"
+     th:src="@{/img/isotipo.png?v=2}"
+     alt="System TOR"/>
+
+<!-- MENÚ DE USUARIO -->
+<div class="menu-usuario">
+    <button type="button"
+            class="btn-menu-hamburguesa"
+            id="btnMenuUsuario"
+            aria-label="Abrir menú">
+        <span></span>
+        <span></span>
+    </button>
+
+    <div class="menu-usuario-opciones" id="menuUsuarioOpciones">
+        <a th:href="@{/logout}">Cerrar sesión</a>
+    </div>
+</div>
+
+<script th:src="@{/js/menu.js}"></script>
+
+</body>
+</html>

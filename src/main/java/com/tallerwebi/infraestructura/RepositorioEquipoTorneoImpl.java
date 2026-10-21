@@ -85,4 +85,24 @@ public class RepositorioEquipoTorneoImpl implements RepositorioEquipoTorneo {
       .setParameter(ID_TORNEO, idTorneo)
       .getResultList();
   }
+
+  @Override
+  public EquipoTorneo buscarEquipoTorneoPorId(Long idEquipo, Long idTorneo) {
+    String hql =
+      "FROM EquipoTorneo et " + "WHERE et.equipo.id = :idEquipo " + "AND et.torneo.id = :idTorneo";
+
+    List<EquipoTorneo> resultados = sessionFactory
+      .getCurrentSession()
+      .createQuery(hql, EquipoTorneo.class)
+      .setParameter("idEquipo", idEquipo)
+      .setParameter("idTorneo", idTorneo)
+      .getResultList();
+
+    return resultados.isEmpty() ? null : resultados.get(0);
+  }
+
+  @Override
+  public void eliminar(EquipoTorneo equipoTorneo) {
+    sessionFactory.getCurrentSession().delete(equipoTorneo);
+  }
 }

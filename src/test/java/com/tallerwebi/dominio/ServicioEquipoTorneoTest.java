@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
@@ -176,5 +177,61 @@ public class ServicioEquipoTorneoTest {
     assertThat(resultado, is(estadisticasEsperadas));
 
     verify(repositorioEquipoTorneoMock).obtenerTablaPosiciones(idTorneo);
+  }
+
+  @Test
+  public void deberiaDesvincularEquipoCuandoExiste() {
+    // preparacion
+    Long idEquipo = 3L;
+    Long idTorneo = 8L;
+
+    EquipoTorneo equipoTorneo = new EquipoTorneo();
+
+    when(repositorioEquipoTorneoMock.buscarEquipoTorneoPorId(idEquipo, idTorneo))
+      .thenReturn(equipoTorneo);
+
+    // ejecucion
+    servicioEquipoTorneo.desvincularEquipo(idEquipo, idTorneo);
+
+    // validacion
+    verify(repositorioEquipoTorneoMock, times(1)).eliminar(equipoTorneo);
+  }
+
+  @Test
+  public void noDeberiaEliminarEquipoTorneoCuandoNoExiste() {
+    // preparacion
+    Long idEquipo = 3L;
+    Long idTorneo = 8L;
+
+    when(repositorioEquipoTorneoMock.buscarEquipoTorneoPorId(idEquipo, idTorneo)).thenReturn(null);
+
+    // ejecucion
+    servicioEquipoTorneo.desvincularEquipo(idEquipo, idTorneo);
+
+    // validacion
+    verify(repositorioEquipoTorneoMock, times(0)).eliminar(any(EquipoTorneo.class));
+  }
+
+  @Test
+  public void deberiaConsultarEquipoTorneoPorId() {
+    // preparacion
+    Long idEquipo = 3L;
+    Long idTorneo = 8L;
+
+    EquipoTorneo equipoTorneo = new EquipoTorneo();
+
+    when(repositorioEquipoTorneoMock.buscarEquipoTorneoPorId(idEquipo, idTorneo))
+      .thenReturn(equipoTorneo);
+
+    // ejecucion
+    EquipoTorneo equipoTorneoObtenido = servicioEquipoTorneo.consultarEquipoTorneoPorId(
+      idEquipo,
+      idTorneo
+    );
+
+    // validacion
+    assertThat(equipoTorneoObtenido, is(equalTo(equipoTorneo)));
+
+    verify(repositorioEquipoTorneoMock, times(1)).buscarEquipoTorneoPorId(idEquipo, idTorneo);
   }
 }

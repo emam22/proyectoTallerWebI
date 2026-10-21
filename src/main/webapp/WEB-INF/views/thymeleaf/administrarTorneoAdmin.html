@@ -232,16 +232,16 @@
     </div>
 
     <div class="fila-botones-superiores">
-        <a th:href="@{/editarEquipo(idTorneo=${idTorneoActual})}" class="btn-card-admin">
+        <a th:href="@{/editar-equipo(idTorneo=${idTorneoActual})}" class="btn-card-admin">
             EDITAR EQUIPO
         </a>
         <a th:href="@{/agregarSancion(idTorneo=${idTorneoActual})}" class="btn-card-admin">
             AGREGAR SANCIÓN
         </a>
-        <a th:href="@{/formulario-torneo}" class="btn-card-admin">
-            CREAR NUEVO<br>TORNEO
+        <a th:href="@{/creacion-equipo-admin(idTorneo=${idTorneoActual})}" class="btn-card-admin">
+            CREAR NUEVO<br>EQUIPO
         </a>
-        <a th:href="@{/desvincularEquipo(idTorneo=${idTorneoActual})}" class="btn-card-admin">
+        <a th:href="@{/desvincular-equipo(idTorneo=${idTorneoActual})}" class="btn-card-admin">
             DESVINCULAR<br>EQUIPO
         </a>
     </div>
@@ -350,6 +350,23 @@
     </div>
 
 </div>
+
+
+<!-- LOGO DE MARCA (DEBAJO DEL MENÚ HAMBURGUESA) -->
+<img class="logo-marca-debajo-menu" th:src="@{/img/isotipo.png?v=2}" alt="System TOR"/>
+
+<!-- MENÚ DE USUARIO -->
+<div class="menu-usuario">
+    <button type="button" class="btn-menu-hamburguesa" id="btnMenuUsuario" aria-label="Abrir menú">
+        <span></span>
+        <span></span>
+    </button>
+    <div class="menu-usuario-opciones" id="menuUsuarioOpciones">
+        <a th:href="@{/logout}">Cerrar sesión</a>
+    </div>
+</div>
+<script th:src="@{/js/menu.js}"></script>
+
 
 </body>
 </html>

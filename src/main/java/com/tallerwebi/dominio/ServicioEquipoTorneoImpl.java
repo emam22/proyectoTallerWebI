@@ -90,4 +90,18 @@ public class ServicioEquipoTorneoImpl implements ServicioEquipoTorneo {
   public List<EquipoTorneo> obtenerEquiposPorTorneo(Long idTorneo) {
     return repositorioEquipoTorneo.obtenerEquiposPorTorneo(idTorneo);
   }
+
+  @Override
+  public void desvincularEquipo(Long idEquipo, Long idTorneo) {
+    EquipoTorneo equipoTorneo = consultarEquipoTorneoPorId(idEquipo, idTorneo);
+
+    if (equipoTorneo != null) {
+      repositorioEquipoTorneo.eliminar(equipoTorneo);
+    }
+  }
+
+  @Override
+  public EquipoTorneo consultarEquipoTorneoPorId(Long idEquipo, Long idTorneo) {
+    return repositorioEquipoTorneo.buscarEquipoTorneoPorId(idEquipo, idTorneo);
+  }
 }
