@@ -12,6 +12,9 @@ public interface ServicioTorneo {
   List<Jornada> obtenerJornadasPorTorneo(Long torneoId);
   void crearTorneoConFixture(Torneo torneo, List<Long> idsEquipos)
     throws TorneoExistente, Exception;
+
+  void validarTorneo(Torneo torneo);
+
   long contarFechasFinalizadas(Long idTorneo);
   boolean consultarAunEnFechaParaEditar(Long idTorneo);
 }

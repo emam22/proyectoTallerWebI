@@ -9,11 +9,9 @@ public interface ServicioEquipoTorneo {
   int contarEquiposPorTorneo(Long idTorneo);
   void inscribirEquipoExistente(Equipo equipo, Torneo torneo) throws EquipoYaInscripto;
   List<EquipoTorneo> obtenerEstadisticas(Long idTorneo);
-<<<<<<< Updated upstream
-=======
+
   void desvincularEquipo(Long idEquipo, Long idTorneo);
   EquipoTorneo consultarEquipoTorneoPorId(Long idEquipo, Long idTorneo);
 
->>>>>>> Stashed changes
   List<EquipoTorneo> obtenerEquiposPorTorneo(Long idTorneo);
 }

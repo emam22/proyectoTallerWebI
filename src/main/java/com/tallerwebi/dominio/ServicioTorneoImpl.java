@@ -4,7 +4,6 @@ import com.tallerwebi.dominio.excepcion.FechaLimiteEditarTorneo;
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
 import com.tallerwebi.infraestructura.RepositorioEquipoImpl;
 import jakarta.transaction.Transactional;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,15 +75,41 @@ public class ServicioTorneoImpl implements ServicioTorneo {
   @Override
   public void crearTorneoConFixture(Torneo torneo, List<Long> idsEquipos)
     throws TorneoExistente, Exception {
-    validarDatosFixture(torneo, idsEquipos);
+    validarTorneo(torneo);
+
+    if (idsEquipos == null || idsEquipos.size() < torneo.getCantidadDeEquipos()) {
+      throw new IllegalArgumentException("Faltan equipos para generar el fixture");
+    }
+
+    // Volver a buscar el torneo dentro de la transacción actual
+    Torneo torneoGestionado = repositorioTorneo.buscarTorneoPorId(torneo.getId());
+    validarTorneoGestionado(torneoGestionado);
+
+    validarDatosFixture(torneoGestionado, idsEquipos);
+
+    // Evitamos conservar fechas libres de una generación anterior.
+    equiposFechaLibreIda.clear();
 
     List<Equipo> equipos = buscarEquipos(idsEquipos);
     agregarFechaLibreSiCorresponde(equipos);
 
-    List<List<Equipo[]>> partidosDeIda = crearJornadasDeIda(torneo, equipos);
+    List<List<Equipo[]>> partidosDeIda = crearJornadasDeIda(torneoGestionado, equipos);
 
-    if (Boolean.TRUE.equals(torneo.getIdaYVuelta())) {
-      crearJornadasDeVuelta(torneo, partidosDeIda);
+    if (Boolean.TRUE.equals(torneoGestionado.getIdaYVuelta())) {
+      crearJornadasDeVuelta(torneoGestionado, partidosDeIda);
+    }
+  }
+
+  @Override
+  public void validarTorneo(Torneo torneo) {
+    if (torneo == null || torneo.getId() == null) {
+      throw new IllegalArgumentException("El torneo no existe");
+    }
+  }
+
+  private void validarTorneoGestionado(Torneo torneo) {
+    if (torneo == null) {
+      throw new IllegalArgumentException("No se encontró el torneo");
     }
   }
 

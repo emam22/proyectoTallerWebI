@@ -35,15 +35,16 @@ public class ControladorTorneo {
   private static final String REDIRECT_CREACION_EQUIPO = "redirect:/creacion-equipo?idTorneo=";
   private static final String ERROR = "error";
   private static final String REDIRECT_CREACION_EQUIPO_ADMIN =
-          "redirect:/creacion-equipo-admin?idTorneo=";
+    "redirect:/creacion-equipo-admin?idTorneo=";
+  private static final String REDIRECT_LOBBY_ADMIN = "redirect:/lobbyAdmin";
 
   private static final Logger LOGGER = Logger.getLogger(ControladorTorneo.class.getName());
 
   @Autowired
   public ControladorTorneo(
-          ServicioTorneo servicioTorneo,
-          ServicioEquipoTorneo servicioEquipoTorneo,
-          ServicioEquipo servicioEquipo
+    ServicioTorneo servicioTorneo,
+    ServicioEquipoTorneo servicioEquipoTorneo,
+    ServicioEquipo servicioEquipo
   ) {
     this.servicioTorneo = servicioTorneo;
     this.servicioEquipoTorneo = servicioEquipoTorneo;
@@ -59,13 +60,13 @@ public class ControladorTorneo {
 
   @RequestMapping(path = "/crearTorneo", method = RequestMethod.POST)
   public ModelAndView crearTorneo(
-          @ModelAttribute("torneo") Torneo torneo,
-          RedirectAttributes redirectAttributes
+    @ModelAttribute("torneo") Torneo torneo,
+    RedirectAttributes redirectAttributes
   ) {
     if (torneo.getCantidadMaxJugadores() <= torneo.getCantidadMinJugadores()) {
       redirectAttributes.addFlashAttribute(
-              ERROR,
-              "La cantidad máxima de jugadores debe ser mayor que la mínima"
+        ERROR,
+        "La cantidad máxima de jugadores debe ser mayor que la mínima"
       );
 
       return new ModelAndView("redirect:/formulario-torneo");
@@ -125,57 +126,57 @@ public class ControladorTorneo {
   /*Los parametros deben llegar por ModelAttribute*/
   @RequestMapping(path = "/guardarEquipo", method = RequestMethod.POST)
   public ModelAndView guardarEquipo(
-          @RequestParam(ID_TORNEO) Long idTorneo,
-          @RequestParam("nombreEquipo") String nombreEquipo,
-          @RequestParam("colorLocal1") String colorLocal1,
-          @RequestParam("colorLocal2") String colorLocal2,
-          @RequestParam("colorVisitante1") String colorVisitante1,
-          @RequestParam("colorVisitante2") String colorVisitante2,
-          RedirectAttributes redirectAttributes
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    @RequestParam("nombreEquipo") String nombreEquipo,
+    @RequestParam("colorLocal1") String colorLocal1,
+    @RequestParam("colorLocal2") String colorLocal2,
+    @RequestParam("colorVisitante1") String colorVisitante1,
+    @RequestParam("colorVisitante2") String colorVisitante2,
+    RedirectAttributes redirectAttributes
   ) {
     return obtenerModeloGuardarEquipo(
-            idTorneo,
-            nombreEquipo,
-            colorLocal1,
-            colorLocal2,
-            colorVisitante1,
-            colorVisitante2,
-            redirectAttributes,
-            REDIRECT_CREACION_EQUIPO + idTorneo
+      idTorneo,
+      nombreEquipo,
+      colorLocal1,
+      colorLocal2,
+      colorVisitante1,
+      colorVisitante2,
+      redirectAttributes,
+      REDIRECT_CREACION_EQUIPO + idTorneo
     );
   }
 
   @RequestMapping(path = "/guardarEquipoAdmin", method = RequestMethod.POST)
   public ModelAndView guardarEquipoAdmin(
-          @RequestParam(ID_TORNEO) Long idTorneo,
-          @RequestParam("nombreEquipo") String nombreEquipo,
-          @RequestParam("colorLocal1") String colorLocal1,
-          @RequestParam("colorLocal2") String colorLocal2,
-          @RequestParam("colorVisitante1") String colorVisitante1,
-          @RequestParam("colorVisitante2") String colorVisitante2,
-          RedirectAttributes redirectAttributes
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    @RequestParam("nombreEquipo") String nombreEquipo,
+    @RequestParam("colorLocal1") String colorLocal1,
+    @RequestParam("colorLocal2") String colorLocal2,
+    @RequestParam("colorVisitante1") String colorVisitante1,
+    @RequestParam("colorVisitante2") String colorVisitante2,
+    RedirectAttributes redirectAttributes
   ) {
     return obtenerModeloGuardarEquipo(
-            idTorneo,
-            nombreEquipo,
-            colorLocal1,
-            colorLocal2,
-            colorVisitante1,
-            colorVisitante2,
-            redirectAttributes,
-            REDIRECT_CREACION_EQUIPO_ADMIN + idTorneo
+      idTorneo,
+      nombreEquipo,
+      colorLocal1,
+      colorLocal2,
+      colorVisitante1,
+      colorVisitante2,
+      redirectAttributes,
+      REDIRECT_CREACION_EQUIPO_ADMIN + idTorneo
     );
   }
 
   private ModelAndView obtenerModeloGuardarEquipo(
-          Long idTorneo,
-          String nombreEquipo,
-          String colorLocal1,
-          String colorLocal2,
-          String colorVisitante1,
-          String colorVisitante2,
-          RedirectAttributes redirectAttributes,
-          String redireccion
+    Long idTorneo,
+    String nombreEquipo,
+    String colorLocal1,
+    String colorLocal2,
+    String colorVisitante1,
+    String colorVisitante2,
+    RedirectAttributes redirectAttributes,
+    String redireccion
   ) {
     Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
 
@@ -226,37 +227,37 @@ public class ControladorTorneo {
 
   @RequestMapping(path = "/cargar-equipo-existente", method = RequestMethod.POST)
   public ModelAndView cargarEquipoExistente(
-          @RequestParam(ID_EQUIPO) Long idEquipo,
-          @RequestParam(ID_TORNEO) Long idTorneo,
-          RedirectAttributes redirectAttributes
+    @RequestParam(ID_EQUIPO) Long idEquipo,
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    RedirectAttributes redirectAttributes
   ) {
     return cargarEquipoExistenteComun(
-            idEquipo,
-            idTorneo,
-            redirectAttributes,
-            REDIRECT_CREACION_EQUIPO + idTorneo
+      idEquipo,
+      idTorneo,
+      redirectAttributes,
+      REDIRECT_CREACION_EQUIPO + idTorneo
     );
   }
 
   @RequestMapping(path = "/cargar-equipo-existente-admin", method = RequestMethod.POST)
   public ModelAndView cargarEquipoExistenteAdmin(
-          @RequestParam(ID_EQUIPO) Long idEquipo,
-          @RequestParam(ID_TORNEO) Long idTorneo,
-          RedirectAttributes redirectAttributes
+    @RequestParam(ID_EQUIPO) Long idEquipo,
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    RedirectAttributes redirectAttributes
   ) {
     return cargarEquipoExistenteComun(
-            idEquipo,
-            idTorneo,
-            redirectAttributes,
-            REDIRECT_CREACION_EQUIPO_ADMIN + idTorneo
+      idEquipo,
+      idTorneo,
+      redirectAttributes,
+      REDIRECT_CREACION_EQUIPO_ADMIN + idTorneo
     );
   }
 
   private ModelAndView cargarEquipoExistenteComun(
-          Long idEquipo,
-          Long idTorneo,
-          RedirectAttributes redirectAttributes,
-          String redireccion
+    Long idEquipo,
+    Long idTorneo,
+    RedirectAttributes redirectAttributes,
+    String redireccion
   ) {
     Equipo equipo = servicioEquipo.consultarEquipoPorId(idEquipo);
     Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
@@ -272,53 +273,51 @@ public class ControladorTorneo {
 
   @RequestMapping(path = "/finalizarTorneo", method = RequestMethod.POST)
   public ModelAndView finalizarTorneo(
-          @RequestParam(ID_TORNEO) Long idTorneo,
-          RedirectAttributes redirectAttributes
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    RedirectAttributes redirectAttributes
   ) {
     Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
 
     if (torneo == null) {
       redirectAttributes.addFlashAttribute("error", "No se encontró el torneo.");
-      return new ModelAndView("redirect:/lobbyAdmin");
+      return new ModelAndView(REDIRECT_LOBBY_ADMIN);
     }
 
-    /* Deberia estar en un metodo del servicio
-    int cantidadActual = servicioEquipoTorneo.contarEquiposPorTorneo(idTorneo);
-
-    int cantidadNecesaria = torneo.getCantidadDeEquipos();
-
-
-    if (cantidadActual < cantidadNecesaria) {
-      return new ModelAndView("redirect:/creacion-equipo?idTorneo=" + idTorneo);
-    }*/
-
     try {
-      // Comprobamos si el fixture ya fue generado.
+      List<EquipoTorneo> inscripciones = servicioEquipoTorneo.obtenerEquiposPorTorneo(idTorneo);
+
+      List<Long> idsEquipos = inscripciones
+        .stream()
+        .map(inscripcion -> inscripcion.getEquipo().getId())
+        .toList();
+
+      if (idsEquipos.size() != torneo.getCantidadDeEquipos()) {
+        redirectAttributes.addFlashAttribute(
+          ERROR,
+          "La cantidad de equipos inscriptos no coincide con la configurada."
+        );
+        return new ModelAndView(REDIRECT_LOBBY_ADMIN);
+      }
+
       List<Jornada> jornadasExistentes = servicioTorneo.obtenerJornadasPorTorneo(idTorneo);
 
-      if (jornadasExistentes == null || jornadasExistentes.isEmpty()) {
-        // Recuperamos las inscripciones del torneo.
-        List<EquipoTorneo> inscripciones = servicioEquipoTorneo.obtenerEquiposPorTorneo(idTorneo);
-
-        // Obtenemos los IDs de los equipos inscriptos.
-        List<Long> idsEquipos = inscripciones
-                .stream()
-                .map(inscripcion -> inscripcion.getEquipo().getId())
-                .toList();
-
-        // Generamos y guardamos las jornadas y sus partidos.
+      if (
+        jornadasExistentes == null ||
+        jornadasExistentes.isEmpty() ||
+        jornadasExistentes.stream().allMatch(jornada -> jornada.getPartidos().isEmpty())
+      ) {
         servicioTorneo.crearTorneoConFixture(torneo, idsEquipos);
       }
 
       // Volvemos al lobby con el fixture ya generado.
-      return new ModelAndView("redirect:/lobbyAdmin");
+      return new ModelAndView(REDIRECT_LOBBY_ADMIN);
     } catch (Exception e) {
       redirectAttributes.addFlashAttribute(
-              "error",
-              "No se pudo generar el fixture: " + e.getMessage()
+        "error",
+        "No se pudo generar el fixture: " + e.getMessage()
       );
 
-      return new ModelAndView("redirect:/lobbyAdmin");
+      return new ModelAndView(REDIRECT_LOBBY_ADMIN);
     }
   }
 
@@ -349,9 +348,9 @@ public class ControladorTorneo {
 
   @RequestMapping(path = "/desvincular-equipo", method = RequestMethod.POST)
   public ModelAndView desvincularEquipo(
-          @RequestParam(ID_EQUIPO) Long idEquipo,
-          @RequestParam(ID_TORNEO) Long idTorneo,
-          RedirectAttributes redirectAttributes
+    @RequestParam(ID_EQUIPO) Long idEquipo,
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    RedirectAttributes redirectAttributes
   ) {
     servicioEquipoTorneo.desvincularEquipo(idEquipo, idTorneo);
 
@@ -374,8 +373,8 @@ public class ControladorTorneo {
 
   @RequestMapping(path = "/editar-equipo/detalle", method = RequestMethod.GET)
   public ModelAndView mostrarFormularioEditarEquipo(
-          @RequestParam(ID_EQUIPO) Long idEquipo,
-          @RequestParam(ID_TORNEO) Long idTorneo
+    @RequestParam(ID_EQUIPO) Long idEquipo,
+    @RequestParam(ID_TORNEO) Long idTorneo
   ) {
     Map<String, Object> model = new HashMap<>();
 
@@ -391,35 +390,26 @@ public class ControladorTorneo {
 
     return new ModelAndView("formulario-editar-equipo", model);
   }
-
-  @RequestMapping(
-          path = "/actualizar-equipo",
-          method = RequestMethod.POST
-  )
+  /*
+  @RequestMapping(path = "/actualizar-equipo", method = RequestMethod.POST)
   public ModelAndView actualizarEquipo(
-          @RequestParam(ID_EQUIPO) Long idEquipo,
-          @RequestParam(ID_TORNEO) Long idTorneo,
-          @RequestParam("nombreEquipo") String nombreEquipo,
-          @RequestParam(value = "escudoEquipo", required = false)
-          MultipartFile escudoEquipo,
-          @RequestParam("colorLocal1") String colorLocal1,
-          @RequestParam("colorLocal2") String colorLocal2,
-          @RequestParam("colorVisitante1") String colorVisitante1,
-          @RequestParam("colorVisitante2") String colorVisitante2,
-          RedirectAttributes redirectAttributes) {
-
+    @RequestParam(ID_EQUIPO) Long idEquipo,
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    @RequestParam("nombreEquipo") String nombreEquipo,
+    @RequestParam(value = "escudoEquipo", required = false) MultipartFile escudoEquipo,
+    @RequestParam("colorLocal1") String colorLocal1,
+    @RequestParam("colorLocal2") String colorLocal2,
+    @RequestParam("colorVisitante1") String colorVisitante1,
+    @RequestParam("colorVisitante2") String colorVisitante2,
+    RedirectAttributes redirectAttributes
+  ) {
     // Buscar el equipo seleccionado
     Equipo equipo = servicioEquipo.consultarEquipoPorId(idEquipo);
 
     if (equipo == null) {
-      redirectAttributes.addFlashAttribute(
-              ERROR,
-              "No se encontró el equipo seleccionado."
-      );
+      redirectAttributes.addFlashAttribute(ERROR, "No se encontró el equipo seleccionado.");
 
-      return new ModelAndView(
-              "redirect:/editar-equipo?idTorneo=" + idTorneo
-      );
+      return new ModelAndView("redirect:/editar-equipo?idTorneo=" + idTorneo);
     }
 
     // Actualizar el nombre
@@ -429,9 +419,7 @@ public class ControladorTorneo {
     // Se guardan ambos colores de cada camiseta en un String.
     equipo.setColorLocal(colorLocal1 + "," + colorLocal2);
 
-    equipo.setColorVisitanate(
-            colorVisitante1 + "," + colorVisitante2
-    );
+    equipo.setColorVisitanate(colorVisitante1 + "," + colorVisitante2);
 
     // Actualizar el escudo solamente si se seleccionó uno nuevo
     if (escudoEquipo != null && !escudoEquipo.isEmpty()) {
@@ -445,23 +433,10 @@ public class ControladorTorneo {
     // Persistir los cambios mediante el servicio
     servicioEquipo.actualizarEquipo(equipo);
 
-    redirectAttributes.addFlashAttribute(
-            "mensaje",
-            "Equipo actualizado correctamente."
-    );
+    redirectAttributes.addFlashAttribute("mensaje", "Equipo actualizado correctamente.");
 
-    return new ModelAndView(
-            "redirect:/editar-equipo?idTorneo=" + idTorneo
-    );
+    return new ModelAndView("redirect:/editar-equipo?idTorneo=" + idTorneo);
   }
-
-
-
+  */
 
 }
-
-
-
-
-
-

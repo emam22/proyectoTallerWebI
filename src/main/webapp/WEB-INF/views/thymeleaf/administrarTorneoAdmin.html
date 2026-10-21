@@ -63,6 +63,13 @@
             background-color: #484848;
         }
 
+        .panel-fechas-admin form .btn-card-admin {
+            width: 100%;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+
         /* FILA INFERIOR: FECHAS + TABLA + ACCIONES LATERALES */
         .fila-inferior-grid {
             display: grid;
@@ -252,47 +259,62 @@
 
         <div class="panel-fechas-admin">
 
+            <!-- Cuando todavía no existe el fixture -->
+            <div th:if="${jornadas == null or #lists.isEmpty(jornadas)}"
+                 class="card-fecha-bloque">
 
-            <div class="card-fecha-bloque">
-                <div class="fecha-titulo" th:text="${fecha1Nombre} ?: 'FECHA 11 DE 30'">FECHA 11 DE 30</div>
+                <h3 class="fecha-titulo">FIXTURE</h3>
 
-                <div class="partido-item">
-                    <div class="partido-equipos">
-                        <span>BARRACAS CENTRAL</span>
-                        <span>BOCA JUNIORS</span>
-                    </div>
-                    <div class="partido-horario">jue, 10 de Sept 20hS</div>
-                </div>
+                <p style="color: white; font-size: 13px; text-align: center;">
+                    Todavía no se generó el fixture.
+                </p>
 
-                <div class="partido-item">
-                    <div class="partido-equipos">
-                        <span>DEFENSA Y JUSTICIA</span>
-                        <span>LANÚS</span>
-                    </div>
-                    <div class="partido-horario">jue, 10 de Sept 21hS</div>
-                </div>
+                <form th:action="@{/finalizarTorneo}" method="post">
+                    <input type="hidden"
+                           name="idTorneo"
+                           th:value="${idTorneoActual}"/>
+
+                    <button type="submit" class="btn-card-admin">
+                        CREAR FIXTURE
+                    </button>
+                </form>
             </div>
 
-            <!-- FECHA 2 -->
-            <div class="card-fecha-bloque">
-                <div class="fecha-titulo" th:text="${fecha2Nombre} ?: 'FECHA 12 DE 30'">FECHA 12 DE 30</div>
+            <!-- Cuando ya existe el fixture -->
+            <div th:if="${jornadas != null and !#lists.isEmpty(jornadas)}">
 
-                <div class="partido-item">
-                    <div class="partido-equipos">
-                        <span>BARRACAS CENTRAL</span>
-                        <span>BOCA JUNIORS</span>
+                <a th:href="@{/fixtureTorneoAdmin(idTorneo=${idTorneoActual})}"
+                   style="display: block; color: #b6ff00; font-weight: 900;
+                  font-size: 20px; text-align: center; margin-bottom: 12px;">
+                    FIXTURE
+                </a>
+
+                <div class="card-fecha-bloque"
+                     th:each="jornada, iter : ${jornadas}"
+                     th:if="${iter.count le 2}">
+
+                    <h3 class="fecha-titulo"
+                        th:text="|Jornada ${jornada.numero}|">
+                        Jornada 1
+                    </h3>
+
+                    <div class="partido-item"
+                         th:each="partido, partidoIter : ${jornada.partidos}"
+                         th:if="${partidoIter.count le 2}">
+
+                        <div class="partido-equipos">
+                            <span th:text="${partido.equipoLocal.nombre}">Local</span>
+                            <span>VS</span>
+                            <span th:text="${partido.equipoVisitante.nombre}">
+                        Visitante
+                    </span>
+                        </div>
+
                     </div>
-                    <div class="partido-horario">jue, 10 de Sept 20hS</div>
                 </div>
 
-                <div class="partido-item">
-                    <div class="partido-equipos">
-                        <span>DEFENSA Y JUSTICIA</span>
-                        <span>LANÚS</span>
-                    </div>
-                    <div class="partido-horario">jue, 10 de Sept 21hS</div>
-                </div>
             </div>
+
 
         </div>
 

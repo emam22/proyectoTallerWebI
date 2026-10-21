@@ -52,4 +52,39 @@ public class RepositorioJornadaImpl implements RepositorioJornada {
       .setParameter("torneoId", torneoId)
       .getResultList();
   }
+
+  @Override
+  public void actualizar(Jornada jornada) {
+    sessionFactory.getCurrentSession().merge(jornada);
+  }
+
+  @Override
+  public void eliminarPartidosDeEquipo(Long idTorneo, Long idEquipo) {
+    sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "delete from Partido p " +
+        "where p.jornada.torneo.id = :idTorneo " +
+        "and (p.equipoLocal.id = :idEquipo " +
+        "or p.equipoVisitante.id = :idEquipo)"
+      )
+      .setParameter("idTorneo", idTorneo)
+      .setParameter("idEquipo", idEquipo)
+      .executeUpdate();
+  }
+
+  @Override
+  public void eliminarFixturePorTorneo(Long idTorneo) {
+    sessionFactory
+      .getCurrentSession()
+      .createQuery("delete from Partido p " + "where p.jornada.torneo.id = :idTorneo")
+      .setParameter("idTorneo", idTorneo)
+      .executeUpdate();
+
+    sessionFactory
+      .getCurrentSession()
+      .createMutationQuery("delete from Jornada j " + "where j.torneo.id = :idTorneo")
+      .setParameter("idTorneo", idTorneo)
+      .executeUpdate();
+  }
 }

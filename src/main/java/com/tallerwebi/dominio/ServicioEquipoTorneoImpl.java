@@ -13,14 +13,17 @@ public class ServicioEquipoTorneoImpl implements ServicioEquipoTorneo {
 
   private ServicioEquipo servicioEquipo;
   private RepositorioEquipoTorneo repositorioEquipoTorneo;
+  private RepositorioJornada repositorioJornada;
 
   @Autowired
   public ServicioEquipoTorneoImpl(
     RepositorioEquipoTorneo repositorioEquipoTorneo,
-    ServicioEquipo servicioEquipo
+    ServicioEquipo servicioEquipo,
+    RepositorioJornada repositorioJornada
   ) {
     this.repositorioEquipoTorneo = repositorioEquipoTorneo;
     this.servicioEquipo = servicioEquipo;
+    this.repositorioJornada = repositorioJornada;
   }
 
   @Override
@@ -95,9 +98,12 @@ public class ServicioEquipoTorneoImpl implements ServicioEquipoTorneo {
   public void desvincularEquipo(Long idEquipo, Long idTorneo) {
     EquipoTorneo equipoTorneo = consultarEquipoTorneoPorId(idEquipo, idTorneo);
 
-    if (equipoTorneo != null) {
-      repositorioEquipoTorneo.eliminar(equipoTorneo);
+    if (equipoTorneo == null) {
+      return;
     }
+
+    repositorioJornada.eliminarFixturePorTorneo(idTorneo);
+    repositorioEquipoTorneo.eliminar(equipoTorneo);
   }
 
   @Override

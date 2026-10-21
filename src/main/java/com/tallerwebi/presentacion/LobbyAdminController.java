@@ -48,12 +48,31 @@ public class LobbyAdminController {
       return new ModelAndView("redirect:/lobbyAdmin");
     }
 
-    model.put("torneo", torneo);
-
     List<EquipoTorneo> tabla = servicioEquipoTorneo.obtenerEstadisticas(idTorneo);
+    List<Jornada> jornadas = servicioTorneo.obtenerJornadasPorTorneo(idTorneo);
+
+    model.put("torneo", torneo);
     model.put("tablaPosiciones", tabla);
     model.put("idTorneoActual", idTorneo);
+    model.put("jornadas", jornadas);
+    model.put("hayFixture", jornadas != null && !jornadas.isEmpty());
 
     return new ModelAndView("administrarTorneoAdmin", model);
+  }
+
+  @GetMapping("/fixtureTorneoAdmin")
+  public ModelAndView verFixtureAdmin(@RequestParam("idTorneo") Long idTorneo) {
+    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+
+    if (torneo == null) {
+      return new ModelAndView("redirect:/lobbyAdmin");
+    }
+
+    Map<String, Object> model = new ModelMap();
+
+    model.put("torneo", torneo);
+    model.put("jornadas", servicioTorneo.obtenerJornadasPorTorneo(idTorneo));
+
+    return new ModelAndView("fixtureTorneoAdmin", model);
   }
 }
