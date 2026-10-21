@@ -394,7 +394,6 @@ public class ControladorTorneo {
     @RequestParam(ID_EQUIPO) Long idEquipo,
     @RequestParam(ID_TORNEO) Long idTorneo,
     @RequestParam("nombre") String nombre,
-    @RequestParam("escudo") String escudo,
     @RequestParam("colorLocal1") String colorLocal1,
     @RequestParam("colorLocal2") String colorLocal2,
     @RequestParam("colorVisitante1") String colorVisitante1,
@@ -407,7 +406,6 @@ public class ControladorTorneo {
     }
 
     equipo.setNombre(nombre);
-    equipo.setEscudo(escudo);
     equipo.setColorLocal1(colorLocal1);
     equipo.setColorLocal2(colorLocal2);
     equipo.setColorVisitante1(colorVisitante1);
@@ -415,6 +413,6 @@ public class ControladorTorneo {
 
     servicioEquipo.actualizarEquipo(equipo);
 
-    return new ModelAndView("redirect:/lobbyAdmin?idTorneo=" + idTorneo);
+    return new ModelAndView("redirect:/administrarTorneoAdmin/" + idTorneo);
   }
 }

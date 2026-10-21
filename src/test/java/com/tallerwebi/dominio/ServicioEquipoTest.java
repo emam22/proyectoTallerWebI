@@ -99,4 +99,18 @@ public class ServicioEquipoTest {
 
     verify(repositorioEquipoMock, times(1)).listar();
   }
+
+  @Test
+  void deberiaActualizarElEquipoCorrectamente() {
+    // preparacion
+    Equipo equipoAActualizar = new Equipo();
+    equipoAActualizar.setId(1L);
+    equipoAActualizar.setNombre("Equipo Modificado");
+
+    // ejecucion
+    servicioEquipo.actualizarEquipo(equipoAActualizar);
+
+    // verificacion
+    verify(repositorioEquipoMock, times(1)).actualizar(equipoAActualizar);
+  }
 }

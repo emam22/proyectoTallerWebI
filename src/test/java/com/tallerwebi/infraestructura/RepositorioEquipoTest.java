@@ -131,4 +131,24 @@ public class RepositorioEquipoTest {
     // verificacion
     assertThat(equipos, is(empty()));
   }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void deberiaActualizarUnEquipo() {
+    // preparacion
+    Equipo equipo = new Equipo();
+    equipo.setNombre("Boca");
+    sessionFactory.getCurrentSession().persist(equipo);
+
+    // modificacion
+    equipo.setNombre("Boca Juniors");
+
+    // ejecucion
+    repositorioEquipo.actualizar(equipo);
+
+    // verificacion
+    Equipo equipoActualizado = sessionFactory.getCurrentSession().get(Equipo.class, equipo.getId());
+    assertThat(equipoActualizado.getNombre(), is("Boca Juniors"));
+  }
 }

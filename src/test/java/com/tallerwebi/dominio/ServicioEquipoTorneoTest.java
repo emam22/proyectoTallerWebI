@@ -26,6 +26,7 @@ public class ServicioEquipoTorneoTest {
   public void init() {
     this.repositorioEquipoTorneoMock = mock(RepositorioEquipoTorneo.class);
     this.servicioEquipoMock = mock(ServicioEquipo.class);
+    this.JornadaTorneoMock = mock(RepositorioJornada.class);
     this.servicioEquipoTorneo =
       new ServicioEquipoTorneoImpl(
         this.repositorioEquipoTorneoMock,
