@@ -3,6 +3,7 @@ package com.tallerwebi.presentacion;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -13,6 +14,7 @@ import com.tallerwebi.dominio.excepcion.EquipoExistente;
 import com.tallerwebi.dominio.excepcion.EquipoYaInscripto;
 import com.tallerwebi.dominio.excepcion.FechaLimiteEditarTorneo;
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -46,6 +48,7 @@ public class ControladorTorneoTest {
     when(torneoMock.getId()).thenReturn(5L);
     when(torneoMock.getCantidadMinJugadores()).thenReturn(11);
     when(torneoMock.getCantidadMaxJugadores()).thenReturn(23);
+    when(torneoMock.getFechaInicio()).thenReturn(LocalDateTime.now().plusDays(7));
 
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
@@ -63,6 +66,7 @@ public class ControladorTorneoTest {
     // Preparación
     when(torneoMock.getCantidadMinJugadores()).thenReturn(11);
     when(torneoMock.getCantidadMaxJugadores()).thenReturn(23);
+    when(torneoMock.getFechaInicio()).thenReturn(LocalDateTime.now().plusDays(7));
 
     doThrow(TorneoExistente.class).when(servicioTorneoMock).registrarTorneo(torneoMock);
 
@@ -85,6 +89,7 @@ public class ControladorTorneoTest {
     // preparacion
     when(torneoMock.getCantidadMinJugadores()).thenReturn(11);
     when(torneoMock.getCantidadMaxJugadores()).thenReturn(23);
+    when(torneoMock.getFechaInicio()).thenReturn(LocalDateTime.now().plusDays(7));
 
     doThrow(RuntimeException.class).when(servicioTorneoMock).registrarTorneo(torneoMock);
 
@@ -144,6 +149,7 @@ public class ControladorTorneoTest {
     torneo.setCantidadMaxJugadores(23);
     torneo.setCantidadMinJugadores(11);
     torneo.setCantidadDeEquipos(8);
+    torneo.setFechaInicio(LocalDateTime.now().plusDays(5));
 
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
@@ -864,40 +870,51 @@ public class ControladorTorneoTest {
   }
 
   @Test
-  public void alCrearEquipoAdminDebeMostrarLaVistaDeCreacion() throws FechaLimiteEditarTorneo {
+  public void alCrearEquipoAdminDebeMostrarLaVistaDeCreacion() throws Exception {
     Long idTorneo = 1L;
-    RedirectAttributes r = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(idTorneo);
+    torneo.setFechaInicio(LocalDateTime.now().plusDays(5));
+    torneo.setCantidadDeEquipos(8); // <-- AGREGAR ESTA LÍNEA
+    torneo.setCantidadMinJugadores(11); // <-- AGREGAR ESTA LÍNEA
+    torneo.setCantidadMaxJugadores(23); // <-- AGREGAR ESTA LÍNEA
 
-    when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneoMock);
+    when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+    when(servicioEquipoTorneoMock.contarEquiposPorTorneo(idTorneo)).thenReturn(0);
 
-    ModelAndView mav = controladorTorneo.crearEquipoAdmin(idTorneo, r);
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    ModelAndView mav = controladorTorneo.crearEquipoAdmin(idTorneo, redirectAttributes);
 
     assertThat(mav.getViewName(), equalTo("creacion-equipo-admin"));
-
-    verify(servicioTorneoMock).consultarTorneoPorId(idTorneo);
   }
 
   @Test
-  public void alCrearEquipoAdminDebeCargarLosDatosDelTorneo() throws FechaLimiteEditarTorneo {
+  public void alCrearEquipoAdminDebeCargarLosDatosDelTorneo() throws Exception {
+    // 1. Preparación
     Long idTorneo = 1L;
-    RedirectAttributes r = mock(RedirectAttributes.class);
-
     Torneo torneo = new Torneo();
+    torneo.setId(idTorneo);
     torneo.setCantidadDeEquipos(8);
-    torneo.setCantidadMinJugadores(10);
-    torneo.setCantidadMaxJugadores(15);
+    torneo.setCantidadMinJugadores(11);
+    torneo.setCantidadMaxJugadores(23);
+    torneo.setFechaInicio(LocalDateTime.now().plusDays(5)); // Fecha futura indispensable
 
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
-    when(servicioEquipoTorneoMock.contarEquiposPorTorneo(idTorneo)).thenReturn(3);
+    when(servicioEquipoTorneoMock.contarEquiposPorTorneo(idTorneo)).thenReturn(2);
 
-    ModelAndView mav = controladorTorneo.crearEquipoAdmin(idTorneo, r);
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
+    // 2. Ejecución
+    ModelAndView mav = controladorTorneo.crearEquipoAdmin(idTorneo, redirectAttributes);
+
+    // 3. Validación
     assertEquals("creacion-equipo-admin", mav.getViewName());
     assertEquals(idTorneo, mav.getModel().get("idTorneo"));
-    assertEquals(3, mav.getModel().get("cantidadEquiposActuales"));
+    assertEquals(2, mav.getModel().get("cantidadEquiposActuales"));
     assertEquals(8, mav.getModel().get("cantidadEquiposNecesarios"));
-    assertEquals(10, mav.getModel().get("minJugadores"));
-    assertEquals(15, mav.getModel().get("maxJugadores"));
+    assertEquals(11, mav.getModel().get("minJugadores"));
+    assertEquals(23, mav.getModel().get("maxJugadores"));
   }
 
   @Test
@@ -952,5 +969,122 @@ public class ControladorTorneoTest {
       "El equipo ya está inscripto en este torneo",
       redirectAttributes.getFlashAttributes().get("error")
     );
+  }
+
+  @Test
+  public void eliminarTorneoDebeEliminarYRedirigirALobbyAdmin() {
+    Long idTorneo = 1L;
+    Torneo torneo = new Torneo();
+    torneo.setId(idTorneo);
+    torneo.setFechaInicio(LocalDateTime.now().plusDays(5));
+
+    when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    ModelAndView mav = controladorTorneo.eliminarTorneoAdmin(idTorneo, redirectAttributes);
+
+    verify(servicioTorneoMock, times(1)).eliminarTorneo(idTorneo);
+    assertThat(mav.getViewName(), equalTo("redirect:/lobbyAdmin"));
+    assertThat(
+      redirectAttributes.getFlashAttributes().get("mensaje").toString(),
+      equalTo("Torneo eliminado correctamente.")
+    );
+  }
+
+  @Test
+  public void eliminarTorneoFueraDeFechaLimiteDebeRedirigirConError() {
+    Long idTorneo = 1L;
+    Torneo torneo = new Torneo();
+    torneo.setId(idTorneo);
+    // Fecha en el pasado o a menos de 24 hs para forzar la excepción
+    torneo.setFechaInicio(LocalDateTime.now().plusHours(10));
+
+    when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    ModelAndView mav = controladorTorneo.eliminarTorneoAdmin(idTorneo, redirectAttributes);
+
+    verify(servicioTorneoMock, never()).eliminarTorneo(idTorneo);
+    assertThat(mav.getViewName(), equalTo("redirect:/administrarTorneoAdmin/1"));
+    assertThat(redirectAttributes.getFlashAttributes().get("error"), notNullValue());
+  }
+
+  @Test
+  public void crearEquipoAdminFueraDeFechaLimiteDebeRedirigirConError() throws Exception {
+    Long idTorneo = 1L;
+    Torneo torneo = new Torneo();
+    torneo.setId(idTorneo);
+    torneo.setFechaInicio(LocalDateTime.now().plusHours(5)); // Dispara FechaLimiteEditarTorneo
+
+    when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    ModelAndView mav = controladorTorneo.crearEquipoAdmin(idTorneo, redirectAttributes);
+
+    assertThat(mav.getViewName(), equalTo("redirect:/administrarTorneoAdmin/1"));
+    assertThat(redirectAttributes.getFlashAttributes().get("error"), notNullValue());
+  }
+
+  @Test
+  public void mostrarEquiposParaEditarFueraDeFechaLimiteDebeRedirigirConError() throws Exception {
+    Long idTorneo = 1L;
+    Torneo torneo = new Torneo();
+    torneo.setId(idTorneo);
+    torneo.setFechaInicio(LocalDateTime.now().plusHours(10)); // Vencido plazo
+
+    when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    ModelAndView mav = controladorTorneo.mostrarEquiposParaEditar(idTorneo, redirectAttributes);
+
+    assertThat(mav.getViewName(), equalTo("redirect:/administrarTorneoAdmin/1"));
+    assertThat(redirectAttributes.getFlashAttributes().get("error"), notNullValue());
+  }
+
+  @Test
+  public void mostrarEquiposParaDesvincularFueraDeFechaLimiteDebeRedirigirConError()
+    throws Exception {
+    Long idTorneo = 1L;
+    Torneo torneo = new Torneo();
+    torneo.setId(idTorneo);
+    torneo.setFechaInicio(LocalDateTime.now().plusHours(10)); // Vencido plazo
+
+    when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    ModelAndView mav = controladorTorneo.mostrarEquiposParaDesvincular(
+      idTorneo,
+      redirectAttributes
+    );
+
+    assertThat(mav.getViewName(), equalTo("redirect:/administrarTorneoAdmin/1"));
+    assertThat(redirectAttributes.getFlashAttributes().get("error"), notNullValue());
+  }
+
+  @Test
+  public void eliminarTorneoCuandoServicioFallaDebeRedirigirConError() {
+    Long idTorneo = 1L;
+    Torneo torneo = new Torneo();
+    torneo.setId(idTorneo);
+    torneo.setFechaInicio(LocalDateTime.now().plusDays(5));
+
+    when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+    doThrow(new RuntimeException("Fallo en base"))
+      .when(servicioTorneoMock)
+      .eliminarTorneo(idTorneo);
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    ModelAndView mav = controladorTorneo.eliminarTorneoAdmin(idTorneo, redirectAttributes);
+
+    assertThat(mav.getViewName(), equalTo("redirect:/administrarTorneoAdmin/1"));
+    assertThat(redirectAttributes.getFlashAttributes().get("error"), notNullValue());
+  }
+
+  @Test
+  public void testFechaLimiteEditarTorneoConstructores() {
+    FechaLimiteEditarTorneo ex1 = new FechaLimiteEditarTorneo();
+    FechaLimiteEditarTorneo ex2 = new FechaLimiteEditarTorneo("Mensaje");
+    assertThat(ex1, notNullValue());
+    assertThat(ex2.getMessage(), equalTo("Mensaje"));
   }
 }

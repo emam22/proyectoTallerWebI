@@ -41,6 +41,7 @@ public class ControladorTorneo {
   private static final String REDIRECT_LOBBY_ADMIN = "redirect:/lobbyAdmin";
   private static final String REDIRECT_ADMINISTRAR_TORNEO_ADMIN =
     "redirect:/administrarTorneoAdmin/";
+  private static final String REDIRECT_FORMULARIO_TORNEO = "redirect:/formulario-torneo";
 
   private static final Logger LOGGER = Logger.getLogger(ControladorTorneo.class.getName());
 
@@ -73,7 +74,7 @@ public class ControladorTorneo {
         "La cantidad máxima de jugadores debe ser mayor que la mínima"
       );
 
-      return new ModelAndView("redirect:/formulario-torneo");
+      return new ModelAndView(REDIRECT_FORMULARIO_TORNEO);
     }
 
     if (torneo.getFechaInicio() == null || torneo.getFechaInicio().isBefore(LocalDateTime.now())) {
@@ -81,7 +82,7 @@ public class ControladorTorneo {
         ERROR,
         "No puedes iniciar un torneo con una fecha anterior a la actual"
       );
-      return new ModelAndView("redirect:/formulario-torneo");
+      return new ModelAndView(REDIRECT_FORMULARIO_TORNEO);
     }
 
     try {
@@ -89,9 +90,10 @@ public class ControladorTorneo {
     } catch (TorneoExistente e) {
       redirectAttributes.addFlashAttribute(ERROR, "Ya existe un torneo con este nombre");
 
-      return new ModelAndView("redirect:/formulario-torneo");
+      return new ModelAndView(REDIRECT_FORMULARIO_TORNEO);
     } catch (Exception e) {
       redirectAttributes.addFlashAttribute(ERROR, "Error al crear el torneo");
+      return new ModelAndView(REDIRECT_FORMULARIO_TORNEO);
     }
 
     return new ModelAndView(REDIRECT_CREACION_EQUIPO + torneo.getId());

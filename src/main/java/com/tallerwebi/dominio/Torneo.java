@@ -139,6 +139,9 @@ public class Torneo {
 
   @Transient
   public boolean permiteModificaciones() {
+    if (this.fechaInicio == null) {
+      return false; // O false si considerás que sin fecha no se permite; habitualmente true para no romper tests previos sin fecha
+    }
     LocalDateTime fechaLimite = fechaInicio.minusHours(24);
     return LocalDateTime.now().isBefore(fechaLimite);
   }
