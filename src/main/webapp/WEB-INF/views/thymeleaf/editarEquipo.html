@@ -294,6 +294,7 @@
             <p>No hay equipos inscriptos en este torneo.</p>
         </div>
 
+
         <!-- LISTA DE EQUIPOS -->
         <div th:each="equipoTorneo : ${equipos}">
 
@@ -305,23 +306,13 @@
                     </strong>
                 </div>
 
-                <form th:action="@{/editar-equipo/detalle}"
-                      method="get">
-
-                    <input type="hidden"
-                           name="idEquipo"
-                           th:value="${equipoTorneo.equipo.id}"/>
-
-                    <input type="hidden"
-                           name="idTorneo"
-                           th:value="${idTorneo}"/>
-
-                    <button type="submit"
-                            class="btn btn-editar">
-                        Editar
-                    </button>
-
-                </form>
+                <a th:href="@{/formulario-editar-equipo(
+                idEquipo=${equipoTorneo.equipo.id},
+                idTorneo=${idTorneo}
+            )}"
+                   class="btn-card-admin">
+                    EDITAR EQUIPO
+                </a>
 
             </div>
 

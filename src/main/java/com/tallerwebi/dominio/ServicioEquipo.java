@@ -8,4 +8,5 @@ public interface ServicioEquipo {
   Equipo consultarEquipo(String nombre);
   void registrarEquipo(Equipo equipo) throws EquipoExistente;
   List<Equipo> obtenerEquipos();
+  void actualizarEquipo(Equipo equipo);
 }

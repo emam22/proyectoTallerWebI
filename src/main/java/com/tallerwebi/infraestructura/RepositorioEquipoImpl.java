@@ -47,4 +47,9 @@ public class RepositorioEquipoImpl implements RepositorioEquipo {
       .createQuery("from Equipo", Equipo.class)
       .getResultList();
   }
+
+  @Override
+  public void actualizar(Equipo equipo) {
+    sessionFactory.getCurrentSession().merge(equipo);
+  }
 }

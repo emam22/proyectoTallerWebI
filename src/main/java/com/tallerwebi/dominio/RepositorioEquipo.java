@@ -7,4 +7,5 @@ public interface RepositorioEquipo {
   Equipo buscarEquipo(String nombre);
   void guardar(Equipo equipo);
   List<Equipo> listar();
+  void actualizar(Equipo equipo);
 }

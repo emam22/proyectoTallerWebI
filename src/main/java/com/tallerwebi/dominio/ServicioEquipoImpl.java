@@ -43,4 +43,9 @@ public class ServicioEquipoImpl implements ServicioEquipo {
   public List<Equipo> obtenerEquipos() {
     return repositorioEquipo.listar();
   }
+
+  @Override
+  public void actualizarEquipo(Equipo equipo) {
+    repositorioEquipo.actualizar(equipo);
+  }
 }

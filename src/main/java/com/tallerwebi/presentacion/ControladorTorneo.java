@@ -361,82 +361,60 @@ public class ControladorTorneo {
 
   @RequestMapping(path = "/editar-equipo", method = RequestMethod.GET)
   public ModelAndView mostrarEquiposParaEditar(@RequestParam(ID_TORNEO) Long idTorneo) {
-    Map<String, Object> model = new HashMap<>();
+    ModelAndView mav = new ModelAndView("editarEquipo");
 
-    List<EquipoTorneo> equipos = servicioEquipoTorneo.obtenerEquiposPorTorneo(idTorneo);
+    mav.addObject(ID_TORNEO, idTorneo);
 
-    model.put(ID_TORNEO, idTorneo);
-    model.put("equipos", equipos);
+    mav.addObject("equipos", servicioEquipoTorneo.obtenerEquiposPorTorneo(idTorneo));
 
-    return new ModelAndView("editarEquipo", model);
+    return mav;
   }
 
-  @RequestMapping(path = "/editar-equipo/detalle", method = RequestMethod.GET)
+  @RequestMapping(path = "/formulario-editar-equipo", method = RequestMethod.GET)
   public ModelAndView mostrarFormularioEditarEquipo(
     @RequestParam(ID_EQUIPO) Long idEquipo,
     @RequestParam(ID_TORNEO) Long idTorneo
   ) {
-    Map<String, Object> model = new HashMap<>();
-
     Equipo equipo = servicioEquipo.consultarEquipoPorId(idEquipo);
 
     if (equipo == null) {
-      return new ModelAndView("redirect:/editar-equipo?idTorneo=" + idTorneo);
+      return new ModelAndView("redirect:/editarEquipo?idTorneo=" + idTorneo);
     }
 
-    model.put("equipo", equipo);
-    model.put(ID_EQUIPO, idEquipo);
-    model.put(ID_TORNEO, idTorneo);
+    ModelAndView mav = new ModelAndView("formulario-editar-equipo");
 
-    return new ModelAndView("formulario-editar-equipo", model);
+    mav.addObject("equipo", equipo);
+    mav.addObject(ID_TORNEO, idTorneo);
+
+    return mav;
   }
-  /*
+
   @RequestMapping(path = "/actualizar-equipo", method = RequestMethod.POST)
   public ModelAndView actualizarEquipo(
     @RequestParam(ID_EQUIPO) Long idEquipo,
     @RequestParam(ID_TORNEO) Long idTorneo,
-    @RequestParam("nombreEquipo") String nombreEquipo,
-    @RequestParam(value = "escudoEquipo", required = false) MultipartFile escudoEquipo,
+    @RequestParam("nombre") String nombre,
+    @RequestParam("escudo") String escudo,
     @RequestParam("colorLocal1") String colorLocal1,
     @RequestParam("colorLocal2") String colorLocal2,
     @RequestParam("colorVisitante1") String colorVisitante1,
-    @RequestParam("colorVisitante2") String colorVisitante2,
-    RedirectAttributes redirectAttributes
+    @RequestParam("colorVisitante2") String colorVisitante2
   ) {
-    // Buscar el equipo seleccionado
     Equipo equipo = servicioEquipo.consultarEquipoPorId(idEquipo);
 
     if (equipo == null) {
-      redirectAttributes.addFlashAttribute(ERROR, "No se encontró el equipo seleccionado.");
-
-      return new ModelAndView("redirect:/editar-equipo?idTorneo=" + idTorneo);
+      return new ModelAndView("redirect:/editarEquipo?idTorneo=" + idTorneo);
     }
 
-    // Actualizar el nombre
-    equipo.setNombre(nombreEquipo);
+    equipo.setNombre(nombre);
+    equipo.setEscudo(escudo);
+    equipo.setColorLocal1(colorLocal1);
+    equipo.setColorLocal2(colorLocal2);
+    equipo.setColorVisitante1(colorVisitante1);
+    equipo.setColorVisitante2(colorVisitante2);
 
-    // Actualizar los colores.
-    // Se guardan ambos colores de cada camiseta en un String.
-    equipo.setColorLocal(colorLocal1 + "," + colorLocal2);
-
-    equipo.setColorVisitanate(colorVisitante1 + "," + colorVisitante2);
-
-    // Actualizar el escudo solamente si se seleccionó uno nuevo
-    if (escudoEquipo != null && !escudoEquipo.isEmpty()) {
-      String nombreArchivo = escudoEquipo.getOriginalFilename();
-
-      if (nombreArchivo != null && !nombreArchivo.isBlank()) {
-        equipo.setEscudo(nombreArchivo);
-      }
-    }
-
-    // Persistir los cambios mediante el servicio
     servicioEquipo.actualizarEquipo(equipo);
 
-    redirectAttributes.addFlashAttribute("mensaje", "Equipo actualizado correctamente.");
-
-    return new ModelAndView("redirect:/editar-equipo?idTorneo=" + idTorneo);
+    return new ModelAndView("redirect:/lobbyAdmin?idTorneo=" + idTorneo);
   }
-  */
-
 }
