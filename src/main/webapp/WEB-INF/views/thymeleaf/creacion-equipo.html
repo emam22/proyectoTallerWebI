@@ -387,9 +387,7 @@
         <!-- FINALIZAR TORNEO -->
         <div class="form-actions form-finalizar">
 
-            <form th:action="@{/finalizarTorneo}"
-                  method="post">
-
+            <form th:action="@{/finalizarTorneo}" method="post">
                 <input type="hidden"
                        name="idTorneo"
                        th:value="${idTorneo}">
@@ -397,9 +395,8 @@
                 <button type="submit"
                         class="btn btn-verde"
                         th:disabled="${cantidadEquiposActuales < cantidadEquiposNecesarios}">
-                    Iniciar torneo
+                    Crear Fixture
                 </button>
-
             </form>
 
         </div>

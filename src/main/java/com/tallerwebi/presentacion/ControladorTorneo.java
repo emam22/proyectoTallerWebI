@@ -37,6 +37,8 @@ public class ControladorTorneo {
   private static final String REDIRECT_CREACION_EQUIPO_ADMIN =
     "redirect:/creacion-equipo-admin?idTorneo=";
   private static final String REDIRECT_LOBBY_ADMIN = "redirect:/lobbyAdmin";
+  private static final String REDIRECT_ADMINISTRAR_TORNEO_ADMIN =
+    "redirect:/administrarTorneoAdmin/";
 
   private static final Logger LOGGER = Logger.getLogger(ControladorTorneo.class.getName());
 
@@ -276,11 +278,31 @@ public class ControladorTorneo {
     @RequestParam(ID_TORNEO) Long idTorneo,
     RedirectAttributes redirectAttributes
   ) {
+    return finalizarTorneoComun(idTorneo, redirectAttributes, REDIRECT_LOBBY_ADMIN);
+  }
+
+  @RequestMapping(path = "/finalizarTorneoAdmin", method = RequestMethod.POST)
+  public ModelAndView finalizarTorneoAdmin(
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    RedirectAttributes redirectAttributes
+  ) {
+    return finalizarTorneoComun(
+      idTorneo,
+      redirectAttributes,
+      REDIRECT_ADMINISTRAR_TORNEO_ADMIN + idTorneo
+    );
+  }
+
+  private ModelAndView finalizarTorneoComun(
+    Long idTorneo,
+    RedirectAttributes redirectAttributes,
+    String redireccion
+  ) {
     Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
 
     if (torneo == null) {
-      redirectAttributes.addFlashAttribute("error", "No se encontró el torneo.");
-      return new ModelAndView(REDIRECT_LOBBY_ADMIN);
+      redirectAttributes.addFlashAttribute(ERROR, "No se encontró el torneo.");
+      return new ModelAndView(redireccion);
     }
 
     try {
@@ -296,7 +318,7 @@ public class ControladorTorneo {
           ERROR,
           "La cantidad de equipos inscriptos no coincide con la configurada."
         );
-        return new ModelAndView(REDIRECT_LOBBY_ADMIN);
+        return new ModelAndView(redireccion);
       }
 
       List<Jornada> jornadasExistentes = servicioTorneo.obtenerJornadasPorTorneo(idTorneo);
@@ -309,15 +331,14 @@ public class ControladorTorneo {
         servicioTorneo.crearTorneoConFixture(torneo, idsEquipos);
       }
 
-      // Volvemos al lobby con el fixture ya generado.
-      return new ModelAndView(REDIRECT_LOBBY_ADMIN);
+      return new ModelAndView(redireccion);
     } catch (Exception e) {
       redirectAttributes.addFlashAttribute(
-        "error",
+        ERROR,
         "No se pudo generar el fixture: " + e.getMessage()
       );
 
-      return new ModelAndView(REDIRECT_LOBBY_ADMIN);
+      return new ModelAndView(redireccion);
     }
   }
 

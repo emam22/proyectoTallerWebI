@@ -269,7 +269,8 @@
                     Todavía no se generó el fixture.
                 </p>
 
-                <form th:action="@{/finalizarTorneo}" method="post">
+
+                <form th:action="@{/finalizarTorneoAdmin}" method="post">
                     <input type="hidden"
                            name="idTorneo"
                            th:value="${idTorneoActual}"/>

@@ -10,6 +10,7 @@ import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.*;
 import com.tallerwebi.dominio.excepcion.EquipoExistente;
+import com.tallerwebi.dominio.excepcion.EquipoYaInscripto;
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -410,5 +411,526 @@ public class ControladorTorneoTest {
     // validacion
     assertThat(mav.getViewName(), equalTo("redirect:/editarEquipo?idTorneo=" + idTorneo));
     verify(servicioEquipoMock, never()).actualizarEquipo(any());
+  }
+
+  @Test
+  public void finalizarTorneoSiNoExisteDeberiaRedirigirAlLobbyAdmin() {
+    // Preparación
+    when(servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(null);
+
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    // Ejecución
+    ModelAndView mav = controladorTorneo.finalizarTorneo(1L, redirectAttributes);
+
+    // Validación
+    assertThat(mav.getViewName(), equalTo("redirect:/lobbyAdmin"));
+    assertThat(
+      redirectAttributes.getFlashAttributes().get("error"),
+      equalTo("No se encontró el torneo.")
+    );
+  }
+
+  @Test
+  public void finalizarTorneoConCantidadIncorrectaDeEquiposDeberiaMostrarError() {
+    // Preparación
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    torneo.setCantidadDeEquipos(4);
+
+    when(servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(torneo);
+
+    Equipo equipo = new Equipo();
+    equipo.setId(10L);
+
+    EquipoTorneo inscripcion = new EquipoTorneo();
+    inscripcion.setEquipo(equipo);
+
+    when(servicioEquipoTorneoMock.obtenerEquiposPorTorneo(1L))
+      .thenReturn(Arrays.asList(inscripcion));
+
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    // Ejecución
+    ModelAndView mav = controladorTorneo.finalizarTorneo(1L, redirectAttributes);
+
+    // Validación
+    assertThat(mav.getViewName(), equalTo("redirect:/lobbyAdmin"));
+    assertThat(
+      redirectAttributes.getFlashAttributes().get("error"),
+      equalTo("La cantidad de equipos inscriptos no coincide con la configurada.")
+    );
+  }
+
+  @Test
+  public void finalizarTorneoConFixtureExistenteNoDeberiaGenerarloNuevamente() throws Exception {
+    // Preparación
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    torneo.setCantidadDeEquipos(2);
+
+    when(servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(torneo);
+
+    Equipo equipo1 = new Equipo();
+    equipo1.setId(10L);
+
+    Equipo equipo2 = new Equipo();
+    equipo2.setId(20L);
+
+    EquipoTorneo inscripcion1 = new EquipoTorneo();
+    inscripcion1.setEquipo(equipo1);
+
+    EquipoTorneo inscripcion2 = new EquipoTorneo();
+    inscripcion2.setEquipo(equipo2);
+
+    when(servicioEquipoTorneoMock.obtenerEquiposPorTorneo(1L))
+      .thenReturn(Arrays.asList(inscripcion1, inscripcion2));
+
+    Jornada jornada = mock(Jornada.class);
+    when(jornada.getPartidos()).thenReturn(Arrays.asList(mock(Partido.class)));
+
+    when(servicioTorneoMock.obtenerJornadasPorTorneo(1L)).thenReturn(Arrays.asList(jornada));
+
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    // Ejecución
+    ModelAndView mav = controladorTorneo.finalizarTorneo(1L, redirectAttributes);
+
+    // Validación
+    assertThat(mav.getViewName(), equalTo("redirect:/lobbyAdmin"));
+
+    verify(servicioTorneoMock, never()).crearTorneoConFixture(any(), anyList());
+  }
+
+  @Test
+  public void finalizarTorneoSiFallaLaConsultaDeInscripcionesDeberiaMostrarError() {
+    // Preparación
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    torneo.setCantidadDeEquipos(2);
+
+    when(servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(torneo);
+
+    when(servicioEquipoTorneoMock.obtenerEquiposPorTorneo(1L))
+      .thenThrow(new RuntimeException("Error de consulta"));
+
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    // Ejecución
+    ModelAndView mav = controladorTorneo.finalizarTorneo(1L, redirectAttributes);
+
+    // Validación
+    assertThat(mav.getViewName(), equalTo("redirect:/lobbyAdmin"));
+    assertThat(
+      redirectAttributes.getFlashAttributes().get("error"),
+      equalTo("No se pudo generar el fixture: Error de consulta")
+    );
+  }
+
+  @Test
+  public void finalizarTorneoSiFallaLaCreacionDelFixtureDeberiaMostrarError() throws Exception {
+    // Preparación
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    torneo.setCantidadDeEquipos(2);
+
+    when(servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(torneo);
+
+    Equipo equipo1 = new Equipo();
+    equipo1.setId(10L);
+
+    Equipo equipo2 = new Equipo();
+    equipo2.setId(20L);
+
+    EquipoTorneo inscripcion1 = new EquipoTorneo();
+    inscripcion1.setEquipo(equipo1);
+
+    EquipoTorneo inscripcion2 = new EquipoTorneo();
+    inscripcion2.setEquipo(equipo2);
+
+    when(servicioEquipoTorneoMock.obtenerEquiposPorTorneo(1L))
+      .thenReturn(Arrays.asList(inscripcion1, inscripcion2));
+
+    when(servicioTorneoMock.obtenerJornadasPorTorneo(1L)).thenReturn(new ArrayList<>());
+
+    doThrow(new RuntimeException("Error al crear fixture"))
+      .when(servicioTorneoMock)
+      .crearTorneoConFixture(eq(torneo), eq(Arrays.asList(10L, 20L)));
+
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    // Ejecución
+    ModelAndView mav = controladorTorneo.finalizarTorneo(1L, redirectAttributes);
+
+    // Validación
+    assertThat(mav.getViewName(), equalTo("redirect:/lobbyAdmin"));
+    assertThat(
+      redirectAttributes.getFlashAttributes().get("error"),
+      equalTo("No se pudo generar el fixture: Error al crear fixture")
+    );
+  }
+
+  @Test
+  public void finalizarTorneoConJornadasSinPartidosDeberiaGenerarFixture() throws Exception {
+    // Preparación
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    torneo.setCantidadDeEquipos(2);
+
+    when(servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(torneo);
+
+    Equipo equipo1 = new Equipo();
+    equipo1.setId(10L);
+
+    Equipo equipo2 = new Equipo();
+    equipo2.setId(20L);
+
+    EquipoTorneo inscripcion1 = new EquipoTorneo();
+    inscripcion1.setEquipo(equipo1);
+
+    EquipoTorneo inscripcion2 = new EquipoTorneo();
+    inscripcion2.setEquipo(equipo2);
+
+    when(servicioEquipoTorneoMock.obtenerEquiposPorTorneo(1L))
+      .thenReturn(Arrays.asList(inscripcion1, inscripcion2));
+
+    Jornada jornada1 = mock(Jornada.class);
+    Jornada jornada2 = mock(Jornada.class);
+
+    when(jornada1.getPartidos()).thenReturn(new ArrayList<>());
+    when(jornada2.getPartidos()).thenReturn(new ArrayList<>());
+
+    when(servicioTorneoMock.obtenerJornadasPorTorneo(1L))
+      .thenReturn(Arrays.asList(jornada1, jornada2));
+
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    // Ejecución
+    ModelAndView mav = controladorTorneo.finalizarTorneo(1L, redirectAttributes);
+
+    // Validación
+    assertThat(mav.getViewName(), equalTo("redirect:/lobbyAdmin"));
+
+    verify(servicioTorneoMock).crearTorneoConFixture(eq(torneo), eq(Arrays.asList(10L, 20L)));
+  }
+
+  @Test
+  public void finalizarTorneoSiLasJornadasSonNullDeberiaGenerarFixture() {
+    Torneo torneo = mock(Torneo.class);
+
+    when(servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(torneo);
+    when(torneo.getCantidadDeEquipos()).thenReturn(2);
+
+    Equipo equipo1 = new Equipo();
+    equipo1.setId(10L);
+
+    Equipo equipo2 = new Equipo();
+    equipo2.setId(20L);
+
+    EquipoTorneo inscripcion1 = new EquipoTorneo();
+    inscripcion1.setEquipo(equipo1);
+
+    EquipoTorneo inscripcion2 = new EquipoTorneo();
+    inscripcion2.setEquipo(equipo2);
+
+    when(servicioEquipoTorneoMock.obtenerEquiposPorTorneo(1L))
+      .thenReturn(Arrays.asList(inscripcion1, inscripcion2));
+
+    when(servicioTorneoMock.obtenerJornadasPorTorneo(1L)).thenReturn(null);
+
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    ModelAndView resultado = controladorTorneo.finalizarTorneo(1L, redirectAttributes);
+
+    assertEquals("redirect:/lobbyAdmin", resultado.getViewName());
+  }
+
+  @Test
+  public void alListarEquiposAdminDebeMostrarLaVistaYElIdDelTorneo() {
+    Long idTorneo = 8L;
+    List<Equipo> equipos = new ArrayList<>();
+
+    when(servicioEquipoMock.obtenerEquipos()).thenReturn(equipos);
+
+    ModelAndView mav = controladorTorneo.listarEquiposAdmin(idTorneo);
+
+    assertEquals("lista-equipos-admin", mav.getViewName());
+    assertEquals(equipos, mav.getModel().get("equipos"));
+    assertEquals(idTorneo, mav.getModel().get("idTorneo"));
+
+    verify(servicioEquipoMock).obtenerEquipos();
+  }
+
+  @Test
+  public void mostrarEquiposParaDesvincularDebeCargarLasInscripciones() {
+    Long idTorneo = 5L;
+    List<EquipoTorneo> inscripciones = new ArrayList<>();
+
+    when(servicioEquipoTorneoMock.obtenerEquiposPorTorneo(idTorneo)).thenReturn(inscripciones);
+
+    ModelAndView mav = controladorTorneo.mostrarEquiposParaDesvincular(idTorneo);
+
+    assertEquals("desvincularEquipo", mav.getViewName());
+    assertEquals(idTorneo, mav.getModel().get("idTorneo"));
+    assertEquals(inscripciones, mav.getModel().get("equipos"));
+
+    verify(servicioEquipoTorneoMock).obtenerEquiposPorTorneo(idTorneo);
+  }
+
+  @Test
+  public void mostrarEquiposParaEditarDebeCargarLasInscripciones() {
+    Long idTorneo = 3L;
+    List<EquipoTorneo> inscripciones = new ArrayList<>();
+
+    when(servicioEquipoTorneoMock.obtenerEquiposPorTorneo(idTorneo)).thenReturn(inscripciones);
+
+    ModelAndView mav = controladorTorneo.mostrarEquiposParaEditar(idTorneo);
+
+    assertEquals("editarEquipo", mav.getViewName());
+    assertEquals(idTorneo, mav.getModel().get("idTorneo"));
+    assertEquals(inscripciones, mav.getModel().get("equipos"));
+
+    verify(servicioEquipoTorneoMock).obtenerEquiposPorTorneo(idTorneo);
+  }
+
+  @Test
+  public void mostrarFormularioEditarEquipoSiExisteDebeMostrarElFormulario() {
+    Long idEquipo = 4L;
+    Long idTorneo = 7L;
+
+    Equipo equipo = new Equipo();
+    equipo.setId(idEquipo);
+    equipo.setNombre("Los Leones");
+
+    when(servicioEquipoMock.consultarEquipoPorId(idEquipo)).thenReturn(equipo);
+
+    ModelAndView mav = controladorTorneo.mostrarFormularioEditarEquipo(idEquipo, idTorneo);
+
+    assertEquals("formulario-editar-equipo", mav.getViewName());
+    assertEquals(equipo, mav.getModel().get("equipo"));
+    assertEquals(idTorneo, mav.getModel().get("idTorneo"));
+
+    verify(servicioEquipoMock).consultarEquipoPorId(idEquipo);
+  }
+
+  @Test
+  public void mostrarFormularioEditarEquipoSiNoExisteDebeRedirigir() {
+    Long idEquipo = 1L;
+    Long idTorneo = 2L;
+
+    when(servicioEquipoMock.consultarEquipoPorId(idEquipo)).thenReturn(null);
+
+    ModelAndView mav = controladorTorneo.mostrarFormularioEditarEquipo(idEquipo, idTorneo);
+
+    assertEquals("redirect:/editarEquipo?idTorneo=" + idTorneo, mav.getViewName());
+
+    verify(servicioEquipoMock).consultarEquipoPorId(idEquipo);
+  }
+
+  @Test
+  public void alGuardarEquipoCorrectamenteDebeInscribirloYRedirigir() throws Exception {
+    // Preparación
+    Long idTorneo = 1L;
+
+    Torneo torneo = mock(Torneo.class);
+    when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+    when(torneo.getCantidadDeEquipos()).thenReturn(4);
+    when(servicioEquipoTorneoMock.contarEquiposPorTorneo(idTorneo)).thenReturn(2);
+
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    // Ejecución
+    ModelAndView mav = controladorTorneo.guardarEquipo(
+      idTorneo,
+      "Los Leones",
+      "#FF0000",
+      "#FFFFFF",
+      "#0000FF",
+      "#FFFFFF",
+      redirectAttributes
+    );
+
+    // Validación
+    assertThat(mav.getViewName(), equalTo("redirect:/creacion-equipo?idTorneo=1"));
+
+    verify(servicioEquipoTorneoMock)
+      .crearEquipoEInscribirlo(
+        argThat(equipo ->
+          equipo.getNombre().equals("Los Leones") &&
+          equipo.getColorLocal1().equals("#FF0000") &&
+          equipo.getColorLocal2().equals("#FFFFFF") &&
+          equipo.getColorVisitante1().equals("#0000FF") &&
+          equipo.getColorVisitante2().equals("#FFFFFF")
+        ),
+        eq(torneo)
+      );
+  }
+
+  @Test
+  public void alGuardarEquipoSiElTorneoEstaCompletoDebeRedirigirSinInscribirlo()
+    throws EquipoExistente {
+    // Preparación
+    Long idTorneo = 1L;
+
+    Torneo torneo = mock(Torneo.class);
+    when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+    when(torneo.getCantidadDeEquipos()).thenReturn(4);
+    when(servicioEquipoTorneoMock.contarEquiposPorTorneo(idTorneo)).thenReturn(4);
+
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    // Ejecución
+    ModelAndView mav = controladorTorneo.guardarEquipo(
+      idTorneo,
+      "Los Leones",
+      "#FF0000",
+      "#FFFFFF",
+      "#0000FF",
+      "#FFFFFF",
+      redirectAttributes
+    );
+
+    // Validación
+    assertThat(mav.getViewName(), equalTo("redirect:/creacion-equipo?idTorneo=1"));
+
+    verify(servicioEquipoTorneoMock, never())
+      .crearEquipoEInscribirlo(any(Equipo.class), any(Torneo.class));
+  }
+
+  @Test
+  public void alListarEquiposAdminDebeMostrarLaVistaYConsultarLosEquipos() {
+    Long idTorneo = 1L;
+    List<Equipo> equipos = new ArrayList<>();
+
+    when(servicioEquipoMock.obtenerEquipos()).thenReturn(equipos);
+
+    ModelAndView mav = controladorTorneo.listarEquiposAdmin(idTorneo);
+
+    assertThat(mav.getViewName(), equalTo("lista-equipos-admin"));
+    assertThat(mav.getModel().get("idTorneo"), equalTo(idTorneo));
+    assertThat(mav.getModel().get("equipos"), equalTo(equipos));
+
+    verify(servicioEquipoMock).obtenerEquipos();
+  }
+
+  @Test
+  public void alMostrarEquiposParaDesvincularDebeMostrarLaVistaYLosEquipos() {
+    Long idTorneo = 1L;
+    List<EquipoTorneo> equipos = new ArrayList<>();
+
+    when(servicioEquipoTorneoMock.obtenerEquiposPorTorneo(idTorneo)).thenReturn(equipos);
+
+    ModelAndView mav = controladorTorneo.mostrarEquiposParaDesvincular(idTorneo);
+
+    assertThat(mav.getViewName(), equalTo("desvincularEquipo"));
+    assertThat(mav.getModel().get("idTorneo"), equalTo(idTorneo));
+    assertThat(mav.getModel().get("equipos"), equalTo(equipos));
+
+    verify(servicioEquipoTorneoMock).obtenerEquiposPorTorneo(idTorneo);
+  }
+
+  @Test
+  public void alMostrarEquiposParaEditarDebeMostrarLaVistaYLosEquipos() {
+    Long idTorneo = 1L;
+    List<EquipoTorneo> equipos = new ArrayList<>();
+
+    when(servicioEquipoTorneoMock.obtenerEquiposPorTorneo(idTorneo)).thenReturn(equipos);
+
+    ModelAndView mav = controladorTorneo.mostrarEquiposParaEditar(idTorneo);
+
+    assertThat(mav.getViewName(), equalTo("editarEquipo"));
+    assertThat(mav.getModel().get("idTorneo"), equalTo(idTorneo));
+    assertThat(mav.getModel().get("equipos"), equalTo(equipos));
+
+    verify(servicioEquipoTorneoMock).obtenerEquiposPorTorneo(idTorneo);
+  }
+
+  @Test
+  public void alCrearEquipoAdminDebeMostrarLaVistaDeCreacion() {
+    Long idTorneo = 1L;
+
+    when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneoMock);
+
+    ModelAndView mav = controladorTorneo.crearEquipoAdmin(idTorneo);
+
+    assertThat(mav.getViewName(), equalTo("creacion-equipo-admin"));
+
+    verify(servicioTorneoMock).consultarTorneoPorId(idTorneo);
+  }
+
+  @Test
+  public void alCrearEquipoAdminDebeCargarLosDatosDelTorneo() {
+    Long idTorneo = 1L;
+
+    Torneo torneo = new Torneo();
+    torneo.setCantidadDeEquipos(8);
+    torneo.setCantidadMinJugadores(10);
+    torneo.setCantidadMaxJugadores(15);
+
+    when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+    when(servicioEquipoTorneoMock.contarEquiposPorTorneo(idTorneo)).thenReturn(3);
+
+    ModelAndView mav = controladorTorneo.crearEquipoAdmin(idTorneo);
+
+    assertEquals("creacion-equipo-admin", mav.getViewName());
+    assertEquals(idTorneo, mav.getModel().get("idTorneo"));
+    assertEquals(3, mav.getModel().get("cantidadEquiposActuales"));
+    assertEquals(8, mav.getModel().get("cantidadEquiposNecesarios"));
+    assertEquals(10, mav.getModel().get("minJugadores"));
+    assertEquals(15, mav.getModel().get("maxJugadores"));
+  }
+
+  @Test
+  public void alCargarEquipoExistenteDebeInscribirloYRedirigir() throws Exception {
+    Long idEquipo = 5L;
+    Long idTorneo = 1L;
+
+    Equipo equipo = new Equipo();
+    Torneo torneo = new Torneo();
+
+    when(servicioEquipoMock.consultarEquipoPorId(idEquipo)).thenReturn(equipo);
+    when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    ModelAndView mav = controladorTorneo.cargarEquipoExistente(
+      idEquipo,
+      idTorneo,
+      redirectAttributes
+    );
+
+    assertEquals("redirect:/creacion-equipo?idTorneo=1", mav.getViewName());
+
+    verify(servicioEquipoTorneoMock).inscribirEquipoExistente(equipo, torneo);
+  }
+
+  @Test
+  public void alCargarEquipoYaInscriptoDebeMostrarErrorYRedirigir() throws Exception {
+    Long idEquipo = 5L;
+    Long idTorneo = 1L;
+
+    Equipo equipo = new Equipo();
+    Torneo torneo = new Torneo();
+
+    when(servicioEquipoMock.consultarEquipoPorId(idEquipo)).thenReturn(equipo);
+    when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+
+    doThrow(new EquipoYaInscripto())
+      .when(servicioEquipoTorneoMock)
+      .inscribirEquipoExistente(equipo, torneo);
+
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    ModelAndView mav = controladorTorneo.cargarEquipoExistente(
+      idEquipo,
+      idTorneo,
+      redirectAttributes
+    );
+
+    assertEquals("redirect:/creacion-equipo?idTorneo=1", mav.getViewName());
+    assertEquals(
+      "El equipo ya está inscripto en este torneo",
+      redirectAttributes.getFlashAttributes().get("error")
+    );
   }
 }

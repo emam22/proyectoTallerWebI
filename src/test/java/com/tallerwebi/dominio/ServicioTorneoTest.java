@@ -54,6 +54,7 @@ public class ServicioTorneoTest {
   private Torneo torneoValido(String nombre) {
     Torneo torneo = new Torneo();
     torneo.setNombre(nombre);
+    torneo.setId(1L);
     torneo.setCantidadDeEquipos(4);
     torneo.setCantidadMinJugadores(10);
     torneo.setCantidadMaxJugadores(15);
@@ -142,7 +143,10 @@ public class ServicioTorneoTest {
   public void crearTorneoConDosEquiposDeberiaCrearUnaJornada() throws Exception {
     //given
     Torneo torneo = new Torneo();
+    torneo.setId(1L);
     torneo.setCantidadDeEquipos(2);
+
+    when(repositorioTorneoMock.buscarTorneoPorId(1L)).thenReturn(torneo);
 
     givenCreacionEquipo(1L, "Barcelona");
     givenCreacionEquipo(2L, "Real Madrid");
@@ -168,7 +172,10 @@ public class ServicioTorneoTest {
   public void crearTorneoConDosEquiposSeDeberiaCrearJornadaYAsociarlaAlTorneo() throws Exception {
     //given
     Torneo torneo = new Torneo();
+    torneo.setId(1L);
     torneo.setCantidadDeEquipos(2);
+
+    when(repositorioTorneoMock.buscarTorneoPorId(1L)).thenReturn(torneo);
 
     givenCreacionEquipo(1L, "Barcelona");
     givenCreacionEquipo(2L, "Real Madrid");
@@ -186,7 +193,10 @@ public class ServicioTorneoTest {
   public void alCrearTorneoSeDeberiaCrearLaJornadaNumeroUno() throws Exception {
     //given
     Torneo torneo = new Torneo();
+    torneo.setId(1L);
     torneo.setCantidadDeEquipos(2);
+
+    when(repositorioTorneoMock.buscarTorneoPorId(1L)).thenReturn(torneo);
 
     givenCreacionEquipo(1L, "Barcelona");
     givenCreacionEquipo(2L, "Real Madrid");
@@ -204,10 +214,13 @@ public class ServicioTorneoTest {
   @Test
   public void alCrearTorneoLaJornadaDeberiaEstarEnPendiente() throws Exception {
     Torneo torneo = new Torneo();
+    torneo.setId(1L);
     torneo.setCantidadDeEquipos(2);
 
     givenCreacionEquipo(1L, "Barcelona");
     givenCreacionEquipo(2L, "Real Madrid");
+
+    when(repositorioTorneoMock.buscarTorneoPorId(1L)).thenReturn(torneo);
 
     List<Long> idsEquipos = Arrays.asList(1L, 2L);
 
@@ -226,7 +239,10 @@ public class ServicioTorneoTest {
   @Test
   public void alCrearTorneoConDosEquiposSeDebeCrearUnPartido() throws Exception {
     Torneo torneo = new Torneo();
+    torneo.setId(1L);
     torneo.setCantidadDeEquipos(2);
+
+    when(repositorioTorneoMock.buscarTorneoPorId(1L)).thenReturn(torneo);
 
     givenCreacionEquipo(1L, "Barcelona");
     givenCreacionEquipo(2L, "Real Madrid");
@@ -244,7 +260,10 @@ public class ServicioTorneoTest {
   @Test
   public void alCrearTorneoSeDebeAsignarLosEquiposAlPartido() throws Exception {
     Torneo torneo = new Torneo();
+    torneo.setId(1L);
     torneo.setCantidadDeEquipos(2);
+
+    when(repositorioTorneoMock.buscarTorneoPorId(1L)).thenReturn(torneo);
 
     givenCreacionEquipo(1L, "Barcelona");
     givenCreacionEquipo(2L, "Real Madrid");
@@ -262,7 +281,10 @@ public class ServicioTorneoTest {
   @Test
   public void alCrearTorneoSeDebeAgregarElPartidoAlTorneo() throws Exception {
     Torneo torneo = new Torneo();
+    torneo.setId(1L);
     torneo.setCantidadDeEquipos(2);
+
+    when(repositorioTorneoMock.buscarTorneoPorId(1L)).thenReturn(torneo);
 
     givenCreacionEquipo(1L, "Barcelona");
     givenCreacionEquipo(2L, "Real Madrid");
@@ -278,7 +300,10 @@ public class ServicioTorneoTest {
   @Test
   public void alCrearTorneoConCuatroEquiposSeDebenCrearSeisPartidos() throws Exception {
     Torneo torneo = new Torneo();
+    torneo.setId(1L);
     torneo.setCantidadDeEquipos(4);
+
+    when(repositorioTorneoMock.buscarTorneoPorId(1L)).thenReturn(torneo);
 
     givenCreacionEquipo(1L, "Barcelona");
     givenCreacionEquipo(2L, "Real Madrid");
@@ -294,6 +319,8 @@ public class ServicioTorneoTest {
   @Test
   public void alCrearTorneoConCuatrosEquiposSeDebenCrearTresJornadas() throws Exception {
     Torneo torneo = torneoValido("Nuevo Torneo");
+
+    when(repositorioTorneoMock.buscarTorneoPorId(1L)).thenReturn(torneo);
 
     givenCreacionEquipo(1L, "Barcelona");
     givenCreacionEquipo(2L, "Real Madrid");
@@ -317,6 +344,10 @@ public class ServicioTorneoTest {
     givenCreacionEquipo(2L, "Real Madrid");
     givenCreacionEquipo(3L, "Manchester City");
     givenCreacionEquipo(4L, "Manchester United");
+    when(repositorioTorneoMock.buscarTorneoPorId(1L)).thenReturn(torneo);
+    when(repositorioTorneoMock.buscarTorneoPorId(2L)).thenReturn(torneo);
+    when(repositorioTorneoMock.buscarTorneoPorId(3L)).thenReturn(torneo);
+    when(repositorioTorneoMock.buscarTorneoPorId(4L)).thenReturn(torneo);
 
     List<Long> idsEquipos = Arrays.asList(1L, 2L, 3L, 4L);
     servicioTorneo.crearTorneoConFixture(torneo, idsEquipos);
@@ -335,6 +366,8 @@ public class ServicioTorneoTest {
     torneo.setCantidadDeEquipos(4);
     torneo.setIdaYVuelta(false);
 
+    when(repositorioTorneoMock.buscarTorneoPorId(1L)).thenReturn(torneo);
+
     givenCreacionEquipo(1L, "Barcelona");
     givenCreacionEquipo(2L, "Real Madrid");
     givenCreacionEquipo(3L, "Manchester City");
@@ -349,8 +382,11 @@ public class ServicioTorneoTest {
   @Test
   public void alCrearTorneoConCuatroEquiposValidarQueSeJuegueIdaYVuelta() throws Exception {
     Torneo torneo = new Torneo();
+    torneo.setId(1L);
     torneo.setCantidadDeEquipos(4);
     torneo.setIdaYVuelta(true);
+
+    when(repositorioTorneoMock.buscarTorneoPorId(1L)).thenReturn(torneo);
 
     givenCreacionEquipo(1L, "Barcelona");
     givenCreacionEquipo(2L, "Real Madrid");
