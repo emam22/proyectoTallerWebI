@@ -11,6 +11,7 @@ import static org.mockito.Mockito.*;
 import com.tallerwebi.dominio.*;
 import com.tallerwebi.dominio.excepcion.EquipoExistente;
 import com.tallerwebi.dominio.excepcion.EquipoYaInscripto;
+import com.tallerwebi.dominio.excepcion.FechaLimiteEditarTorneo;
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -662,13 +663,19 @@ public class ControladorTorneoTest {
   }
 
   @Test
-  public void mostrarEquiposParaDesvincularDebeCargarLasInscripciones() {
+  public void mostrarEquiposParaDesvincularDebeCargarLasInscripciones()
+    throws FechaLimiteEditarTorneo {
     Long idTorneo = 5L;
     List<EquipoTorneo> inscripciones = new ArrayList<>();
 
+    RedirectAttributes redirectAttributes = mock(RedirectAttributes.class);
+
     when(servicioEquipoTorneoMock.obtenerEquiposPorTorneo(idTorneo)).thenReturn(inscripciones);
 
-    ModelAndView mav = controladorTorneo.mostrarEquiposParaDesvincular(idTorneo);
+    ModelAndView mav = controladorTorneo.mostrarEquiposParaDesvincular(
+      idTorneo,
+      redirectAttributes
+    );
 
     assertEquals("desvincularEquipo", mav.getViewName());
     assertEquals(idTorneo, mav.getModel().get("idTorneo"));
@@ -678,13 +685,15 @@ public class ControladorTorneoTest {
   }
 
   @Test
-  public void mostrarEquiposParaEditarDebeCargarLasInscripciones() {
+  public void mostrarEquiposParaEditarDebeCargarLasInscripciones() throws FechaLimiteEditarTorneo {
     Long idTorneo = 3L;
     List<EquipoTorneo> inscripciones = new ArrayList<>();
 
+    RedirectAttributes r = mock(RedirectAttributes.class);
+
     when(servicioEquipoTorneoMock.obtenerEquiposPorTorneo(idTorneo)).thenReturn(inscripciones);
 
-    ModelAndView mav = controladorTorneo.mostrarEquiposParaEditar(idTorneo);
+    ModelAndView mav = controladorTorneo.mostrarEquiposParaEditar(idTorneo, r);
 
     assertEquals("editarEquipo", mav.getViewName());
     assertEquals(idTorneo, mav.getModel().get("idTorneo"));
@@ -814,13 +823,19 @@ public class ControladorTorneoTest {
   }
 
   @Test
-  public void alMostrarEquiposParaDesvincularDebeMostrarLaVistaYLosEquipos() {
+  public void alMostrarEquiposParaDesvincularDebeMostrarLaVistaYLosEquipos()
+    throws FechaLimiteEditarTorneo {
     Long idTorneo = 1L;
     List<EquipoTorneo> equipos = new ArrayList<>();
 
+    RedirectAttributes redirectAttributes = mock(RedirectAttributes.class);
+
     when(servicioEquipoTorneoMock.obtenerEquiposPorTorneo(idTorneo)).thenReturn(equipos);
 
-    ModelAndView mav = controladorTorneo.mostrarEquiposParaDesvincular(idTorneo);
+    ModelAndView mav = controladorTorneo.mostrarEquiposParaDesvincular(
+      idTorneo,
+      redirectAttributes
+    );
 
     assertThat(mav.getViewName(), equalTo("desvincularEquipo"));
     assertThat(mav.getModel().get("idTorneo"), equalTo(idTorneo));
@@ -830,13 +845,16 @@ public class ControladorTorneoTest {
   }
 
   @Test
-  public void alMostrarEquiposParaEditarDebeMostrarLaVistaYLosEquipos() {
+  public void alMostrarEquiposParaEditarDebeMostrarLaVistaYLosEquipos()
+    throws FechaLimiteEditarTorneo {
     Long idTorneo = 1L;
     List<EquipoTorneo> equipos = new ArrayList<>();
 
+    RedirectAttributes r = mock(RedirectAttributes.class);
+
     when(servicioEquipoTorneoMock.obtenerEquiposPorTorneo(idTorneo)).thenReturn(equipos);
 
-    ModelAndView mav = controladorTorneo.mostrarEquiposParaEditar(idTorneo);
+    ModelAndView mav = controladorTorneo.mostrarEquiposParaEditar(idTorneo, r);
 
     assertThat(mav.getViewName(), equalTo("editarEquipo"));
     assertThat(mav.getModel().get("idTorneo"), equalTo(idTorneo));
@@ -846,12 +864,13 @@ public class ControladorTorneoTest {
   }
 
   @Test
-  public void alCrearEquipoAdminDebeMostrarLaVistaDeCreacion() {
+  public void alCrearEquipoAdminDebeMostrarLaVistaDeCreacion() throws FechaLimiteEditarTorneo {
     Long idTorneo = 1L;
+    RedirectAttributes r = mock(RedirectAttributes.class);
 
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneoMock);
 
-    ModelAndView mav = controladorTorneo.crearEquipoAdmin(idTorneo);
+    ModelAndView mav = controladorTorneo.crearEquipoAdmin(idTorneo, r);
 
     assertThat(mav.getViewName(), equalTo("creacion-equipo-admin"));
 
@@ -859,8 +878,9 @@ public class ControladorTorneoTest {
   }
 
   @Test
-  public void alCrearEquipoAdminDebeCargarLosDatosDelTorneo() {
+  public void alCrearEquipoAdminDebeCargarLosDatosDelTorneo() throws FechaLimiteEditarTorneo {
     Long idTorneo = 1L;
+    RedirectAttributes r = mock(RedirectAttributes.class);
 
     Torneo torneo = new Torneo();
     torneo.setCantidadDeEquipos(8);
@@ -870,7 +890,7 @@ public class ControladorTorneoTest {
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
     when(servicioEquipoTorneoMock.contarEquiposPorTorneo(idTorneo)).thenReturn(3);
 
-    ModelAndView mav = controladorTorneo.crearEquipoAdmin(idTorneo);
+    ModelAndView mav = controladorTorneo.crearEquipoAdmin(idTorneo, r);
 
     assertEquals("creacion-equipo-admin", mav.getViewName());
     assertEquals(idTorneo, mav.getModel().get("idTorneo"));

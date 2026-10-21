@@ -68,6 +68,11 @@ public class ServicioTorneoImpl implements ServicioTorneo {
   }
 
   @Override
+  public void eliminarTorneo(Long id) {
+    repositorioTorneo.borrar(id);
+  }
+
+  @Override
   public List<Jornada> obtenerJornadasPorTorneo(Long torneoId) {
     return repositorioJornada.obtenerJornadasPorTorneo(torneoId);
   }

@@ -47,4 +47,13 @@ public class RepositorioTorneoImpl implements RepositorioTorneo {
       .createQuery("from Torneo", Torneo.class)
       .getResultList();
   }
+
+  @Override
+  public void borrar(Long id) {
+    sessionFactory
+      .getCurrentSession()
+      .createQuery("delete from Torneo t where t.id = :id")
+      .setParameter("id", id)
+      .executeUpdate();
+  }
 }

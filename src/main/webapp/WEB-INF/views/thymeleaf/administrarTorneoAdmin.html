@@ -238,6 +238,11 @@
         FECHA LÍMITE
     </div>
 
+    <div th:if="${torneo != null and !torneo.permiteModificaciones()}"
+         style="color: #ff4d4d; font-weight: bold; text-align: center; margin-bottom: 15px;">
+        El plazo de edición expiró. Las opciones de modificación de equipos están bloqueadas.
+    </div>
+
     <div class="fila-botones-superiores">
         <a th:href="@{/editar-equipo(idTorneo=${idTorneoActual})}" class="btn-card-admin">
             EDITAR EQUIPO

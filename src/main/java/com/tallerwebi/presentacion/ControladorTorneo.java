@@ -3,7 +3,9 @@ package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.*;
 import com.tallerwebi.dominio.excepcion.EquipoExistente;
 import com.tallerwebi.dominio.excepcion.EquipoYaInscripto;
+import com.tallerwebi.dominio.excepcion.FechaLimiteEditarTorneo;
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +76,14 @@ public class ControladorTorneo {
       return new ModelAndView("redirect:/formulario-torneo");
     }
 
+    if (torneo.getFechaInicio() == null || torneo.getFechaInicio().isBefore(LocalDateTime.now())) {
+      redirectAttributes.addFlashAttribute(
+        ERROR,
+        "No puedes iniciar un torneo con una fecha anterior a la actual"
+      );
+      return new ModelAndView("redirect:/formulario-torneo");
+    }
+
     try {
       servicioTorneo.registrarTorneo(torneo);
     } catch (TorneoExistente e) {
@@ -82,15 +92,22 @@ public class ControladorTorneo {
       return new ModelAndView("redirect:/formulario-torneo");
     } catch (Exception e) {
       redirectAttributes.addFlashAttribute(ERROR, "Error al crear el torneo");
-
-      return new ModelAndView("redirect:/formulario-torneo");
     }
 
     return new ModelAndView(REDIRECT_CREACION_EQUIPO + torneo.getId());
   }
 
   @RequestMapping(path = "/creacion-equipo-admin", method = RequestMethod.GET)
-  public ModelAndView crearEquipoAdmin(@RequestParam(ID_TORNEO) Long id) {
+  public ModelAndView crearEquipoAdmin(
+    @RequestParam(ID_TORNEO) Long id,
+    RedirectAttributes redirectAttributes
+  ) throws FechaLimiteEditarTorneo {
+    try {
+      validarModificacionTorneo(id);
+    } catch (FechaLimiteEditarTorneo e) {
+      redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
+      return new ModelAndView(REDIRECT_ADMINISTRAR_TORNEO_ADMIN + id);
+    }
     return new ModelAndView("creacion-equipo-admin", obtenerModeloCreacionEquipo(id));
   }
 
@@ -356,7 +373,16 @@ public class ControladorTorneo {
   }
 
   @RequestMapping(path = "/desvincular-equipo", method = RequestMethod.GET)
-  public ModelAndView mostrarEquiposParaDesvincular(@RequestParam(ID_TORNEO) Long idTorneo) {
+  public ModelAndView mostrarEquiposParaDesvincular(
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    RedirectAttributes redirectAttributes
+  ) throws FechaLimiteEditarTorneo {
+    try {
+      validarModificacionTorneo(idTorneo);
+    } catch (FechaLimiteEditarTorneo e) {
+      redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
+      return new ModelAndView(REDIRECT_ADMINISTRAR_TORNEO_ADMIN + idTorneo);
+    }
     Map<String, Object> model = new HashMap<>();
 
     List<EquipoTorneo> equipos = servicioEquipoTorneo.obtenerEquiposPorTorneo(idTorneo);
@@ -381,7 +407,16 @@ public class ControladorTorneo {
   }
 
   @RequestMapping(path = "/editar-equipo", method = RequestMethod.GET)
-  public ModelAndView mostrarEquiposParaEditar(@RequestParam(ID_TORNEO) Long idTorneo) {
+  public ModelAndView mostrarEquiposParaEditar(
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    RedirectAttributes redirectAttributes
+  ) throws FechaLimiteEditarTorneo {
+    try {
+      validarModificacionTorneo(idTorneo);
+    } catch (FechaLimiteEditarTorneo e) {
+      redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
+      return new ModelAndView(REDIRECT_ADMINISTRAR_TORNEO_ADMIN + idTorneo);
+    }
     ModelAndView mav = new ModelAndView("editarEquipo");
 
     mav.addObject(ID_TORNEO, idTorneo);
@@ -434,6 +469,37 @@ public class ControladorTorneo {
 
     servicioEquipo.actualizarEquipo(equipo);
 
-    return new ModelAndView("redirect:/administrarTorneoAdmin/" + idTorneo);
+    return new ModelAndView(REDIRECT_ADMINISTRAR_TORNEO_ADMIN + idTorneo);
+  }
+
+  private void validarModificacionTorneo(Long idTorneo) throws FechaLimiteEditarTorneo {
+    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+    if (torneo != null && !torneo.permiteModificaciones()) {
+      throw new FechaLimiteEditarTorneo(
+        "La fecha actual es mayor a la permitida para hacer cambios en el torneo."
+      );
+    }
+  }
+
+  @RequestMapping(path = "/eliminarTorneo", method = RequestMethod.GET)
+  public ModelAndView eliminarTorneoAdmin(
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    RedirectAttributes redirectAttributes
+  ) {
+    try {
+      validarModificacionTorneo(idTorneo);
+      servicioTorneo.eliminarTorneo(idTorneo);
+      redirectAttributes.addFlashAttribute("mensaje", "Torneo eliminado correctamente.");
+      return new ModelAndView(REDIRECT_LOBBY_ADMIN);
+    } catch (FechaLimiteEditarTorneo e) {
+      redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
+      return new ModelAndView(REDIRECT_ADMINISTRAR_TORNEO_ADMIN + idTorneo);
+    } catch (Exception e) {
+      redirectAttributes.addFlashAttribute(
+        ERROR,
+        "No se pudo eliminar el torneo: " + e.getMessage()
+      );
+      return new ModelAndView(REDIRECT_ADMINISTRAR_TORNEO_ADMIN + idTorneo);
+    }
   }
 }

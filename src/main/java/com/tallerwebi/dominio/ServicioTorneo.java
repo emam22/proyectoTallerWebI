@@ -17,4 +17,5 @@ public interface ServicioTorneo {
 
   long contarFechasFinalizadas(Long idTorneo);
   boolean consultarAunEnFechaParaEditar(Long idTorneo);
+  void eliminarTorneo(Long id);
 }
