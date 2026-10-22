@@ -105,4 +105,23 @@ public class RepositorioJugadorTest {
     Jugador obtenido = this.sessionFactory.getCurrentSession().get(Jugador.class, id);
     assertThat(obtenido, is(nullValue()));
   }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void deberiaActualizarElEstadoDeHabilitacionDeUnJugador() {
+    // preparacion
+    Jugador jugador = new Jugador();
+    jugador.setNombre("Actualizable");
+    this.sessionFactory.getCurrentSession().persist(jugador);
+
+    // ejecucion
+    jugador.setHabilitado(true);
+    this.repositorioJugador.actualizar(jugador);
+    this.sessionFactory.getCurrentSession().flush();
+
+    // verificacion
+    Jugador obtenido = this.sessionFactory.getCurrentSession().get(Jugador.class, jugador.getId());
+    assertThat(obtenido.getHabilitado(), is(true));
+  }
 }

@@ -101,4 +101,31 @@ public class ServicioJugadorTest {
     verify(this.repositorioEquipoMock).guardar(equipo);
     verify(this.repositorioJugadorMock).eliminar(7L);
   }
+
+  @Test
+  public void deberiaHabilitarElJugadorYActualizarlo() {
+    // preparacion
+    Jugador jugador = new Jugador();
+    jugador.setId(7L);
+    when(this.repositorioJugadorMock.obtenerJugador(7L)).thenReturn(jugador);
+
+    // ejecucion
+    this.servicioJugador.habilitarJugador(7L, true);
+
+    // verificacion
+    assertThat(jugador.getHabilitado(), is(true));
+    verify(this.repositorioJugadorMock).actualizar(jugador);
+  }
+
+  @Test
+  public void noDeberiaHabilitarSiElJugadorNoExiste() {
+    // preparacion
+    when(this.repositorioJugadorMock.obtenerJugador(99L)).thenReturn(null);
+
+    // ejecucion
+    this.servicioJugador.habilitarJugador(99L, true);
+
+    // verificacion
+    verify(this.repositorioJugadorMock, never()).actualizar(any(Jugador.class));
+  }
 }

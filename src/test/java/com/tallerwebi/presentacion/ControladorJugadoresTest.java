@@ -292,6 +292,103 @@ public class ControladorJugadoresTest {
     assertThat(mav.getViewName(), is("redirect:/jugadoresTorneo?idTorneo=1"));
   }
 
+  @Test
+  public void deberiaHabilitarElJugadorYRedirigir() {
+    // preparacion
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    inscribirEquipoEnTorneo(1L, 10L, torneo);
+    when(this.servicioJugadorMock.obtenerJugadores(10L)).thenReturn(List.of(jugador(99L)));
+
+    // ejecucion
+    ModelAndView mav =
+      this.controlador.habilitarJugador(1L, 10L, 99L, true, redirectAttributesMock);
+
+    // verificacion
+    verify(this.servicioJugadorMock).habilitarJugador(eq(99L), eq(true));
+    verify(redirectAttributesMock).addFlashAttribute(eq("ok"), anyString());
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneoAdmin?idTorneo=1"));
+  }
+
+  @Test
+  public void deberiaDeshabilitarElJugador() {
+    // preparacion
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    inscribirEquipoEnTorneo(1L, 10L, torneo);
+    when(this.servicioJugadorMock.obtenerJugadores(10L)).thenReturn(List.of(jugador(99L)));
+
+    // ejecucion
+    ModelAndView mav =
+      this.controlador.habilitarJugador(1L, 10L, 99L, false, redirectAttributesMock);
+
+    // verificacion
+    verify(this.servicioJugadorMock).habilitarJugador(eq(99L), eq(false));
+    verify(redirectAttributesMock).addFlashAttribute(eq("ok"), anyString());
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneoAdmin?idTorneo=1"));
+  }
+
+  @Test
+  public void noDeberiaHabilitarSiElEquipoNoEstaInscriptoEnElTorneo() {
+    // preparacion
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    when(this.servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(torneo);
+    when(this.servicioEquipoTorneoMock.obtenerEquiposPorTorneo(1L)).thenReturn(new ArrayList<>());
+
+    // ejecucion
+    ModelAndView mav = this.controlador.habilitarJugador(1L, 99L, 5L, true, redirectAttributesMock);
+
+    // verificacion
+    verify(this.servicioJugadorMock, never()).habilitarJugador(any(), anyBoolean());
+    verify(redirectAttributesMock).addFlashAttribute(eq("error"), anyString());
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneoAdmin?idTorneo=1"));
+  }
+
+  @Test
+  public void noDeberiaHabilitarSiElJugadorNoPerteneceAlEquipo() {
+    // preparacion
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    inscribirEquipoEnTorneo(1L, 10L, torneo);
+    when(this.servicioJugadorMock.obtenerJugadores(10L)).thenReturn(List.of(jugador(1L)));
+
+    // ejecucion
+    ModelAndView mav =
+      this.controlador.habilitarJugador(1L, 10L, 99L, true, redirectAttributesMock);
+
+    // verificacion
+    verify(this.servicioJugadorMock, never()).habilitarJugador(any(), anyBoolean());
+    verify(redirectAttributesMock).addFlashAttribute(eq("error"), anyString());
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneoAdmin?idTorneo=1"));
+  }
+
+  @Test
+  public void noDeberiaHabilitarSiElTorneoNoExiste() {
+    // preparacion
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    when(this.servicioTorneoMock.consultarTorneoPorId(7L)).thenReturn(null);
+
+    // ejecucion
+    ModelAndView mav =
+      this.controlador.habilitarJugador(7L, 10L, 99L, true, redirectAttributesMock);
+
+    // verificacion
+    verify(this.servicioJugadorMock, never()).habilitarJugador(any(), anyBoolean());
+    assertThat(mav.getViewName(), is("redirect:/lobbyAdmin"));
+  }
+
+  private Jugador jugador(Long id) {
+    Jugador jugador = new Jugador();
+    jugador.setId(id);
+
+    return jugador;
+  }
+
   private void inscribirEquipoEnTorneo(Long idTorneo, Long idEquipo, Torneo torneo) {
     when(this.servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
     Equipo equipo = new Equipo();
