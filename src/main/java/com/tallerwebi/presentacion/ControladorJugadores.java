@@ -251,6 +251,50 @@ public class ControladorJugadores {
   }
 
   // =========================
+  // HABILITAR JUGADOR
+  // =========================
+
+  @RequestMapping(path = "/jugadoresTorneoAdmin/habilitar", method = RequestMethod.POST)
+  public ModelAndView habilitarJugador(
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    @RequestParam(ID_EQUIPO) Long idEquipo,
+    @RequestParam("idJugador") Long idJugador,
+    @RequestParam(value = "habilitado", required = false) Boolean habilitado,
+    RedirectAttributes redirectAttributes
+  ) {
+    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+
+    if (torneo == null) {
+      return new ModelAndView("redirect:/lobbyAdmin");
+    }
+
+    String redireccion = REDIRECT_JUGADORES_ADMIN + idTorneo;
+
+    if (!equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
+      return rechazar(
+        redireccion,
+        "El equipo no esta inscripto en este torneo.",
+        redirectAttributes
+      );
+    }
+
+    if (!perteneceAlEquipo(idEquipo, idJugador)) {
+      return rechazar(redireccion, "El jugador no pertenece a este equipo.", redirectAttributes);
+    }
+
+    boolean nuevoEstado = habilitado != null && habilitado;
+
+    servicioJugador.habilitarJugador(idJugador, nuevoEstado);
+
+    redirectAttributes.addFlashAttribute(
+      OK,
+      nuevoEstado ? "Jugador habilitado correctamente." : "Jugador deshabilitado correctamente."
+    );
+
+    return new ModelAndView(redireccion);
+  }
+
+  // =========================
   // MÉTODOS AUXILIARES
   // =========================
 
@@ -291,6 +335,20 @@ public class ControladorJugadores {
   private boolean tieneDorsal(List<Jugador> jugadores, Integer dorsal) {
     for (Jugador existente : jugadores) {
       if (existente.getDorsal() != null && existente.getDorsal().equals(dorsal)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private boolean perteneceAlEquipo(Long idEquipo, Long idJugador) {
+    if (idJugador == null) {
+      return false;
+    }
+
+    for (Jugador jugador : servicioJugador.obtenerJugadores(idEquipo)) {
+      if (jugador.getId() != null && jugador.getId().equals(idJugador)) {
         return true;
       }
     }
