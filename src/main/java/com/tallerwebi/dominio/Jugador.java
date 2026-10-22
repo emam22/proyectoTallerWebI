@@ -17,6 +17,7 @@ public class Jugador {
   private String nombre;
   private String apellido;
   private Integer categoria;
+  private Boolean habilitado = false;
 
   public Long getId() {
     return id;
@@ -64,5 +65,13 @@ public class Jugador {
 
   public void setCategoria(Integer categoria) {
     this.categoria = categoria;
+  }
+
+  public Boolean getHabilitado() {
+    return habilitado;
+  }
+
+  public void setHabilitado(Boolean habilitado) {
+    this.habilitado = habilitado;
   }
 }
