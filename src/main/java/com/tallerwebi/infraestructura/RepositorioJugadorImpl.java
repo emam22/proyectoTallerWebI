@@ -23,6 +23,11 @@ public class RepositorioJugadorImpl implements RepositorioJugador {
   }
 
   @Override
+  public void actualizar(Jugador jugador) {
+    sessionFactory.getCurrentSession().merge(jugador);
+  }
+
+  @Override
   public void eliminar(Long idJugador) {
     Jugador jugador = sessionFactory.getCurrentSession().get(Jugador.class, idJugador);
     if (jugador != null) {
