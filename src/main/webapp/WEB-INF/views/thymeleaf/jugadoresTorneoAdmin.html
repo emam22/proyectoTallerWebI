@@ -183,6 +183,48 @@
             color: var(--bg);
         }
 
+        .btn-habilitar {
+            background: var(--accent-soft);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-size: 11px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background var(--dur-fast), color var(--dur-fast);
+        }
+
+        .btn-habilitar:hover {
+            background: var(--accent);
+            color: var(--bg);
+        }
+
+        .estado-jugador {
+            display: inline-block;
+            border-radius: 6px;
+            padding: 4px 9px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .estado-jugador.habilitado {
+            background: var(--accent-soft);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+        }
+
+        .estado-jugador.pendiente {
+            background: var(--surface-3);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        td form {
+            display: inline-block;
+            margin-right: 4px;
+        }
+
         .btn-jugadores {
             background: var(--surface-2);
             border: 2px solid var(--accent);
@@ -290,6 +332,7 @@
                 <th>NOMBRE</th>
                 <th>APELLIDO</th>
                 <th>PUESTO</th>
+                <th>ESTADO</th>
                 <th>ACCIONES</th>
             </tr>
             </thead>
@@ -300,6 +343,18 @@
                 <td th:text="${jugador.apellido}">Apellido</td>
                 <td th:text="${jugador.puesto}">Puesto</td>
                 <td>
+                    <span class="estado-jugador"
+                          th:classappend="${jugador.habilitado} ? ' habilitado' : ' pendiente'"
+                          th:text="${jugador.habilitado} ? 'Habilitado' : 'Pendiente'">Estado</span>
+                </td>
+                <td>
+                    <form th:action="@{/jugadoresTorneoAdmin/habilitar(idTorneo=${torneo.id})}" method="post">
+                        <input type="hidden" name="idEquipo" th:value="${filaEquipo.equipo.id}"/>
+                        <input type="hidden" name="idJugador" th:value="${jugador.id}"/>
+                        <input type="hidden" name="habilitado" th:value="${jugador.habilitado} ? 'false' : 'true'"/>
+                        <button type="submit" class="btn-habilitar"
+                                th:text="${jugador.habilitado} ? 'Deshabilitar' : 'Habilitar'">Habilitar</button>
+                    </form>
                     <form th:action="@{/jugadoresTorneoAdmin/eliminar(idTorneo=${torneo.id})}" method="post">
                         <input type="hidden" name="idEquipo" th:value="${filaEquipo.equipo.id}"/>
                         <input type="hidden" name="idJugador" th:value="${jugador.id}"/>
@@ -308,7 +363,7 @@
                 </td>
             </tr>
             <tr th:if="${#lists.isEmpty(filaEquipo.jugadores)}">
-                <td colspan="5" class="aviso">Sin jugadores cargados.</td>
+                <td colspan="6" class="aviso">Sin jugadores cargados.</td>
             </tr>
             </tbody>
         </table>
