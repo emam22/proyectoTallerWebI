@@ -143,8 +143,20 @@ body::before {
     height: 46px;
     object-fit: contain;
     z-index: 2000;
-    pointer-events: none;
+    cursor: pointer;
     filter: drop-shadow(0 3px 6px var(--shadow));
+}
+
+/* =========================
+   ISOTIPO LINK A LA HOME
+   El logo de marca (superior izquierda) y los logos de las barras de
+   navegacion se renderizan con el fragmento `logoHome`, que apunta a
+   la home segun el rol de la sesion.
+   `display: contents` evita que el <a> agregue una caja extra al layout.
+======================= */
+
+.logo-home {
+    display: contents;
 }
 
 .logo-marca-debajo-menu {

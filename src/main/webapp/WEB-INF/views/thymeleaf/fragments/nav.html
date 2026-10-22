@@ -22,5 +22,20 @@
        title="Volver a la pantalla anterior">&#8592; Volver</a>
 </th:block>
 
+<!--
+  Isotipo de la app que funciona como link a la home segun el rol de la sesion
+  (admin -> /elegirTorneoAdmin, usuario -> /elegirTorneo).
+  Uso:  <a th:replace="~{fragments/nav :: logoHome(clase='logo-marca')}"></a>
+  Sin clase propia: <a th:replace="~{fragments/nav :: logoHome(clase='')}"></a>
+-->
+<th:block th:fragment="logoHome(clase)">
+    <a th:with="home=${session.ROL != null and session.ROL.equalsIgnoreCase('admin')} ? '/elegirTorneoAdmin' : '/elegirTorneo'"
+       th:href="@{${home}}"
+       class="logo-home"
+       title="Ir al inicio">
+        <img th:src="@{/img/isotipo.png?v=2}" src="https://via.placeholder.com/40" alt="System TOR" th:classappend="${clase}"/>
+    </a>
+</th:block>
+
 </body>
 </html>
