@@ -174,7 +174,7 @@
     <div class="navbar-brand-wrapper">
         <!-- Contenedor blanco con el logo del jugador -->
         <div class="navbar-logo-box">
-            <img th:src="@{/img/isotipo.png?v=2}" src="https://via.placeholder.com/40" alt="Logo">
+            <a th:replace="~{fragments/nav :: logoHome(clase='')}"></a>
         </div>
         <!-- Bloque verde sesgado -->
         <div class="navbar-title-box">

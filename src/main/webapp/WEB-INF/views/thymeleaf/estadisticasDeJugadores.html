@@ -156,7 +156,7 @@
 
 <!-- BARRA SUPERIOR -->
 <header class="header-superior">
-    <img th:src="@{/img/isotipo.png?v=2}" alt="Logo" class="isotipo-header">
+    <a th:replace="~{fragments/nav :: logoHome(clase='isotipo-header')}"></a>
     <h1 class="titulo-pagina">ESTADÍSTICAS DE JUGADORES</h1>
 
     <div class="menu-usuario">

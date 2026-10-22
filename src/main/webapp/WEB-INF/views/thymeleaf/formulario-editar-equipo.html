@@ -277,9 +277,7 @@
     </div>
 </div>
 
-<img class="logo-marca"
-     th:src="@{/img/isotipo.png?v=2}"
-     alt="System TOR"/>
+<a th:replace="~{fragments/nav :: logoHome(clase='logo-marca')}"></a>
 
 <div class="menu-usuario">
     <button type="button"

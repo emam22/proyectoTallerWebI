@@ -122,7 +122,7 @@
 <!-- BARRA SUPERIOR -->
 <header class="navbar">
     <div class="navbar-left">
-        <img th:src="@{/img/isotipo.png?v=2}" alt="System TOR">
+        <a th:replace="~{fragments/nav :: logoHome(clase='')}"></a>
         <span class="navbar-title">SystemTOR</span>
     </div>
     <div class="navbar-user">
