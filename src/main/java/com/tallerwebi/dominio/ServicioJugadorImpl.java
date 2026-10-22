@@ -55,4 +55,14 @@ public class ServicioJugadorImpl implements ServicioJugador {
   public Jugador consultarJugador(long idJugador) {
     return repositorioJugador.obtenerJugador(idJugador);
   }
+
+  @Override
+  public void habilitarJugador(Long idJugador, boolean habilitado) {
+    Jugador jugador = repositorioJugador.obtenerJugador(idJugador);
+
+    if (jugador != null) {
+      jugador.setHabilitado(habilitado);
+      repositorioJugador.actualizar(jugador);
+    }
+  }
 }

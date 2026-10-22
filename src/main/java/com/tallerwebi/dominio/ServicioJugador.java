@@ -6,5 +6,6 @@ public interface ServicioJugador {
   List<Jugador> obtenerJugadores(Long idEquipo);
   void agregarJugador(Long idEquipo, Jugador jugador);
   void eliminarJugador(Long idEquipo, Long idJugador);
+  void habilitarJugador(Long idJugador, boolean habilitado);
   Jugador consultarJugador(long idJugador);
 }
