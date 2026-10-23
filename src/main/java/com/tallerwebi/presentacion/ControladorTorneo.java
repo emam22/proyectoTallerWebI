@@ -1,10 +1,7 @@
 package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.*;
-import com.tallerwebi.dominio.excepcion.EquipoExistente;
-import com.tallerwebi.dominio.excepcion.EquipoYaInscripto;
-import com.tallerwebi.dominio.excepcion.FechaLimiteEditarTorneo;
-import com.tallerwebi.dominio.excepcion.TorneoExistente;
+import com.tallerwebi.dominio.excepcion.*;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -153,6 +150,7 @@ public class ControladorTorneo {
     @RequestParam("colorLocal2") String colorLocal2,
     @RequestParam("colorVisitante1") String colorVisitante1,
     @RequestParam("colorVisitante2") String colorVisitante2,
+    @RequestParam("siglas") String siglas,
     RedirectAttributes redirectAttributes
   ) {
     return obtenerModeloGuardarEquipo(
@@ -162,6 +160,7 @@ public class ControladorTorneo {
       colorLocal2,
       colorVisitante1,
       colorVisitante2,
+      siglas,
       redirectAttributes,
       REDIRECT_CREACION_EQUIPO + idTorneo
     );
@@ -175,6 +174,7 @@ public class ControladorTorneo {
     @RequestParam("colorLocal2") String colorLocal2,
     @RequestParam("colorVisitante1") String colorVisitante1,
     @RequestParam("colorVisitante2") String colorVisitante2,
+    @RequestParam("siglas") String siglas,
     RedirectAttributes redirectAttributes
   ) {
     return obtenerModeloGuardarEquipo(
@@ -184,6 +184,7 @@ public class ControladorTorneo {
       colorLocal2,
       colorVisitante1,
       colorVisitante2,
+      siglas,
       redirectAttributes,
       REDIRECT_CREACION_EQUIPO_ADMIN + idTorneo
     );
@@ -196,6 +197,7 @@ public class ControladorTorneo {
     String colorLocal2,
     String colorVisitante1,
     String colorVisitante2,
+    String siglas,
     RedirectAttributes redirectAttributes,
     String redireccion
   ) {
@@ -215,11 +217,14 @@ public class ControladorTorneo {
     equipo.setColorLocal2(colorLocal2);
     equipo.setColorVisitante1(colorVisitante1);
     equipo.setColorVisitante2(colorVisitante2);
+    equipo.setSiglas(siglas);
 
     try {
       servicioEquipoTorneo.crearEquipoEInscribirlo(equipo, torneo);
     } catch (EquipoExistente e) {
       redirectAttributes.addFlashAttribute(ERROR, "Ya existe un equipo con ese nombre");
+    } catch (SiglasExistentes e) {
+      redirectAttributes.addFlashAttribute(ERROR, "Ya existe un equipo con esas siglas");
     }
 
     return new ModelAndView(redireccion);

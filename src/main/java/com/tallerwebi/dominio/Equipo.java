@@ -17,6 +17,7 @@ public class Equipo {
   private String colorLocal2;
   private String colorVisitante1;
   private String colorVisitante2;
+  private String siglas;
 
   @OneToMany
   private List<Jugador> jugadores;
@@ -104,5 +105,13 @@ public class Equipo {
 
   public void setJugadores(List<Jugador> jugadores) {
     this.jugadores = jugadores;
+  }
+
+  public String getSiglas() {
+    return siglas;
+  }
+
+  public void setSiglas(String siglas) {
+    this.siglas = siglas;
   }
 }

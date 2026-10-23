@@ -10,10 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.*;
-import com.tallerwebi.dominio.excepcion.EquipoExistente;
-import com.tallerwebi.dominio.excepcion.EquipoYaInscripto;
-import com.tallerwebi.dominio.excepcion.FechaLimiteEditarTorneo;
-import com.tallerwebi.dominio.excepcion.TorneoExistente;
+import com.tallerwebi.dominio.excepcion.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -310,7 +307,8 @@ public class ControladorTorneoTest {
   }
 
   @Test
-  public void alGuardarEquipoExistenteDebeMostrarErrorYRedirigir() throws EquipoExistente {
+  public void alGuardarEquipoExistenteDebeMostrarErrorYRedirigir()
+    throws EquipoExistente, SiglasExistentes {
     // preparación
     Long idTorneo = 1L;
 
@@ -333,6 +331,7 @@ public class ControladorTorneoTest {
       "#FFFFFF",
       "#0000FF",
       "#FFFFFF",
+      "BOC",
       redirectAttributes
     );
 
@@ -762,6 +761,7 @@ public class ControladorTorneoTest {
       "#FFFFFF",
       "#0000FF",
       "#FFFFFF",
+      "BOC",
       redirectAttributes
     );
 
@@ -783,7 +783,7 @@ public class ControladorTorneoTest {
 
   @Test
   public void alGuardarEquipoSiElTorneoEstaCompletoDebeRedirigirSinInscribirlo()
-    throws EquipoExistente {
+    throws EquipoExistente, SiglasExistentes {
     // Preparación
     Long idTorneo = 1L;
 
@@ -802,6 +802,7 @@ public class ControladorTorneoTest {
       "#FFFFFF",
       "#0000FF",
       "#FFFFFF",
+      "BOC",
       redirectAttributes
     );
 

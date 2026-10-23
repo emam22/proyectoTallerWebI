@@ -151,4 +151,35 @@ public class RepositorioEquipoTest {
     Equipo equipoActualizado = sessionFactory.getCurrentSession().get(Equipo.class, equipo.getId());
     assertThat(equipoActualizado.getNombre(), is("Boca Juniors"));
   }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void deberiaEncontrarUnEquipoPorSusSiglas() {
+    // Preparación
+    Equipo equipo = new Equipo();
+    equipo.setNombre("Boca Juniors");
+    equipo.setSiglas("BOC");
+
+    sessionFactory.getCurrentSession().persist(equipo);
+
+    // Ejecución
+    Equipo equipoEncontrado = repositorioEquipo.buscarEquipoPorSiglas("BOC");
+
+    // Verificación
+    assertThat(equipoEncontrado, is(notNullValue()));
+    assertThat(equipoEncontrado.getNombre(), is("Boca Juniors"));
+    assertThat(equipoEncontrado.getSiglas(), is("BOC"));
+  }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void deberiaRetornarNullSiNoExisteEquipoConEsasSiglas() {
+    // Ejecución
+    Equipo equipoEncontrado = repositorioEquipo.buscarEquipoPorSiglas("BOC");
+
+    // Verificación
+    assertThat(equipoEncontrado, is(nullValue()));
+  }
 }
