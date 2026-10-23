@@ -1,6 +1,7 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.excepcion.EquipoExistente;
+import com.tallerwebi.dominio.excepcion.SiglasExistentes;
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -29,11 +30,17 @@ public class ServicioEquipoImpl implements ServicioEquipo {
   }
 
   @Override
-  public void registrarEquipo(Equipo equipo) throws EquipoExistente {
+  public void registrarEquipo(Equipo equipo) throws EquipoExistente, SiglasExistentes {
     Equipo equipoEncontrado = repositorioEquipo.buscarEquipo(equipo.getNombre());
 
     if (equipoEncontrado != null) {
       throw new EquipoExistente();
+    }
+
+    Equipo equipoConSiglas = repositorioEquipo.buscarEquipoPorSiglas(equipo.getSiglas());
+
+    if (equipoConSiglas != null) {
+      throw new SiglasExistentes();
     }
 
     repositorioEquipo.guardar(equipo);

@@ -52,4 +52,17 @@ public class RepositorioEquipoImpl implements RepositorioEquipo {
   public void actualizar(Equipo equipo) {
     sessionFactory.getCurrentSession().merge(equipo);
   }
+
+  @Override
+  public Equipo buscarEquipoPorSiglas(String siglas) {
+    String hql = "FROM Equipo e WHERE e.siglas = :siglas";
+
+    List<Equipo> equipos = sessionFactory
+      .getCurrentSession()
+      .createQuery(hql, Equipo.class)
+      .setParameter("siglas", siglas)
+      .getResultList();
+
+    return equipos.isEmpty() ? null : equipos.get(0);
+  }
 }

@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.excepcion.EquipoExistente;
+import com.tallerwebi.dominio.excepcion.SiglasExistentes;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -112,5 +113,33 @@ public class ServicioEquipoTest {
 
     // verificacion
     verify(repositorioEquipoMock, times(1)).actualizar(equipoAActualizar);
+  }
+
+  @Test
+  void deberiaLanzarSiglasExistentesCuandoLasSiglasYaEstanRegistradas()
+    throws EquipoExistente, SiglasExistentes {
+    // Preparación
+    Equipo equipoARegistrar = new Equipo();
+    equipoARegistrar.setNombre("Boca Juniors");
+    equipoARegistrar.setSiglas("BOC");
+
+    Equipo equipoExistente = new Equipo();
+    equipoExistente.setNombre("Barcelona");
+    equipoExistente.setSiglas("BOC");
+
+    when(repositorioEquipoMock.buscarEquipo("Boca Juniors")).thenReturn(null);
+    when(repositorioEquipoMock.buscarEquipoPorSiglas("BOC")).thenReturn(equipoExistente);
+
+    // Ejecución y verificación
+    assertThrows(
+      SiglasExistentes.class,
+      () -> {
+        servicioEquipo.registrarEquipo(equipoARegistrar);
+      }
+    );
+
+    verify(repositorioEquipoMock, times(1)).buscarEquipo("Boca Juniors");
+    verify(repositorioEquipoMock, times(1)).buscarEquipoPorSiglas("BOC");
+    verify(repositorioEquipoMock, never()).guardar(equipoARegistrar);
   }
 }

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.excepcion.EquipoExistente;
 import com.tallerwebi.dominio.excepcion.EquipoYaInscripto;
+import com.tallerwebi.dominio.excepcion.SiglasExistentes;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +37,7 @@ public class ServicioEquipoTorneoTest {
   }
 
   @Test
-  public void deberiaCrearEquipoEInscribirloEnTorneo() throws EquipoExistente {
+  public void deberiaCrearEquipoEInscribirloEnTorneo() throws EquipoExistente, SiglasExistentes {
     // preparacion
     Equipo equipo = new Equipo();
     equipo.setNombre("Los Pumas");
@@ -57,7 +58,7 @@ public class ServicioEquipoTorneoTest {
   }
 
   @Test
-  public void deberiaLanzarExcepcionSiElEquipoYaExiste() throws EquipoExistente {
+  public void deberiaLanzarExcepcionSiElEquipoYaExiste() throws EquipoExistente, SiglasExistentes {
     // preparacion
     Equipo equipo = new Equipo();
     equipo.setNombre("Los Pumas");
@@ -239,5 +240,32 @@ public class ServicioEquipoTorneoTest {
     assertThat(equipoTorneoObtenido, is(equalTo(equipoTorneo)));
 
     verify(repositorioEquipoTorneoMock, times(1)).buscarEquipoTorneoPorId(idEquipo, idTorneo);
+  }
+
+  @Test
+  public void deberiaLanzarSiglasExistentesAlCrearEquipoEInscribirlo()
+    throws EquipoExistente, SiglasExistentes {
+    // Preparación
+    Equipo equipo = new Equipo();
+    equipo.setNombre("Boca Juniors");
+    equipo.setSiglas("BOC");
+
+    Torneo torneo = new Torneo();
+
+    when(servicioEquipoMock.consultarEquipo("Boca Juniors")).thenReturn(null);
+
+    doThrow(new SiglasExistentes()).when(servicioEquipoMock).registrarEquipo(equipo);
+
+    // Ejecución y validación
+    assertThrows(
+      SiglasExistentes.class,
+      () -> {
+        servicioEquipoTorneo.crearEquipoEInscribirlo(equipo, torneo);
+      }
+    );
+
+    verify(servicioEquipoMock, times(1)).consultarEquipo("Boca Juniors");
+    verify(servicioEquipoMock, times(1)).registrarEquipo(equipo);
+    verify(repositorioEquipoTorneoMock, never()).guardar(any(EquipoTorneo.class));
   }
 }

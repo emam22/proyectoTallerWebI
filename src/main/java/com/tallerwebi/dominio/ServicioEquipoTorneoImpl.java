@@ -2,6 +2,7 @@ package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.excepcion.EquipoExistente;
 import com.tallerwebi.dominio.excepcion.EquipoYaInscripto;
+import com.tallerwebi.dominio.excepcion.SiglasExistentes;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,8 @@ public class ServicioEquipoTorneoImpl implements ServicioEquipoTorneo {
   }
 
   @Override
-  public void crearEquipoEInscribirlo(Equipo equipo, Torneo torneo) throws EquipoExistente {
+  public void crearEquipoEInscribirlo(Equipo equipo, Torneo torneo)
+    throws EquipoExistente, SiglasExistentes {
     Equipo equipoExistente = servicioEquipo.consultarEquipo(equipo.getNombre());
 
     if (equipoExistente != null) {
