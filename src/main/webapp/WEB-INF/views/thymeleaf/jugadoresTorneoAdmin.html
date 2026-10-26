@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
@@ -250,22 +251,17 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-
             background: #1f1f1f;
             color: var(--accent);
-
             border: 2px solid var(--accent);
             border-radius: var(--radius-md);
-
             padding: 10px 18px;
             margin-bottom: 18px;
-
             font-size: 13px;
             font-weight: bold;
             text-decoration: none;
             text-align: center;
             cursor: pointer;
-
             transition: background var(--dur-fast),
             color var(--dur-fast),
             transform var(--dur-fast);
@@ -287,9 +283,11 @@
                 font-size: 15px;
                 text-align: center;
             }
+
             .header-bar {
                 justify-content: center;
             }
+
             th, td {
                 font-size: 10px;
                 padding: 6px 3px;
@@ -319,11 +317,12 @@
 
     <!-- EQUIPOS Y PLANTELES -->
     <div class="aviso" th:if="${#lists.isEmpty(equipos)}">
-        Este torneo todavia no tiene equipos inscriptos.
+        Este torneo todavía no tiene equipos inscriptos.
     </div>
 
     <div class="seccion" th:each="filaEquipo : ${equipos}">
-        <div class="seccion-titulo" th:text="${filaEquipo.equipo.nombre}">Equipo</div>
+        <div class="seccion-titulo"
+             th:text="${filaEquipo.equipo.nombre}">Equipo</div>
 
         <table>
             <thead>
@@ -333,58 +332,98 @@
                 <th>APELLIDO</th>
                 <th>PUESTO</th>
                 <th>ESTADO</th>
+                <th>SANCION</th>
                 <th>ACCIONES</th>
             </tr>
             </thead>
+
             <tbody>
+            <!-- Una sola fila por jugador -->
             <tr th:each="jugador : ${filaEquipo.jugadores}">
                 <td th:text="${jugador.dorsal}">10</td>
                 <td class="campo" th:text="${jugador.nombre}">Nombre</td>
                 <td th:text="${jugador.apellido}">Apellido</td>
                 <td th:text="${jugador.puesto}">Puesto</td>
+
+                <!-- ESTADO -->
                 <td>
                     <span class="estado-jugador"
                           th:classappend="${jugador.habilitado} ? ' habilitado' : ' pendiente'"
-                          th:text="${jugador.habilitado} ? 'Habilitado' : 'Pendiente'">Estado</span>
+                          th:text="${jugador.habilitado} ? 'Habilitado' : 'Pendiente'">
+                        Estado
+                    </span>
                 </td>
+
+                <!-- SANCIÓN -->
                 <td>
-                    <form th:action="@{/jugadoresTorneoAdmin/habilitar(idTorneo=${torneo.id})}" method="post">
-                        <input type="hidden" name="idEquipo" th:value="${filaEquipo.equipo.id}"/>
-                        <input type="hidden" name="idJugador" th:value="${jugador.id}"/>
-                        <input type="hidden" name="habilitado" th:value="${jugador.habilitado} ? 'false' : 'true'"/>
+                    <span th:if="${jugador.fechasSuspensionPendientes != null
+                                  and jugador.fechasSuspensionPendientes > 0}">
+                        <strong th:text="${jugador.fechasSuspensionPendientes}">1</strong>
+                        fecha(s) pendiente(s)
+                    </span>
+
+                    <span th:if="${jugador.fechasSuspensionPendientes == null
+                                  or jugador.fechasSuspensionPendientes == 0}">
+                        Sin sanción
+                    </span>
+                </td>
+
+                <!-- ACCIONES -->
+                <td>
+                    <form th:action="@{/jugadoresTorneoAdmin/habilitar(idTorneo=${torneo.id})}"
+                          method="post">
+                        <input type="hidden" name="idEquipo"
+                               th:value="${filaEquipo.equipo.id}"/>
+                        <input type="hidden" name="idJugador"
+                               th:value="${jugador.id}"/>
+                        <input type="hidden" name="habilitado"
+                               th:value="${jugador.habilitado} ? 'false' : 'true'"/>
+
                         <button type="submit" class="btn-habilitar"
-                                th:text="${jugador.habilitado} ? 'Deshabilitar' : 'Habilitar'">Habilitar</button>
+                                th:text="${jugador.habilitado} ? 'Deshabilitar' : 'Habilitar'">
+                            Habilitar
+                        </button>
                     </form>
-                    <form th:action="@{/jugadoresTorneoAdmin/eliminar(idTorneo=${torneo.id})}" method="post">
-                        <input type="hidden" name="idEquipo" th:value="${filaEquipo.equipo.id}"/>
-                        <input type="hidden" name="idJugador" th:value="${jugador.id}"/>
+
+                    <form th:action="@{/jugadoresTorneoAdmin/eliminar(idTorneo=${torneo.id})}"
+                          method="post">
+                        <input type="hidden" name="idEquipo"
+                               th:value="${filaEquipo.equipo.id}"/>
+                        <input type="hidden" name="idJugador"
+                               th:value="${jugador.id}"/>
+
                         <button type="submit" class="btn-eliminar">Eliminar</button>
                     </form>
                 </td>
             </tr>
+
+            <!-- Aviso cuando el equipo no tiene jugadores -->
             <tr th:if="${#lists.isEmpty(filaEquipo.jugadores)}">
-                <td colspan="6" class="aviso">Sin jugadores cargados.</td>
+                <td colspan="7" class="aviso">Sin jugadores cargados.</td>
             </tr>
             </tbody>
         </table>
 
+        <!-- AGREGAR JUGADOR -->
         <form class="form-jugador"
               th:action="@{/jugadoresTorneoAdmin/agregar(idTorneo=${torneo.id})}"
               method="post">
-            <input type="hidden" name="idEquipo" th:value="${filaEquipo.equipo.id}"/>
+            <input type="hidden" name="idEquipo"
+                   th:value="${filaEquipo.equipo.id}"/>
             <input type="text" name="nombre" placeholder="Nombre" required/>
             <input type="text" name="apellido" placeholder="Apellido" required/>
             <input type="number" name="dorsal" placeholder="Dorsal" min="1"/>
+
             <select name="puesto">
                 <option value="Arquero">Arquero</option>
                 <option value="Defensor">Defensor</option>
                 <option value="Mediocampista">Mediocampista</option>
                 <option value="Delantero">Delantero</option>
             </select>
+
             <button type="submit">Agregar jugador</button>
         </form>
     </div>
-
 </div>
 
 <!-- LOGO DE MARCA -->
@@ -392,14 +431,17 @@
 
 <!-- MENÚ DE USUARIO -->
 <div class="menu-usuario">
-    <button type="button" class="btn-menu-hamburguesa" id="btnMenuUsuario" aria-label="Abrir menú">
+    <button type="button" class="btn-menu-hamburguesa"
+            id="btnMenuUsuario" aria-label="Abrir menú">
         <span></span>
         <span></span>
     </button>
+
     <div class="menu-usuario-opciones" id="menuUsuarioOpciones">
         <a th:href="@{/logout}">Cerrar sesión</a>
     </div>
 </div>
+
 <script th:src="@{/js/menu.js}"></script>
 
 </body>

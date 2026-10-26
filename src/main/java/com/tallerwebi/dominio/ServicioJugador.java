@@ -8,4 +8,7 @@ public interface ServicioJugador {
   void eliminarJugador(Long idEquipo, Long idJugador);
   void habilitarJugador(Long idJugador, boolean habilitado);
   Jugador consultarJugador(long idJugador);
+  void sancionarJugador(Long idJugador, Integer fechas);
+  void cumplirFechaSuspension(Long idJugador);
+  void agregarFechasSuspension(Long idJugador, Integer fechas);
 }

@@ -128,4 +128,111 @@ public class ServicioJugadorTest {
     // verificacion
     verify(this.repositorioJugadorMock, never()).actualizar(any(Jugador.class));
   }
+
+  @Test
+  public void deberiaConsultarJugadorPorId() {
+    //preparacion
+    Jugador jugador = new Jugador();
+    jugador.setId(10L);
+
+    when(repositorioJugadorMock.obtenerJugador(10L)).thenReturn(jugador);
+
+    //ejecucion
+    Jugador resultado = servicioJugador.consultarJugador(10L);
+
+    //verificacion
+    assertThat(resultado, is(jugador));
+    verify(repositorioJugadorMock).obtenerJugador(10L);
+  }
+
+  @Test
+  public void deberiaRetornarNullSiElJugadorConsultadoNoExiste() {
+    when(repositorioJugadorMock.obtenerJugador(99L)).thenReturn(null);
+
+    Jugador resultado = servicioJugador.consultarJugador(99L);
+
+    assertThat(resultado, is((Jugador) null));
+    verify(repositorioJugadorMock).obtenerJugador(99L);
+  }
+
+  @Test
+  public void deberiaSancionarJugadorYActualizarlo() {
+    //preparacion
+    Jugador jugador = new Jugador();
+    jugador.setId(10L);
+
+    when(repositorioJugadorMock.obtenerJugador(10L)).thenReturn(jugador);
+
+    //ejecucion
+    servicioJugador.sancionarJugador(10L, 3);
+
+    //verificacion
+    assertThat(jugador.getFechasSuspensionPendientes(), is(3));
+    assertThat(jugador.getEstadoSancion(), is("SANCIONADO"));
+    verify(repositorioJugadorMock).actualizar(jugador);
+  }
+
+  @Test
+  public void deberiaDescontarUnaFechaDeSuspension() {
+    //preparacion
+    Jugador jugador = new Jugador();
+    jugador.setFechasSuspensionPendientes(3);
+    jugador.setEstadoSancion("SANCIONADO");
+
+    when(repositorioJugadorMock.obtenerJugador(10L)).thenReturn(jugador);
+
+    //ejecucion
+    servicioJugador.cumplirFechaSuspension(10L);
+
+    //verificacion
+    assertThat(jugador.getFechasSuspensionPendientes(), is(2));
+    assertThat(jugador.getEstadoSancion(), is("SANCIONADO"));
+    verify(repositorioJugadorMock).actualizar(jugador);
+  }
+
+  @Test
+  public void deberiaQuitarLaSancionAlCumplirLaUltimaFecha() {
+    //preparacion
+    Jugador jugador = new Jugador();
+    jugador.setFechasSuspensionPendientes(1);
+    jugador.setEstadoSancion("SANCIONADO");
+
+    when(repositorioJugadorMock.obtenerJugador(10L)).thenReturn(jugador);
+
+    //ejecucion
+    servicioJugador.cumplirFechaSuspension(10L);
+
+    //verificacion
+    assertThat(jugador.getFechasSuspensionPendientes(), is(0));
+    assertThat(jugador.getEstadoSancion(), is("SIN_SANCION"));
+    verify(repositorioJugadorMock).actualizar(jugador);
+  }
+
+  @Test
+  public void deberiaAgregarFechasALaSuspensionExistente() {
+    Jugador jugador = new Jugador();
+    jugador.setFechasSuspensionPendientes(2);
+
+    when(repositorioJugadorMock.obtenerJugador(10L)).thenReturn(jugador);
+
+    servicioJugador.agregarFechasSuspension(10L, 3);
+
+    assertThat(jugador.getFechasSuspensionPendientes(), is(5));
+    assertThat(jugador.getEstadoSancion(), is("SANCIONADO"));
+    verify(repositorioJugadorMock).actualizar(jugador);
+  }
+
+  @Test
+  public void deberiaAgregarFechasSiLasPendientesSonNulas() {
+    Jugador jugador = new Jugador();
+    jugador.setFechasSuspensionPendientes(null);
+
+    when(repositorioJugadorMock.obtenerJugador(10L)).thenReturn(jugador);
+
+    servicioJugador.agregarFechasSuspension(10L, 2);
+
+    assertThat(jugador.getFechasSuspensionPendientes(), is(2));
+    assertThat(jugador.getEstadoSancion(), is("SANCIONADO"));
+    verify(repositorioJugadorMock).actualizar(jugador);
+  }
 }

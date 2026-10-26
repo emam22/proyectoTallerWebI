@@ -21,6 +21,9 @@ public class ControladorJugadores {
   private static final String ID_EQUIPO = "idEquipo";
   private static final String REDIRECT_JUGADORES = "redirect:/jugadoresTorneo?idTorneo=";
   private static final String REDIRECT_JUGADORES_ADMIN = "redirect:/jugadoresTorneoAdmin?idTorneo=";
+  private static final String ERROR_EQUIPO_NO_INSCRIPTO =
+    "El equipo no esta inscripto en este torneo.";
+  private static final String ID_JUGADOR = "idJugador";
 
   private static final String OK = "ok";
   private static final String ERROR = "error";
@@ -133,11 +136,7 @@ public class ControladorJugadores {
     Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
 
     if (torneo == null || !equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
-      return rechazar(
-        redireccion,
-        "El equipo no esta inscripto en este torneo.",
-        redirectAttributes
-      );
+      return rechazar(redireccion, ERROR_EQUIPO_NO_INSCRIPTO, redirectAttributes);
     }
 
     List<Jugador> jugadores = servicioJugador.obtenerJugadores(idEquipo);
@@ -187,7 +186,7 @@ public class ControladorJugadores {
   public ModelAndView eliminarJugador(
     @RequestParam(ID_TORNEO) Long idTorneo,
     @RequestParam(ID_EQUIPO) Long idEquipo,
-    @RequestParam("idJugador") Long idJugador,
+    @RequestParam(ID_JUGADOR) Long idJugador,
     RedirectAttributes redirectAttributes
   ) {
     return eliminarJugadorComun(
@@ -203,7 +202,7 @@ public class ControladorJugadores {
   public ModelAndView eliminarJugadorAdmin(
     @RequestParam(ID_TORNEO) Long idTorneo,
     @RequestParam(ID_EQUIPO) Long idEquipo,
-    @RequestParam("idJugador") Long idJugador,
+    @RequestParam(ID_JUGADOR) Long idJugador,
     RedirectAttributes redirectAttributes
   ) {
     return eliminarJugadorComun(
@@ -225,11 +224,7 @@ public class ControladorJugadores {
     Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
 
     if (torneo == null || !equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
-      return rechazar(
-        redireccion,
-        "El equipo no esta inscripto en este torneo.",
-        redirectAttributes
-      );
+      return rechazar(redireccion, ERROR_EQUIPO_NO_INSCRIPTO, redirectAttributes);
     }
 
     List<Jugador> jugadores = servicioJugador.obtenerJugadores(idEquipo);
@@ -271,11 +266,7 @@ public class ControladorJugadores {
     String redireccion = REDIRECT_JUGADORES_ADMIN + idTorneo;
 
     if (!equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
-      return rechazar(
-        redireccion,
-        "El equipo no esta inscripto en este torneo.",
-        redirectAttributes
-      );
+      return rechazar(redireccion, ERROR_EQUIPO_NO_INSCRIPTO, redirectAttributes);
     }
 
     if (!perteneceAlEquipo(idEquipo, idJugador)) {
@@ -368,5 +359,46 @@ public class ControladorJugadores {
     }
 
     return equipos;
+  }
+
+  //sancionar jugador
+
+  @RequestMapping(path = "/jugadoresTorneoAdmin/sancionar", method = RequestMethod.POST)
+  public ModelAndView sancionarJugador(
+    @RequestParam("idTorneo") Long idTorneo,
+    @RequestParam("idEquipo") Long idEquipo,
+    @RequestParam(ID_JUGADOR) Long idJugador,
+    @RequestParam("fechas") Integer fechas,
+    RedirectAttributes redirectAttributes
+  ) {
+    String redireccion = REDIRECT_JUGADORES_ADMIN + idTorneo;
+
+    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+
+    if (torneo == null) {
+      return new ModelAndView("redirect:/lobbyAdmin");
+    }
+
+    if (!equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
+      return rechazar(redireccion, ERROR_EQUIPO_NO_INSCRIPTO, redirectAttributes);
+    }
+
+    if (!perteneceAlEquipo(idEquipo, idJugador)) {
+      return rechazar(redireccion, "El jugador no pertenece a este equipo.", redirectAttributes);
+    }
+
+    if (fechas == null || fechas <= 0) {
+      return rechazar(
+        redireccion,
+        "La cantidad de fechas debe ser mayor a cero.",
+        redirectAttributes
+      );
+    }
+
+    servicioJugador.sancionarJugador(idJugador, fechas);
+
+    redirectAttributes.addFlashAttribute(OK, "Jugador sancionado por " + fechas + " fecha(s).");
+
+    return new ModelAndView(redireccion);
   }
 }

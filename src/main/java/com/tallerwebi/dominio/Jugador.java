@@ -18,6 +18,8 @@ public class Jugador {
   private String apellido;
   private Integer categoria;
   private Boolean habilitado = false;
+  private Integer fechasSuspensionPendientes = 0;
+  private String estadoSancion = "SIN_SANCION";
 
   public Long getId() {
     return id;
@@ -73,5 +75,21 @@ public class Jugador {
 
   public void setHabilitado(Boolean habilitado) {
     this.habilitado = habilitado;
+  }
+
+  public Integer getFechasSuspensionPendientes() {
+    return fechasSuspensionPendientes;
+  }
+
+  public void setFechasSuspensionPendientes(Integer fechasSuspensionPendientes) {
+    this.fechasSuspensionPendientes = fechasSuspensionPendientes;
+  }
+
+  public String getEstadoSancion() {
+    return estadoSancion;
+  }
+
+  public void setEstadoSancion(String estadoSancion) {
+    this.estadoSancion = estadoSancion;
   }
 }

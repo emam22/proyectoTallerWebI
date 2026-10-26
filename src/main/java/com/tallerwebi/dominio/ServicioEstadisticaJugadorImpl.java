@@ -11,13 +11,16 @@ public class ServicioEstadisticaJugadorImpl implements ServicioEstadisticaJugado
 
   private final ServicioJugador servicioJugador;
   private RepositorioEstadisticaJugador repoEstadisticas;
+  ServicioTorneo servicioTorneo;
 
   public ServicioEstadisticaJugadorImpl(
     ServicioJugador servicioJugador,
-    RepositorioEstadisticaJugador repoEstadisticas
+    RepositorioEstadisticaJugador repoEstadisticas,
+    ServicioTorneo servicioTorneo
   ) {
     this.servicioJugador = servicioJugador;
     this.repoEstadisticas = repoEstadisticas;
+    this.servicioTorneo = servicioTorneo;
   }
 
   @Override
@@ -48,5 +51,61 @@ public class ServicioEstadisticaJugadorImpl implements ServicioEstadisticaJugado
   @Override
   public void eliminarEstadisticas(Long idJugador) {
     repoEstadisticas.eliminarFilaEstadistica(idJugador);
+  }
+
+  @Override
+  public void registrarTarjetaAmarilla(Long idJugador, Long idTorneo) {
+    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+    EstadisticaJugador estadisticas = obtenerEstadisticasValidadas(idJugador, idTorneo);
+
+    Integer limite = torneo.getCantidadAmaSusp();
+
+    if (limite == null || limite <= 0) {
+      throw new IllegalArgumentException(
+        "El torneo no tiene configurado un límite válido de amarillas."
+      );
+    }
+
+    int amarillasAntes = valorOZero(estadisticas.getAmarillas());
+    int amarillasDespues = amarillasAntes + 1;
+
+    estadisticas.setAmarillas(amarillasDespues);
+    repoEstadisticas.actualizarEstadisticasJugador(estadisticas);
+
+    if (amarillasDespues % limite == 0) {
+      servicioJugador.agregarFechasSuspension(idJugador, 1);
+    }
+  }
+
+  private int valorOZero(Integer valor) {
+    return valor == null ? 0 : valor;
+  }
+
+  @Override
+  public void registrarTarjetaRoja(Long idJugador, Long idTorneo) {
+    EstadisticaJugador estadisticas = obtenerEstadisticasValidadas(idJugador, idTorneo);
+
+    int rojas = valorOZero(estadisticas.getRojas());
+
+    estadisticas.setRojas(rojas + 1);
+
+    repoEstadisticas.actualizarEstadisticasJugador(estadisticas);
+
+    servicioJugador.agregarFechasSuspension(idJugador, 1);
+  }
+
+  private EstadisticaJugador obtenerEstadisticasValidadas(Long idJugador, Long idTorneo) {
+    Jugador jugador = servicioJugador.consultarJugador(idJugador);
+    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+
+    EstadisticaJugador estadisticas = repoEstadisticas.buscarEstadisticasPorIdJugador(idJugador);
+
+    if (jugador == null || torneo == null || estadisticas == null) {
+      throw new IllegalArgumentException(
+        "No se encontró el jugador, el torneo o sus estadísticas."
+      );
+    }
+
+    return estadisticas;
   }
 }

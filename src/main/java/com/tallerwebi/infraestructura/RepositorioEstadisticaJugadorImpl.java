@@ -36,4 +36,21 @@ public class RepositorioEstadisticaJugadorImpl implements RepositorioEstadistica
       .setParameter("idJugador", idJugador)
       .executeUpdate();
   }
+
+  @Override
+  public EstadisticaJugador buscarEstadisticasPorIdJugador(Long idJugador) {
+    return sf
+      .getCurrentSession()
+      .createQuery(
+        "SELECT e FROM EstadisticaJugador e WHERE e.jugador.id = :idJugador",
+        EstadisticaJugador.class
+      )
+      .setParameter("idJugador", idJugador)
+      .uniqueResult();
+  }
+
+  @Override
+  public void actualizarEstadisticasJugador(EstadisticaJugador estadisticas) {
+    sf.getCurrentSession().merge(estadisticas);
+  }
 }

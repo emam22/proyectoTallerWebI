@@ -57,6 +57,69 @@ public class ServicioJugadorImpl implements ServicioJugador {
   }
 
   @Override
+  public void sancionarJugador(Long idJugador, Integer fechas) {
+    Jugador jugador = repositorioJugador.obtenerJugador(idJugador);
+
+    if (jugador == null) {
+      return;
+    }
+
+    if (fechas == null || fechas <= 0) {
+      throw new IllegalArgumentException("La cantidad de fechas debe ser mayor a cero.");
+    }
+
+    jugador.setFechasSuspensionPendientes(fechas);
+    jugador.setEstadoSancion("SANCIONADO");
+    //  jugador.setHabilitado(false);
+
+    repositorioJugador.actualizar(jugador);
+  }
+
+  @Override
+  public void cumplirFechaSuspension(Long idJugador) {
+    Jugador jugador = repositorioJugador.obtenerJugador(idJugador);
+
+    if (jugador == null) {
+      return;
+    }
+
+    Integer pendientes = jugador.getFechasSuspensionPendientes();
+
+    if (pendientes == null || pendientes <= 0) {
+      return;
+    }
+
+    pendientes--;
+    jugador.setFechasSuspensionPendientes(pendientes);
+
+    if (pendientes == 0) {
+      jugador.setEstadoSancion("SIN_SANCION");
+    } else {
+      jugador.setEstadoSancion("SANCIONADO");
+    }
+
+    repositorioJugador.actualizar(jugador);
+  }
+
+  @Override
+  public void agregarFechasSuspension(Long idJugador, Integer fechas) {
+    Jugador jugador = repositorioJugador.obtenerJugador(idJugador);
+
+    if (jugador == null || fechas == null || fechas <= 0) {
+      return;
+    }
+
+    int pendientes = jugador.getFechasSuspensionPendientes() == null
+      ? 0
+      : jugador.getFechasSuspensionPendientes();
+
+    jugador.setFechasSuspensionPendientes(pendientes + fechas);
+    jugador.setEstadoSancion("SANCIONADO");
+
+    repositorioJugador.actualizar(jugador);
+  }
+
+  @Override
   public void habilitarJugador(Long idJugador, boolean habilitado) {
     Jugador jugador = repositorioJugador.obtenerJugador(idJugador);
 

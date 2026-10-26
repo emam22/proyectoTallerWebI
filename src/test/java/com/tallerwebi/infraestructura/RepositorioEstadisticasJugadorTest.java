@@ -104,4 +104,26 @@ public class RepositorioEstadisticasJugadorTest {
     assertTrue(!estadisticasActualizadas.contains(est1));
     assertTrue(estadisticasActualizadas.contains(est2));
   }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void deberiaBuscarEstadisticasPorIdJugador() {
+    // Preparación
+    Jugador jugador = new Jugador();
+    sessionFactory.getCurrentSession().persist(jugador);
+
+    EstadisticaJugador estadistica = new EstadisticaJugador();
+    estadistica.setJugador(jugador);
+    repositorioEstadisticaJugador.guardar(estadistica);
+
+    // Ejecución
+    EstadisticaJugador resultado = repositorioEstadisticaJugador.buscarEstadisticasPorIdJugador(
+      jugador.getId()
+    );
+
+    // Verificación
+    assertEquals(jugador.getId(), resultado.getJugador().getId());
+    assertEquals(estadistica.getId(), resultado.getId());
+  }
 }

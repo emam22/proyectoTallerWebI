@@ -398,4 +398,39 @@ public class ControladorJugadoresTest {
     when(this.servicioEquipoTorneoMock.obtenerEquiposPorTorneo(idTorneo))
       .thenReturn(List.of(equipoTorneo));
   }
+
+  @Test
+  public void deberiaAceptarUnaFechaDeSancion() {
+    //preparcion
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+
+    inscribirEquipoEnTorneo(1L, 10L, torneo);
+    when(this.servicioJugadorMock.obtenerJugadores(10L)).thenReturn(List.of(jugador(99L)));
+
+    //ejecucion
+    ModelAndView mav = this.controlador.sancionarJugador(1L, 10L, 99L, 1, redirectAttributesMock);
+
+    //verificacion
+    verify(this.servicioJugadorMock).sancionarJugador(99L, 1);
+    verify(redirectAttributesMock).addFlashAttribute("ok", "Jugador sancionado por 1 fecha(s).");
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneoAdmin?idTorneo=1"));
+  }
+
+  @Test
+  public void noDeberiaSancionarSiElEquipoNoTieneJugadores() {
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+
+    inscribirEquipoEnTorneo(1L, 10L, torneo);
+    when(this.servicioJugadorMock.obtenerJugadores(10L)).thenReturn(new ArrayList<>());
+
+    ModelAndView mav = this.controlador.sancionarJugador(1L, 10L, 99L, 2, redirectAttributesMock);
+
+    verify(this.servicioJugadorMock, never()).sancionarJugador(any(), any());
+    verify(redirectAttributesMock).addFlashAttribute(eq("error"), anyString());
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneoAdmin?idTorneo=1"));
+  }
 }

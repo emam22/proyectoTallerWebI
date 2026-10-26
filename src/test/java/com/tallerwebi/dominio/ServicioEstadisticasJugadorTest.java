@@ -17,14 +17,20 @@ public class ServicioEstadisticasJugadorTest {
   private ServicioEstadisticaJugadorImpl servicioEstadistica;
   private ServicioJugador servicioJugadorMock;
   private RepositorioEstadisticaJugador repoEstadisticasMock;
+  private ServicioTorneo servicioTorneoMock;
 
   @BeforeEach
   public void init() {
     servicioJugadorMock = mock(ServicioJugador.class);
     repoEstadisticasMock = mock(RepositorioEstadisticaJugador.class);
+    servicioTorneoMock = mock(ServicioTorneo.class);
 
     servicioEstadistica =
-      new ServicioEstadisticaJugadorImpl(servicioJugadorMock, repoEstadisticasMock);
+      new ServicioEstadisticaJugadorImpl(
+        servicioJugadorMock,
+        repoEstadisticasMock,
+        servicioTorneoMock
+      );
   }
 
   @Test
@@ -78,5 +84,50 @@ public class ServicioEstadisticasJugadorTest {
     // Validación
     assertThat(resultado, equalTo(estadisticas));
     verify(repoEstadisticasMock, times(1)).obtenerEstadisticas();
+  }
+
+  @Test
+  public void alRegistrarTarjetaAmarillaDebeActualizarEstadisticas() {
+    Jugador jugador = new Jugador();
+    jugador.setId(1L);
+
+    Torneo torneo = new Torneo();
+    torneo.setCantidadAmaSusp(3);
+
+    EstadisticaJugador estadisticas = new EstadisticaJugador();
+    estadisticas.setJugador(jugador);
+    estadisticas.setAmarillas(0);
+
+    when(servicioJugadorMock.consultarJugador(1L)).thenReturn(jugador);
+    when(servicioTorneoMock.consultarTorneoPorId(10L)).thenReturn(torneo);
+    when(repoEstadisticasMock.buscarEstadisticasPorIdJugador(1L)).thenReturn(estadisticas);
+
+    servicioEstadistica.registrarTarjetaAmarilla(1L, 10L);
+
+    assertThat(estadisticas.getAmarillas(), equalTo(1));
+    verify(repoEstadisticasMock).actualizarEstadisticasJugador(estadisticas);
+    verify(servicioJugadorMock, never()).agregarFechasSuspension(1L, 1);
+  }
+
+  @Test
+  public void alRegistrarTarjetaRojaDebeActualizarEstadisticasYAgregarSuspension() {
+    Jugador jugador = new Jugador();
+    jugador.setId(1L);
+
+    Torneo torneo = new Torneo();
+
+    EstadisticaJugador estadisticas = new EstadisticaJugador();
+    estadisticas.setJugador(jugador);
+    estadisticas.setRojas(0);
+
+    when(servicioJugadorMock.consultarJugador(1L)).thenReturn(jugador);
+    when(servicioTorneoMock.consultarTorneoPorId(10L)).thenReturn(torneo);
+    when(repoEstadisticasMock.buscarEstadisticasPorIdJugador(1L)).thenReturn(estadisticas);
+
+    servicioEstadistica.registrarTarjetaRoja(1L, 10L);
+
+    assertThat(estadisticas.getRojas(), equalTo(1));
+    verify(repoEstadisticasMock).actualizarEstadisticasJugador(estadisticas);
+    verify(servicioJugadorMock).agregarFechasSuspension(1L, 1);
   }
 }

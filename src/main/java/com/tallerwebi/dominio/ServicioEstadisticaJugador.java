@@ -7,4 +7,6 @@ public interface ServicioEstadisticaJugador {
   void iniciarEstadisticas(Jugador Jugador) throws JugadorNoExiste;
   List<EstadisticaJugador> obtenerEstadisticas();
   void eliminarEstadisticas(Long idJugador);
+  void registrarTarjetaAmarilla(Long idJugador, Long idTorneo);
+  void registrarTarjetaRoja(Long idJugador, Long idTorneo);
 }
