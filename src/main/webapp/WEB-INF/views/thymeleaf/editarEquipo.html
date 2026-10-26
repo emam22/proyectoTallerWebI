@@ -209,6 +209,41 @@
             overflow-wrap: anywhere;
         }
 
+        /* BOTÓN EDITAR EQUIPO */
+        .btn-card-admin {
+            display: inline-block;
+            box-sizing: border-box;
+            padding: 12px 20px;
+            background: #1f1f1f;
+            color: #b6ff00;
+            border: 2px solid #b6ff00;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s, transform 0.1s;
+        }
+
+        /* EFECTO AL PASAR EL MOUSE */
+        .btn-card-admin:hover {
+            background: #b6ff00;
+            color: #111111;
+            transform: translateY(-2px);
+        }
+
+        /* EFECTO AL HACER CLIC */
+        .btn-card-admin:active {
+            transform: translateY(0);
+        }
+
+        /* ACCESIBILIDAD: FOCO CON TECLADO */
+        .btn-card-admin:focus-visible {
+            outline: 2px solid white;
+            outline-offset: 3px;
+        }
+
         /* RESPONSIVE */
         @media (max-width: 700px) {
             body {

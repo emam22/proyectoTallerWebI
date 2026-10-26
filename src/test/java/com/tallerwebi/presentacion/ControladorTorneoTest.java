@@ -366,56 +366,64 @@ public class ControladorTorneoTest {
   }
 
   @Test
-  public void deberiaActualizarElEquipoYRedirigirAlAdministrarTorneo() {
-    // preparacion
+  public void deberiaActualizarElEquipoYRedirigirAlAdministrarTorneo()
+    throws EquipoExistente, SiglasExistentes {
+    // Preparación
     Long idEquipo = 1L;
     Long idTorneo = 2L;
+
     Equipo equipo = new Equipo();
     equipo.setId(idEquipo);
     equipo.setNombre("Equipo Viejo");
+    equipo.setSiglas("EV");
 
     when(servicioEquipoMock.consultarEquipoPorId(idEquipo)).thenReturn(equipo);
 
-    // ejecucion
+    // Ejecución
     ModelAndView mav = controladorTorneo.actualizarEquipo(
       idEquipo,
       idTorneo,
       "Equipo Nuevo",
+      "EN",
       "#ffffff",
       "#000000",
       "#ff0000",
       "#00ff00"
     );
 
-    // validacion
+    // Validación
     assertThat(mav.getViewName(), equalTo("redirect:/administrarTorneoAdmin/" + idTorneo));
     assertThat(equipo.getNombre(), equalTo("Equipo Nuevo"));
+    assertThat(equipo.getSiglas(), equalTo("EN"));
     assertThat(equipo.getColorLocal1(), equalTo("#ffffff"));
 
     verify(servicioEquipoMock, times(1)).actualizarEquipo(equipo);
   }
 
   @Test
-  public void deberiaRedirigirAEditarEquipoSiElEquipoNoExisteAlActualizar() {
-    // preparacion
+  public void deberiaRedirigirAEditarEquipoSiElEquipoNoExisteAlActualizar()
+    throws EquipoExistente, SiglasExistentes {
+    // Preparación
     Long idEquipo = 99L;
     Long idTorneo = 2L;
 
     when(servicioEquipoMock.consultarEquipoPorId(idEquipo)).thenReturn(null);
 
-    // ejecucion
+    // Ejecución
     ModelAndView mav = controladorTorneo.actualizarEquipo(
       idEquipo,
       idTorneo,
       "Nombre",
+      "NOM",
       "#ffffff",
       "#000000",
       "#ff0000",
       "#00ff00"
     );
 
-    // validacion
+    // Validación
     assertThat(mav.getViewName(), equalTo("redirect:/editarEquipo?idTorneo=" + idTorneo));
+
     verify(servicioEquipoMock, never()).actualizarEquipo(any());
   }
 

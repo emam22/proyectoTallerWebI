@@ -60,6 +60,20 @@ public class ControladorJugadores {
     return gestionarJugadoresComun(idTorneo, "jugadoresTorneoAdmin");
   }
 
+  @RequestMapping(path = "/jugadoresTorneoEditar", method = RequestMethod.GET)
+  public ModelAndView gestionarJugadoresEditar(
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    @RequestParam(ID_EQUIPO) Long idEquipo
+  ) {
+    ModelAndView modelo = gestionarJugadoresComun(idTorneo, "jugadoresTorneoEditar");
+
+    if (modelo.getModel().containsKey("torneo")) {
+      modelo.addObject(ID_EQUIPO, idEquipo);
+    }
+
+    return modelo;
+  }
+
   private ModelAndView gestionarJugadoresComun(Long idTorneo, String vista) {
     Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
 
@@ -120,6 +134,28 @@ public class ControladorJugadores {
       puesto,
       redirectAttributes,
       REDIRECT_JUGADORES_ADMIN + idTorneo
+    );
+  }
+
+  @RequestMapping(path = "/jugadoresTorneoEditar/agregar", method = RequestMethod.POST)
+  public ModelAndView agregarJugadorEditar(
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    @RequestParam(ID_EQUIPO) Long idEquipo,
+    @RequestParam("nombre") String nombre,
+    @RequestParam("apellido") String apellido,
+    @RequestParam(value = "dorsal", required = false) Integer dorsal,
+    @RequestParam(value = "puesto", required = false) String puesto,
+    RedirectAttributes redirectAttributes
+  ) throws JugadorNoExiste {
+    return agregarJugadorComun(
+      idTorneo,
+      idEquipo,
+      nombre,
+      apellido,
+      dorsal,
+      puesto,
+      redirectAttributes,
+      redirectJugadoresEditar(idTorneo, idEquipo)
     );
   }
 
@@ -214,6 +250,22 @@ public class ControladorJugadores {
     );
   }
 
+  @RequestMapping(path = "/jugadoresTorneoEditar/eliminar", method = RequestMethod.POST)
+  public ModelAndView eliminarJugadorEditar(
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    @RequestParam(ID_EQUIPO) Long idEquipo,
+    @RequestParam(ID_JUGADOR) Long idJugador,
+    RedirectAttributes redirectAttributes
+  ) {
+    return eliminarJugadorComun(
+      idTorneo,
+      idEquipo,
+      idJugador,
+      redirectAttributes,
+      redirectJugadoresEditar(idTorneo, idEquipo)
+    );
+  }
+
   private ModelAndView eliminarJugadorComun(
     Long idTorneo,
     Long idEquipo,
@@ -253,17 +305,51 @@ public class ControladorJugadores {
   public ModelAndView habilitarJugador(
     @RequestParam(ID_TORNEO) Long idTorneo,
     @RequestParam(ID_EQUIPO) Long idEquipo,
-    @RequestParam("idJugador") Long idJugador,
+    @RequestParam(ID_JUGADOR) Long idJugador,
     @RequestParam(value = "habilitado", required = false) Boolean habilitado,
     RedirectAttributes redirectAttributes
+  ) {
+    return habilitarJugadorComun(
+      idTorneo,
+      idEquipo,
+      idJugador,
+      habilitado,
+      redirectAttributes,
+      REDIRECT_JUGADORES_ADMIN + idTorneo
+    );
+  }
+
+  @RequestMapping(path = "/jugadoresTorneoEditar/habilitar", method = RequestMethod.POST)
+  public ModelAndView habilitarJugadorEditar(
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    @RequestParam(ID_EQUIPO) Long idEquipo,
+    @RequestParam(ID_JUGADOR) Long idJugador,
+    @RequestParam(value = "habilitado", required = false) Boolean habilitado,
+    RedirectAttributes redirectAttributes
+  ) {
+    return habilitarJugadorComun(
+      idTorneo,
+      idEquipo,
+      idJugador,
+      habilitado,
+      redirectAttributes,
+      redirectJugadoresEditar(idTorneo, idEquipo)
+    );
+  }
+
+  private ModelAndView habilitarJugadorComun(
+    Long idTorneo,
+    Long idEquipo,
+    Long idJugador,
+    Boolean habilitado,
+    RedirectAttributes redirectAttributes,
+    String redireccion
   ) {
     Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
 
     if (torneo == null) {
       return new ModelAndView("redirect:/lobbyAdmin");
     }
-
-    String redireccion = REDIRECT_JUGADORES_ADMIN + idTorneo;
 
     if (!equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
       return rechazar(redireccion, ERROR_EQUIPO_NO_INSCRIPTO, redirectAttributes);
@@ -400,5 +486,9 @@ public class ControladorJugadores {
     redirectAttributes.addFlashAttribute(OK, "Jugador sancionado por " + fechas + " fecha(s).");
 
     return new ModelAndView(redireccion);
+  }
+
+  private String redirectJugadoresEditar(Long idTorneo, Long idEquipo) {
+    return "redirect:/jugadoresTorneoEditar?idTorneo=" + idTorneo + "&idEquipo=" + idEquipo;
   }
 }

@@ -9,5 +9,5 @@ public interface ServicioEquipo {
   Equipo consultarEquipo(String nombre);
   void registrarEquipo(Equipo equipo) throws EquipoExistente, SiglasExistentes;
   List<Equipo> obtenerEquipos();
-  void actualizarEquipo(Equipo equipo);
+  void actualizarEquipo(Equipo equipo) throws EquipoExistente, SiglasExistentes;
 }

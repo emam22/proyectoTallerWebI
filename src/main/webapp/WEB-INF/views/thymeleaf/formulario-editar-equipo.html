@@ -255,6 +255,31 @@
                     </div>
                 </div>
 
+
+
+                <!-- SIGLAS -->
+                <div class="form-group">
+                    <label for="siglas">
+                        Ingresar siglas (3 a 5 letras)
+                    </label>
+
+                    <input
+                            type="text"
+                            id="siglas"
+                            name="siglas"
+                            class="input-text"
+                            minlength="3"
+                            maxlength="5"
+                            pattern="[A-Za-z]{3,5}"
+                            title="Las siglas deben tener entre 3 y 5 letras."
+                            oninput="this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 5)"
+                            th:value="${equipo.siglas}"
+
+                            required
+                    >
+                </div>
+
+
             </div>
 
             <!-- GUARDAR CAMBIOS -->
@@ -262,6 +287,19 @@
                 <button type="submit" class="btn btn-verde">
                     Guardar cambios
                 </button>
+            </div>
+
+
+
+            <!-- BOTÓN PARA GESTIONAR JUGADORES -->
+            <div class="form-actions">
+                <a th:href="@{/jugadoresTorneoEditar(
+                    idTorneo=${idTorneo},
+                    idEquipo=${equipo.id}
+                    )}"
+                   class="btn btn-blanco">
+                    Gestionar jugadores
+                </a>
             </div>
 
         </form>

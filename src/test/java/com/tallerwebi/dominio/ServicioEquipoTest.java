@@ -102,7 +102,7 @@ public class ServicioEquipoTest {
   }
 
   @Test
-  void deberiaActualizarElEquipoCorrectamente() {
+  void deberiaActualizarElEquipoCorrectamente() throws EquipoExistente, SiglasExistentes {
     // preparacion
     Equipo equipoAActualizar = new Equipo();
     equipoAActualizar.setId(1L);
@@ -113,6 +113,50 @@ public class ServicioEquipoTest {
 
     // verificacion
     verify(repositorioEquipoMock, times(1)).actualizar(equipoAActualizar);
+  }
+
+  @Test
+  public void deberiaLanzarExcepcionAlActualizarEquipoConNombreExistente() {
+    // Preparación
+    Equipo equipoAActualizar = new Equipo();
+    equipoAActualizar.setId(1L);
+    equipoAActualizar.setNombre("Boca Juniors");
+    equipoAActualizar.setSiglas("BOC");
+
+    Equipo otroEquipo = new Equipo();
+    otroEquipo.setId(2L);
+    otroEquipo.setNombre("Boca Juniors");
+    otroEquipo.setSiglas("BJ");
+
+    when(repositorioEquipoMock.buscarEquipo("Boca Juniors")).thenReturn(otroEquipo);
+
+    // Ejecución y validación
+    assertThrows(EquipoExistente.class, () -> servicioEquipo.actualizarEquipo(equipoAActualizar));
+
+    verify(repositorioEquipoMock, never()).actualizar(any());
+  }
+
+  @Test
+  public void deberiaLanzarExcepcionAlActualizarEquipoConSiglasExistentes() {
+    // Preparación
+    Equipo equipoAActualizar = new Equipo();
+    equipoAActualizar.setId(1L);
+    equipoAActualizar.setNombre("River Plate");
+    equipoAActualizar.setSiglas("BOC");
+
+    Equipo otroEquipo = new Equipo();
+    otroEquipo.setId(2L);
+    otroEquipo.setNombre("Otro Equipo");
+    otroEquipo.setSiglas("BOC");
+
+    when(repositorioEquipoMock.buscarEquipo("River Plate")).thenReturn(null);
+
+    when(repositorioEquipoMock.buscarEquipoPorSiglas("BOC")).thenReturn(otroEquipo);
+
+    // Ejecución y validación
+    assertThrows(SiglasExistentes.class, () -> servicioEquipo.actualizarEquipo(equipoAActualizar));
+
+    verify(repositorioEquipoMock, never()).actualizar(any());
   }
 
   @Test

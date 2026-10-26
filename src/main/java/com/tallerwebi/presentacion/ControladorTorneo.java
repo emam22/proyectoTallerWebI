@@ -457,6 +457,7 @@ public class ControladorTorneo {
     @RequestParam(ID_EQUIPO) Long idEquipo,
     @RequestParam(ID_TORNEO) Long idTorneo,
     @RequestParam("nombre") String nombre,
+    @RequestParam("siglas") String siglas,
     @RequestParam("colorLocal1") String colorLocal1,
     @RequestParam("colorLocal2") String colorLocal2,
     @RequestParam("colorVisitante1") String colorVisitante1,
@@ -469,12 +470,27 @@ public class ControladorTorneo {
     }
 
     equipo.setNombre(nombre);
+    equipo.setSiglas(siglas);
     equipo.setColorLocal1(colorLocal1);
     equipo.setColorLocal2(colorLocal2);
     equipo.setColorVisitante1(colorVisitante1);
     equipo.setColorVisitante2(colorVisitante2);
 
-    servicioEquipo.actualizarEquipo(equipo);
+    try {
+      servicioEquipo.actualizarEquipo(equipo);
+    } catch (EquipoExistente e) {
+      ModelAndView mav = new ModelAndView("formulario-editar-equipo");
+      mav.addObject("equipo", equipo);
+      mav.addObject(ID_TORNEO, idTorneo);
+      mav.addObject("error", "Ya existe un equipo con ese nombre.");
+      return mav;
+    } catch (SiglasExistentes e) {
+      ModelAndView mav = new ModelAndView("formulario-editar-equipo");
+      mav.addObject("equipo", equipo);
+      mav.addObject(ID_TORNEO, idTorneo);
+      mav.addObject("error", "Ya existen equipos con esas siglas.");
+      return mav;
+    }
 
     return new ModelAndView(REDIRECT_ADMINISTRAR_TORNEO_ADMIN + idTorneo);
   }
