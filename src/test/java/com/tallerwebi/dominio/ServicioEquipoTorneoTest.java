@@ -268,4 +268,173 @@ public class ServicioEquipoTorneoTest {
     verify(servicioEquipoMock, times(1)).registrarEquipo(equipo);
     verify(repositorioEquipoTorneoMock, never()).guardar(any(EquipoTorneo.class));
   }
+
+  @Test
+  public void deberiaActualizarTablaPosicionesCuandoGanaLocal() {
+    // preparacion
+    Long idTorneo = 1L;
+    Long idLocal = 10L;
+    Long idVisitante = 20L;
+
+    EquipoTorneo statsLocal = new EquipoTorneo();
+    statsLocal.setPartidosJugados(0);
+    statsLocal.setPartidosGanados(0);
+    statsLocal.setPartidosEmpatados(0);
+    statsLocal.setPartidoPerdidos(0);
+    statsLocal.setGolesAFavor(0);
+    statsLocal.setGolesEnContra(0);
+    statsLocal.setPuntos(0);
+
+    EquipoTorneo statsVisitante = new EquipoTorneo();
+    statsVisitante.setPartidosJugados(0);
+    statsVisitante.setPartidosGanados(0);
+    statsVisitante.setPartidosEmpatados(0);
+    statsVisitante.setPartidoPerdidos(0);
+    statsVisitante.setGolesAFavor(0);
+    statsVisitante.setGolesEnContra(0);
+    statsVisitante.setPuntos(0);
+
+    when(repositorioEquipoTorneoMock.buscarEquipoTorneoPorId(idLocal, idTorneo))
+      .thenReturn(statsLocal);
+    when(repositorioEquipoTorneoMock.buscarEquipoTorneoPorId(idVisitante, idTorneo))
+      .thenReturn(statsVisitante);
+
+    // ejecucion (Gana Local 2 a 1)
+    servicioEquipoTorneo.actualizarTablaPosiciones(idTorneo, idLocal, idVisitante, 2, 1);
+
+    // verificacion Local
+    assertThat(statsLocal.getPartidosJugados(), is(1));
+    assertThat(statsLocal.getPartidosGanados(), is(1));
+    assertThat(statsLocal.getPartidoPerdidos(), is(0));
+    assertThat(statsLocal.getPartidosEmpatados(), is(0));
+    assertThat(statsLocal.getGolesAFavor(), is(2));
+    assertThat(statsLocal.getGolesEnContra(), is(1));
+    assertThat(statsLocal.getPuntos(), is(3));
+
+    // verificacion Visitante
+    assertThat(statsVisitante.getPartidosJugados(), is(1));
+    assertThat(statsVisitante.getPartidosGanados(), is(0));
+    assertThat(statsVisitante.getPartidoPerdidos(), is(1));
+    assertThat(statsVisitante.getPartidosEmpatados(), is(0));
+    assertThat(statsVisitante.getGolesAFavor(), is(1));
+    assertThat(statsVisitante.getGolesEnContra(), is(2));
+    assertThat(statsVisitante.getPuntos(), is(0));
+  }
+
+  @Test
+  public void deberiaActualizarTablaPosicionesCuandoGanaVisitante() {
+    // preparacion
+    Long idTorneo = 1L;
+    Long idLocal = 10L;
+    Long idVisitante = 20L;
+
+    EquipoTorneo statsLocal = new EquipoTorneo();
+    statsLocal.setPartidosJugados(1);
+    statsLocal.setPartidosGanados(1);
+    statsLocal.setPartidosEmpatados(0);
+    statsLocal.setPartidoPerdidos(0);
+    statsLocal.setGolesAFavor(2);
+    statsLocal.setGolesEnContra(0);
+    statsLocal.setPuntos(3);
+
+    EquipoTorneo statsVisitante = new EquipoTorneo();
+    statsVisitante.setPartidosJugados(1);
+    statsVisitante.setPartidosGanados(0);
+    statsVisitante.setPartidosEmpatados(0);
+    statsVisitante.setPartidoPerdidos(1);
+    statsVisitante.setGolesAFavor(0);
+    statsVisitante.setGolesEnContra(1);
+    statsVisitante.setPuntos(0);
+
+    when(repositorioEquipoTorneoMock.buscarEquipoTorneoPorId(idLocal, idTorneo))
+      .thenReturn(statsLocal);
+    when(repositorioEquipoTorneoMock.buscarEquipoTorneoPorId(idVisitante, idTorneo))
+      .thenReturn(statsVisitante);
+
+    // ejecucion (Gana Visitante 0 a 3)
+    servicioEquipoTorneo.actualizarTablaPosiciones(idTorneo, idLocal, idVisitante, 0, 3);
+
+    // verificacion Local
+    assertThat(statsLocal.getPartidosJugados(), is(2));
+    assertThat(statsLocal.getPartidosGanados(), is(1));
+    assertThat(statsLocal.getPartidoPerdidos(), is(1));
+    assertThat(statsLocal.getGolesAFavor(), is(2));
+    assertThat(statsLocal.getGolesEnContra(), is(3));
+    assertThat(statsLocal.getPuntos(), is(3));
+
+    // verificacion Visitante
+    assertThat(statsVisitante.getPartidosJugados(), is(2));
+    assertThat(statsVisitante.getPartidosGanados(), is(1));
+    assertThat(statsVisitante.getPartidoPerdidos(), is(1));
+    assertThat(statsVisitante.getGolesAFavor(), is(3));
+    assertThat(statsVisitante.getGolesEnContra(), is(1));
+    assertThat(statsVisitante.getPuntos(), is(3));
+  }
+
+  @Test
+  public void deberiaActualizarTablaPosicionesCuandoHayEmpate() {
+    // preparacion
+    Long idTorneo = 1L;
+    Long idLocal = 10L;
+    Long idVisitante = 20L;
+
+    EquipoTorneo statsLocal = new EquipoTorneo();
+    statsLocal.setPartidosJugados(0);
+    statsLocal.setPartidosGanados(0);
+    statsLocal.setPartidosEmpatados(0);
+    statsLocal.setPartidoPerdidos(0);
+    statsLocal.setGolesAFavor(0);
+    statsLocal.setGolesEnContra(0);
+    statsLocal.setPuntos(0);
+
+    EquipoTorneo statsVisitante = new EquipoTorneo();
+    statsVisitante.setPartidosJugados(0);
+    statsVisitante.setPartidosGanados(0);
+    statsVisitante.setPartidosEmpatados(0);
+    statsVisitante.setPartidoPerdidos(0);
+    statsVisitante.setGolesAFavor(0);
+    statsVisitante.setGolesEnContra(0);
+    statsVisitante.setPuntos(0);
+
+    when(repositorioEquipoTorneoMock.buscarEquipoTorneoPorId(idLocal, idTorneo))
+      .thenReturn(statsLocal);
+    when(repositorioEquipoTorneoMock.buscarEquipoTorneoPorId(idVisitante, idTorneo))
+      .thenReturn(statsVisitante);
+
+    // ejecucion (Empate 2 a 2)
+    servicioEquipoTorneo.actualizarTablaPosiciones(idTorneo, idLocal, idVisitante, 2, 2);
+
+    // verificacion Local
+    assertThat(statsLocal.getPartidosJugados(), is(1));
+    assertThat(statsLocal.getPartidosEmpatados(), is(1));
+    assertThat(statsLocal.getGolesAFavor(), is(2));
+    assertThat(statsLocal.getGolesEnContra(), is(2));
+    assertThat(statsLocal.getPuntos(), is(1));
+
+    // verificacion Visitante
+    assertThat(statsVisitante.getPartidosJugados(), is(1));
+    assertThat(statsVisitante.getPartidosEmpatados(), is(1));
+    assertThat(statsVisitante.getGolesAFavor(), is(2));
+    assertThat(statsVisitante.getGolesEnContra(), is(2));
+    assertThat(statsVisitante.getPuntos(), is(1));
+  }
+
+  @Test
+  public void noDeberiaActualizarTablaPosicionesSiAlgunaEstadisticaEsNula() {
+    // preparacion
+    Long idTorneo = 1L;
+    Long idLocal = 10L;
+    Long idVisitante = 20L;
+
+    when(repositorioEquipoTorneoMock.buscarEquipoTorneoPorId(idLocal, idTorneo)).thenReturn(null);
+    when(repositorioEquipoTorneoMock.buscarEquipoTorneoPorId(idVisitante, idTorneo))
+      .thenReturn(new EquipoTorneo());
+
+    // ejecucion
+    servicioEquipoTorneo.actualizarTablaPosiciones(idTorneo, idLocal, idVisitante, 1, 0);
+
+    // verificacion
+    verify(repositorioEquipoTorneoMock, times(1)).buscarEquipoTorneoPorId(idLocal, idTorneo);
+    verify(repositorioEquipoTorneoMock, times(1)).buscarEquipoTorneoPorId(idVisitante, idTorneo);
+  }
 }

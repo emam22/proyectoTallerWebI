@@ -11,5 +11,5 @@ public interface ServicioEstadisticaJugador {
   void registrarTarjetaRoja(Long idJugador, Long idTorneo);
   void sumarPartidoJugado(Long idJugador);
   void registrarGol(Long idJugador);
-  void registrarAsistencia (long idJugador);
+  void registrarAsistencia(long idJugador);
 }

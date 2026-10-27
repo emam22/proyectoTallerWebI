@@ -111,10 +111,15 @@ public class RepositorioEquipoTorneoImpl implements RepositorioEquipoTorneo {
   public Equipo buscarEquipoPorId(Long idEquipoDelTorneo) {
     Equipo equipoBuscado;
 
-    equipoBuscado = sessionFactory.getCurrentSession()
-            .createQuery("Select equipo From EquipoTorneo et where et.equipo.id = :idEquipoDelTorneo", Equipo.class)
-            .setParameter("idEquipoDelTorneo", idEquipoDelTorneo)
-            .uniqueResult();
+    equipoBuscado =
+      sessionFactory
+        .getCurrentSession()
+        .createQuery(
+          "Select equipo From EquipoTorneo et where et.equipo.id = :idEquipoDelTorneo",
+          Equipo.class
+        )
+        .setParameter("idEquipoDelTorneo", idEquipoDelTorneo)
+        .uniqueResult();
     return equipoBuscado;
   }
 }

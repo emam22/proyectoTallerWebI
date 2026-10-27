@@ -17,5 +17,11 @@ public interface ServicioEquipoTorneo {
 
   List<EquipoTorneo> obtenerEquiposPorTorneo(Long idTorneo);
 
-  void actualizarTablaPosiciones(Long idTorneo, Long idEquipoLocal, Long idEquipoVisitante, int golesLocal, int golesVisitante);
+  void actualizarTablaPosiciones(
+    Long idTorneo,
+    Long idEquipoLocal,
+    Long idEquipoVisitante,
+    int golesLocal,
+    int golesVisitante
+  );
 }

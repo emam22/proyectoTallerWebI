@@ -130,4 +130,78 @@ public class ServicioEstadisticasJugadorTest {
     verify(repoEstadisticasMock).actualizarEstadisticasJugador(estadisticas);
     verify(servicioJugadorMock).agregarFechasSuspension(1L, 1);
   }
+
+  @Test
+  public void alSumarPartidoJugadoDebeIncrementarElContador() {
+    EstadisticaJugador estadisticas = new EstadisticaJugador();
+    estadisticas.setPartidosJugados(2);
+
+    when(repoEstadisticasMock.buscarEstadisticasPorIdJugador(1L)).thenReturn(estadisticas);
+
+    servicioEstadistica.sumarPartidoJugado(1L);
+
+    assertThat(estadisticas.getPartidosJugados(), equalTo(3));
+    verify(repoEstadisticasMock, times(1)).actualizarEstadisticasJugador(estadisticas);
+  }
+
+  @Test
+  public void alSumarPartidoJugadoSiNoExistenEstadisticasNoDebeHacerNada() {
+    when(repoEstadisticasMock.buscarEstadisticasPorIdJugador(1L)).thenReturn(null);
+
+    servicioEstadistica.sumarPartidoJugado(1L);
+
+    verify(repoEstadisticasMock, never()).actualizarEstadisticasJugador(any());
+  }
+
+  @Test
+  public void alRegistrarGolDebeIncrementarGolesYParticipaciones() {
+    EstadisticaJugador estadisticas = new EstadisticaJugador();
+    estadisticas.setGoles(3);
+    estadisticas.setAsistencias(2);
+    estadisticas.setParticipacionesGol(5);
+
+    when(repoEstadisticasMock.buscarEstadisticasPorIdJugador(1L)).thenReturn(estadisticas);
+
+    servicioEstadistica.registrarGol(1L);
+
+    assertThat(estadisticas.getGoles(), equalTo(4));
+    // 4 goles + 2 asistencias = 6 participaciones
+    assertThat(estadisticas.getParticipacionesGol(), equalTo(6));
+    verify(repoEstadisticasMock, times(1)).actualizarEstadisticasJugador(estadisticas);
+  }
+
+  @Test
+  public void alRegistrarGolSiNoExistenEstadisticasNoDebeHacerNada() {
+    when(repoEstadisticasMock.buscarEstadisticasPorIdJugador(1L)).thenReturn(null);
+
+    servicioEstadistica.registrarGol(1L);
+
+    verify(repoEstadisticasMock, never()).actualizarEstadisticasJugador(any());
+  }
+
+  @Test
+  public void alRegistrarAsistenciaDebeIncrementarAsistenciasYParticipaciones() {
+    EstadisticaJugador estadisticas = new EstadisticaJugador();
+    estadisticas.setGoles(1);
+    estadisticas.setAsistencias(4);
+    estadisticas.setParticipacionesGol(5);
+
+    when(repoEstadisticasMock.buscarEstadisticasPorIdJugador(1L)).thenReturn(estadisticas);
+
+    servicioEstadistica.registrarAsistencia(1L);
+
+    assertThat(estadisticas.getAsistencias(), equalTo(5));
+    // 1 gol + 5 asistencias = 6 participaciones
+    assertThat(estadisticas.getParticipacionesGol(), equalTo(6));
+    verify(repoEstadisticasMock, times(1)).actualizarEstadisticasJugador(estadisticas);
+  }
+
+  @Test
+  public void alRegistrarAsistenciaSiNoExistenEstadisticasNoDebeHacerNada() {
+    when(repoEstadisticasMock.buscarEstadisticasPorIdJugador(1L)).thenReturn(null);
+
+    servicioEstadistica.registrarAsistencia(1L);
+
+    verify(repoEstadisticasMock, never()).actualizarEstadisticasJugador(any());
+  }
 }

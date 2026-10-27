@@ -3,78 +3,79 @@ package com.tallerwebi.presentacion;
 import java.util.List;
 
 public class ResultadoPartidoDTO {
-    private Long idPartido;
-    private Integer golesLocal;
-    private Integer golesVisitante;
-    private List<Long> idsJugadoresTitulares;
 
-    // Eventos individuales
-    private List<Long> idsGoleadores;
-    private List<Long> idsAsistidores;
-    private List<Long> idsTarjetasAmarillas;
-    private List<Long> idsTarjetasRojas;
+  private Long idPartido;
+  private Integer golesLocal;
+  private Integer golesVisitante;
+  private List<Long> idsJugadoresTitulares;
 
-    public Long getIdPartido() {
-        return idPartido;
-    }
+  // Eventos individuales
+  private List<Long> idsGoleadores;
+  private List<Long> idsAsistidores;
+  private List<Long> idsTarjetasAmarillas;
+  private List<Long> idsTarjetasRojas;
 
-    public void setIdPartido(Long idPartido) {
-        this.idPartido = idPartido;
-    }
+  public Long getIdPartido() {
+    return idPartido;
+  }
 
-    public Integer getGolesLocal() {
-        return golesLocal;
-    }
+  public void setIdPartido(Long idPartido) {
+    this.idPartido = idPartido;
+  }
 
-    public void setGolesLocal(Integer golesLocal) {
-        this.golesLocal = golesLocal;
-    }
+  public Integer getGolesLocal() {
+    return golesLocal;
+  }
 
-    public Integer getGolesVisitante() {
-        return golesVisitante;
-    }
+  public void setGolesLocal(Integer golesLocal) {
+    this.golesLocal = golesLocal;
+  }
 
-    public void setGolesVisitante(Integer golesVisitante) {
-        this.golesVisitante = golesVisitante;
-    }
+  public Integer getGolesVisitante() {
+    return golesVisitante;
+  }
 
-    public List<Long> getIdsJugadoresTitulares() {
-        return idsJugadoresTitulares;
-    }
+  public void setGolesVisitante(Integer golesVisitante) {
+    this.golesVisitante = golesVisitante;
+  }
 
-    public void setIdsJugadoresTitulares(List<Long> idsJugadoresTitulares) {
-        this.idsJugadoresTitulares = idsJugadoresTitulares;
-    }
+  public List<Long> getIdsJugadoresTitulares() {
+    return idsJugadoresTitulares;
+  }
 
-    public List<Long> getIdsGoleadores() {
-        return idsGoleadores;
-    }
+  public void setIdsJugadoresTitulares(List<Long> idsJugadoresTitulares) {
+    this.idsJugadoresTitulares = idsJugadoresTitulares;
+  }
 
-    public void setIdsGoleadores(List<Long> idsGoleadores) {
-        this.idsGoleadores = idsGoleadores;
-    }
+  public List<Long> getIdsGoleadores() {
+    return idsGoleadores;
+  }
 
-    public List<Long> getIdsAsistidores() {
-        return idsAsistidores;
-    }
+  public void setIdsGoleadores(List<Long> idsGoleadores) {
+    this.idsGoleadores = idsGoleadores;
+  }
 
-    public void setIdsAsistidores(List<Long> idsAsistidores) {
-        this.idsAsistidores = idsAsistidores;
-    }
+  public List<Long> getIdsAsistidores() {
+    return idsAsistidores;
+  }
 
-    public List<Long> getIdsTarjetasAmarillas() {
-        return idsTarjetasAmarillas;
-    }
+  public void setIdsAsistidores(List<Long> idsAsistidores) {
+    this.idsAsistidores = idsAsistidores;
+  }
 
-    public void setIdsTarjetasAmarillas(List<Long> idsTarjetasAmarillas) {
-        this.idsTarjetasAmarillas = idsTarjetasAmarillas;
-    }
+  public List<Long> getIdsTarjetasAmarillas() {
+    return idsTarjetasAmarillas;
+  }
 
-    public List<Long> getIdsTarjetasRojas() {
-        return idsTarjetasRojas;
-    }
+  public void setIdsTarjetasAmarillas(List<Long> idsTarjetasAmarillas) {
+    this.idsTarjetasAmarillas = idsTarjetasAmarillas;
+  }
 
-    public void setIdsTarjetasRojas(List<Long> idsTarjetasRojas) {
-        this.idsTarjetasRojas = idsTarjetasRojas;
-    }
+  public List<Long> getIdsTarjetasRojas() {
+    return idsTarjetasRojas;
+  }
+
+  public void setIdsTarjetasRojas(List<Long> idsTarjetasRojas) {
+    this.idsTarjetasRojas = idsTarjetasRojas;
+  }
 }
