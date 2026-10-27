@@ -27,7 +27,7 @@ public class EstadisticaJugador {
     return partidosJugados;
   }
 
-  public void setPartidosJugador(Integer partidosJugados) {
+  public void setPartidosJugados(Integer partidosJugados) {
     this.partidosJugados = partidosJugados;
   }
 

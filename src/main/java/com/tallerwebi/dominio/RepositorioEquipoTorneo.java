@@ -10,4 +10,5 @@ public interface RepositorioEquipoTorneo {
   List<EquipoTorneo> obtenerEquiposPorTorneo(Long idTorneo);
   EquipoTorneo buscarEquipoTorneoPorId(Long idEquipo, Long idTorneo);
   void eliminar(EquipoTorneo equipoTorneo);
+  Equipo buscarEquipoPorId(Long idEquipoTorneo);
 }

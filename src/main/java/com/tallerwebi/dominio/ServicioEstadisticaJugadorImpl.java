@@ -108,4 +108,37 @@ public class ServicioEstadisticaJugadorImpl implements ServicioEstadisticaJugado
 
     return estadisticas;
   }
+
+  @Override
+  public void sumarPartidoJugado(Long idJugador) {
+    EstadisticaJugador estadisticas = repoEstadisticas.buscarEstadisticasPorIdJugador(idJugador);
+    if (estadisticas != null) {
+      estadisticas.setPartidosJugados(estadisticas.getPartidosJugados() + 1);
+      repoEstadisticas.actualizarEstadisticasJugador(estadisticas);
+    }
+  }
+
+  @Override
+  public void registrarGol(Long idJugador) {
+    EstadisticaJugador estadisticas = repoEstadisticas.buscarEstadisticasPorIdJugador(idJugador);
+    if (estadisticas != null) {
+      int goles = estadisticas.getGoles() + 1;
+      estadisticas.setGoles(goles);
+      // Participación de gol = goles + asistencias
+      estadisticas.setParticipacionesGol(goles + estadisticas.getAsistencias());
+      repoEstadisticas.actualizarEstadisticasJugador(estadisticas);
+    }
+  }
+
+  @Override
+  public void registrarAsistencia(long idJugador) {
+    EstadisticaJugador estadisticas = repoEstadisticas.buscarEstadisticasPorIdJugador(idJugador);
+    if (estadisticas != null) {
+      int asistencias = estadisticas.getAsistencias() + 1;
+      estadisticas.setAsistencias(asistencias);
+      // Participación de gol = goles + asistencias
+      estadisticas.setParticipacionesGol(estadisticas.getGoles() + asistencias);
+      repoEstadisticas.actualizarEstadisticasJugador(estadisticas);
+    }
+  }
 }

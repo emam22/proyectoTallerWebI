@@ -1,5 +1,6 @@
 package com.tallerwebi.infraestructura;
 
+import com.tallerwebi.dominio.Equipo;
 import com.tallerwebi.dominio.EquipoTorneo;
 import com.tallerwebi.dominio.RepositorioEquipoTorneo;
 import java.util.List;
@@ -104,5 +105,16 @@ public class RepositorioEquipoTorneoImpl implements RepositorioEquipoTorneo {
   @Override
   public void eliminar(EquipoTorneo equipoTorneo) {
     sessionFactory.getCurrentSession().delete(equipoTorneo);
+  }
+
+  @Override
+  public Equipo buscarEquipoPorId(Long idEquipoDelTorneo) {
+    Equipo equipoBuscado;
+
+    equipoBuscado = sessionFactory.getCurrentSession()
+            .createQuery("Select equipo From EquipoTorneo et where et.equipo.id = :idEquipoDelTorneo", Equipo.class)
+            .setParameter("idEquipoDelTorneo", idEquipoDelTorneo)
+            .uniqueResult();
+    return equipoBuscado;
   }
 }
