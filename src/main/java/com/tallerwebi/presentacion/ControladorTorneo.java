@@ -41,6 +41,7 @@ public class ControladorTorneo {
   private static final String REDIRECT_FORMULARIO_TORNEO = "redirect:/formulario-torneo";
 
   private static final Logger LOGGER = Logger.getLogger(ControladorTorneo.class.getName());
+  private static final String EQUIPOS = "equipos";
 
   @Autowired
   public ControladorTorneo(
@@ -245,7 +246,7 @@ public class ControladorTorneo {
 
     List<Equipo> equipos = servicioEquipo.obtenerEquipos();
 
-    model.put("equipos", equipos);
+    model.put(EQUIPOS, equipos);
     model.put(ID_TORNEO, idTorneo);
 
     return new ModelAndView(vista, model);
@@ -395,7 +396,7 @@ public class ControladorTorneo {
     List<EquipoTorneo> equipos = servicioEquipoTorneo.obtenerEquiposPorTorneo(idTorneo);
 
     model.put("idTorneo", idTorneo);
-    model.put("equipos", equipos);
+    model.put(EQUIPOS, equipos);
 
     return new ModelAndView("desvincularEquipo", model);
   }
@@ -428,7 +429,7 @@ public class ControladorTorneo {
 
     mav.addObject(ID_TORNEO, idTorneo);
 
-    mav.addObject("equipos", servicioEquipoTorneo.obtenerEquiposPorTorneo(idTorneo));
+    mav.addObject(EQUIPOS, servicioEquipoTorneo.obtenerEquiposPorTorneo(idTorneo));
 
     return mav;
   }
@@ -524,5 +525,16 @@ public class ControladorTorneo {
       );
       return new ModelAndView(REDIRECT_ADMINISTRAR_TORNEO_ADMIN + idTorneo);
     }
+  }
+
+  @RequestMapping("/elegirEquipoSancion")
+  public ModelAndView elegirEquipoSancion(@RequestParam(ID_TORNEO) Long idTorneo) {
+    Map<String, Object> modelo = new HashMap<>();
+
+    modelo.put(EQUIPOS, servicioEquipoTorneo.obtenerEquiposPorTorneo(idTorneo));
+
+    modelo.put(ID_TORNEO, idTorneo);
+
+    return new ModelAndView("elegirEquipoSancion", modelo);
   }
 }

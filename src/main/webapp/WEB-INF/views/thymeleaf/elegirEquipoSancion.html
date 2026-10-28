@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/app.css}"/>
+    <link rel="icon" type="image/png" th:href="@{/img/favicon.png?v=2}"/>
+
+    <title>Jugadores por equipo</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #1f1f1f;
+            color: white;
+            min-height: 100vh;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form-card {
+            width: 100%;
+            max-width: 850px;
+            background: #444444;
+            border: 2px solid #b6ff00;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-header {
+            width: 100%;
+            background: #b6ff00;
+            color: #111;
+            padding: 14px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-body {
+            padding: 25px;
+        }
+
+        .descripcion {
+            color: #efefef;
+            font-size: 14px;
+            text-align: center;
+            line-height: 1.5;
+            margin-bottom: 22px;
+        }
+
+        .mensaje {
+            color: #b6ff00;
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+            margin-bottom: 18px;
+        }
+
+        .lista-equipos {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .equipo-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            min-width: 0;
+            background: #333333;
+            border: 1px solid #666666;
+            border-radius: 8px;
+            padding: 16px 18px;
+        }
+
+        .equipo-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .equipo-info strong {
+            display: block;
+            color: white;
+            font-size: 16px;
+            overflow-wrap: anywhere;
+        }
+
+        .equipo-info p {
+            color: #bdbdbd;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .btn {
+            display: inline-block;
+            max-width: 100%;
+            padding: 12px 18px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s,
+            transform 0.1s;
+            text-decoration: none;
+            text-align: center;
+            line-height: 1.4;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-jugadores {
+            flex-shrink: 0;
+            background: #b6ff00;
+            color: #111;
+        }
+
+        .btn-jugadores:hover {
+            background: #a4e600;
+        }
+
+        .sin-equipos {
+            background: #333333;
+            border-radius: 8px;
+            padding: 22px;
+            text-align: center;
+            color: #efefef;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .acciones-volver {
+            margin-top: 20px;
+        }
+
+        .btn-volver {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #1f1f1f;
+            color: #b6ff00;
+            text-decoration: none;
+            border: 1px solid #b6ff00;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .btn-volver:hover {
+            background-color: #b6ff00;
+            color: #1f1f1f;
+        }
+
+
+        @media (max-width: 600px) {
+            body {
+                padding: 20px 12px;
+                align-items: flex-start;
+            }
+
+            .form-body {
+                padding: 18px;
+            }
+
+            .equipo-item {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 14px;
+                padding: 15px;
+            }
+
+            .btn-jugadores {
+                display: block;
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 350px) {
+            body {
+                padding: 15px 8px;
+            }
+
+            .form-body {
+                padding: 12px;
+            }
+
+            .form-header {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="form-card">
+
+    <div class="form-header">
+        Equipos del torneo
+    </div>
+
+    <div class="form-body">
+
+        <p class="descripcion">
+            Seleccioná un equipo para consultar todos sus jugadores.
+        </p>
+
+        <p class="mensaje"
+           th:if="${mensaje}"
+           th:text="${mensaje}">
+        </p>
+
+        <div class="sin-equipos"
+             th:if="${#lists.isEmpty(equipos)}">
+            <p>No hay equipos inscriptos en este torneo.</p>
+        </div>
+
+        <div class="lista-equipos"
+             th:unless="${#lists.isEmpty(equipos)}">
+
+            <div class="equipo-item"
+                 th:each="equipoTorneo : ${equipos}">
+
+                <div class="equipo-info">
+                    <strong th:text="${equipoTorneo.equipo.nombre}">
+                        Nombre del equipo
+                    </strong>
+                </div>
+
+                <a class="btn btn-jugadores"
+                   th:href="@{/jugadoresEquipoSancion(
+                        idTorneo=${idTorneo},
+                        idEquipo=${equipoTorneo.equipo.id}
+                    )}">
+                    Ver jugadores
+                </a>
+            </div>
+
+        </div>
+
+        <div class="acciones-volver">
+            <a class="btn btn-volver"
+               th:href="@{/administrarTorneoAdmin/{idTorneo}(idTorneo=${idTorneo})}">
+                Volver al lobby
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<!-- LOGO DE MARCA -->
+<a th:replace="~{fragments/nav :: logoHome(clase='logo-marca')}"></a>
+
+<!-- MENÚ DE USUARIO -->
+<div class="menu-usuario">
+    <button type="button"
+            class="btn-menu-hamburguesa"
+            id="btnMenuUsuario"
+            aria-label="Abrir menú">
+        <span></span>
+        <span></span>
+    </button>
+
+    <div class="menu-usuario-opciones" id="menuUsuarioOpciones">
+        <a th:href="@{/logout}">Cerrar sesión</a>
+    </div>
+</div>
+
+<script th:src="@{/js/menu.js}"></script>
+
+</body>
+</html>

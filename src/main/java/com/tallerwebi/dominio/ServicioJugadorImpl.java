@@ -68,9 +68,16 @@ public class ServicioJugadorImpl implements ServicioJugador {
       throw new IllegalArgumentException("La cantidad de fechas debe ser mayor a cero.");
     }
 
-    jugador.setFechasSuspensionPendientes(fechas);
+    Integer fechasPendientes = jugador.getFechasSuspensionPendientes();
+
+    if (fechasPendientes == null) {
+      fechasPendientes = 0;
+    }
+
+    jugador.setFechasSuspensionPendientes(fechasPendientes + fechas);
     jugador.setEstadoSancion("SANCIONADO");
-    //  jugador.setHabilitado(false);
+
+    // jugador.setHabilitado(false);
 
     repositorioJugador.actualizar(jugador);
   }

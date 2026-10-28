@@ -415,7 +415,7 @@ public class ControladorJugadoresTest {
     //verificacion
     verify(this.servicioJugadorMock).sancionarJugador(99L, 1);
     verify(redirectAttributesMock).addFlashAttribute("ok", "Jugador sancionado por 1 fecha(s).");
-    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneoAdmin?idTorneo=1"));
+    assertThat(mav.getViewName(), is("redirect:/jugadoresEquipoSancion?idTorneo=1&idEquipo=10"));
   }
 
   @Test
@@ -431,6 +431,64 @@ public class ControladorJugadoresTest {
 
     verify(this.servicioJugadorMock, never()).sancionarJugador(any(), any());
     verify(redirectAttributesMock).addFlashAttribute(eq("error"), anyString());
-    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneoAdmin?idTorneo=1"));
+    assertThat(mav.getViewName(), is("redirect:/jugadoresEquipoSancion?idTorneo=1&idEquipo=10"));
+  }
+
+  @Test
+  public void deberiaMostrarJugadoresDelEquipoParaSancionar() {
+    // preparacion
+    Long idTorneo = 1L;
+    Long idEquipo = 5L;
+
+    Torneo torneo = new Torneo();
+    torneo.setId(idTorneo);
+
+    Equipo equipo = new Equipo();
+    equipo.setId(idEquipo);
+
+    EquipoTorneo equipoTorneo = new EquipoTorneo();
+    equipoTorneo.setEquipo(equipo);
+
+    List<EquipoTorneo> equiposTorneo = new ArrayList<>();
+    equiposTorneo.add(equipoTorneo);
+
+    List<Jugador> jugadores = new ArrayList<>();
+    Jugador jugador = new Jugador();
+
+    when(this.servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+    when(this.servicioEquipoTorneoMock.obtenerEquiposPorTorneo(idTorneo)).thenReturn(equiposTorneo);
+    when(this.servicioJugadorMock.obtenerJugadores(idEquipo)).thenReturn(jugadores);
+
+    // ejecucion
+    ModelAndView mav = this.controlador.mostrarJugadoresEquipoSancion(idTorneo, idEquipo);
+
+    // verificacion
+    assertThat(mav.getViewName(), is("jugadoresEquipoSancion"));
+    assertThat(mav.getModel().get("equipo"), is(equipo));
+    assertThat(mav.getModel().get("jugadores"), is(jugadores));
+    assertThat(mav.getModel().get("idTorneo"), is(idTorneo));
+
+    verify(this.servicioJugadorMock).obtenerJugadores(idEquipo);
+  }
+
+  @Test
+  public void noDeberiaMostrarJugadoresSiElEquipoNoEstaInscriptoEnElTorneo() {
+    // preparacion
+    Long idTorneo = 1L;
+    Long idEquipo = 99L;
+
+    Torneo torneo = new Torneo();
+    torneo.setId(idTorneo);
+
+    when(this.servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+    when(this.servicioEquipoTorneoMock.obtenerEquiposPorTorneo(idTorneo))
+      .thenReturn(new ArrayList<>());
+
+    // ejecucion
+    ModelAndView mav = this.controlador.mostrarJugadoresEquipoSancion(idTorneo, idEquipo);
+
+    // verificacion
+    verify(this.servicioJugadorMock, never()).obtenerJugadores(any());
+    assertThat(mav.getViewName(), is("redirect:/elegirEquipoSancion?idTorneo=1"));
   }
 }

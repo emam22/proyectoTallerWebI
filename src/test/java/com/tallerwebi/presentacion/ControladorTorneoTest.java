@@ -1,5 +1,6 @@
 package com.tallerwebi.presentacion;
 
+import static net.bytebuddy.matcher.ElementMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -1095,5 +1096,24 @@ public class ControladorTorneoTest {
     FechaLimiteEditarTorneo ex2 = new FechaLimiteEditarTorneo("Mensaje");
     assertThat(ex1, notNullValue());
     assertThat(ex2.getMessage(), equalTo("Mensaje"));
+  }
+
+  @Test
+  public void alElegirEquipoParaSancionSeDebeMostrarLaVistaConLosEquiposDelTorneo() {
+    // Preparación
+    Long idTorneo = 5L;
+    List<EquipoTorneo> equipos = new ArrayList<>();
+
+    when(servicioEquipoTorneoMock.obtenerEquiposPorTorneo(idTorneo)).thenReturn(equipos);
+
+    // Ejecución
+    ModelAndView mav = controladorTorneo.elegirEquipoSancion(idTorneo);
+
+    // Validación
+    assertThat(mav.getViewName(), equalTo("elegirEquipoSancion"));
+    assertThat(mav.getModel().get("equipos"), equalTo(equipos));
+    assertThat(mav.getModel().get("idTorneo"), equalTo(idTorneo));
+
+    verify(servicioEquipoTorneoMock, times(1)).obtenerEquiposPorTorneo(idTorneo);
   }
 }

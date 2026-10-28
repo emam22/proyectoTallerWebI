@@ -235,4 +235,21 @@ public class ServicioJugadorTest {
     assertThat(jugador.getEstadoSancion(), is("SANCIONADO"));
     verify(repositorioJugadorMock).actualizar(jugador);
   }
+
+  @Test
+  public void deberiaSumarFechasALaSuspensionExistente() {
+    // Preparación
+    Jugador jugador = new Jugador();
+    jugador.setFechasSuspensionPendientes(2);
+
+    when(repositorioJugadorMock.obtenerJugador(10L)).thenReturn(jugador);
+
+    // Ejecución
+    servicioJugador.sancionarJugador(10L, 3);
+
+    // Verificación
+    assertThat(jugador.getFechasSuspensionPendientes(), is(5));
+    assertThat(jugador.getEstadoSancion(), is("SANCIONADO"));
+    verify(repositorioJugadorMock).actualizar(jugador);
+  }
 }
