@@ -3,6 +3,7 @@ package com.tallerwebi.dominio;
 import com.tallerwebi.dominio.excepcion.FechaLimiteEditarTorneo;
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
 import com.tallerwebi.infraestructura.RepositorioEquipoImpl;
+import com.tallerwebi.infraestructura.RepositorioEquipoTorneoImpl;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ public class ServicioTorneoImpl implements ServicioTorneo {
   private final RepositorioEquipoImpl repositorioEquipo;
   private RepositorioTorneo repositorioTorneo;
   private RepositorioJornada repositorioJornada;
+  private RepositorioEquipoTorneo repositorioEquipoTorneo;
 
   private List<Equipo> equiposFechaLibreIda = new ArrayList<>();
 
@@ -25,11 +27,13 @@ public class ServicioTorneoImpl implements ServicioTorneo {
   public ServicioTorneoImpl(
     RepositorioTorneo repositorioTorneo,
     RepositorioEquipoImpl repositorioEquipo,
-    RepositorioJornada repositorioJornada
+    RepositorioJornada repositorioJornada,
+    RepositorioEquipoTorneo repositorioEquipoTorneo
   ) {
     this.repositorioTorneo = repositorioTorneo;
     this.repositorioEquipo = repositorioEquipo;
     this.repositorioJornada = repositorioJornada;
+    this.repositorioEquipoTorneo = repositorioEquipoTorneo;
   }
 
   @Override
@@ -69,6 +73,13 @@ public class ServicioTorneoImpl implements ServicioTorneo {
 
   @Override
   public void eliminarTorneo(Long id) {
+    Torneo torneo = repositorioTorneo.buscarTorneoPorId(id);
+    if (torneo == null) {
+      return;
+    }
+
+    repositorioEquipoTorneo.eliminarPorTorneo(id);
+
     repositorioTorneo.borrar(id);
   }
 

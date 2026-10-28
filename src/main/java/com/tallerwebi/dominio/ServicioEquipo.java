@@ -10,4 +10,5 @@ public interface ServicioEquipo {
   void registrarEquipo(Equipo equipo) throws EquipoExistente, SiglasExistentes;
   List<Equipo> obtenerEquipos();
   void actualizarEquipo(Equipo equipo) throws EquipoExistente, SiglasExistentes;
+  Equipo consultarEquipoJugador(Long idJugador);
 }

@@ -122,4 +122,14 @@ public class RepositorioEquipoTorneoImpl implements RepositorioEquipoTorneo {
         .uniqueResult();
     return equipoBuscado;
   }
+
+  @Override
+  public void eliminarPorTorneo(Long idTorneo) {
+    String hql = "DELETE FROM EquipoTorneo et WHERE et.torneo.id = :idTorneo";
+    sessionFactory
+      .getCurrentSession()
+      .createQuery(hql)
+      .setParameter("idTorneo", idTorneo)
+      .executeUpdate();
+  }
 }

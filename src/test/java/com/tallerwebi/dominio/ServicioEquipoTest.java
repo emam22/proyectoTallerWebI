@@ -186,4 +186,20 @@ public class ServicioEquipoTest {
     verify(repositorioEquipoMock, times(1)).buscarEquipoPorSiglas("BOC");
     verify(repositorioEquipoMock, never()).guardar(equipoARegistrar);
   }
+
+  @Test
+  public void queSePuedaConsultarElEquipoDeUnJugador() {
+    Long idJugador = 5L;
+    Equipo equipoEsperado = new Equipo();
+    equipoEsperado.setId(1L);
+    equipoEsperado.setNombre("Boca Juniors");
+
+    when(repositorioEquipoMock.buscarEquipoPorIdJugador(idJugador)).thenReturn(equipoEsperado);
+
+    Equipo obtenido = servicioEquipo.consultarEquipoJugador(idJugador);
+
+    assertThat(obtenido, notNullValue());
+    assertThat(obtenido.getNombre(), equalTo("Boca Juniors"));
+    verify(repositorioEquipoMock).buscarEquipoPorIdJugador(idJugador);
+  }
 }
