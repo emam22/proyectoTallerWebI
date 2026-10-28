@@ -299,6 +299,13 @@
             </tbody>
         </table>
 
+        <form class="form-confirmar-plantel"
+              th:action="@{/jugadoresTorneo/confirmar(idTorneo=${torneo.id})}"
+              method="post">
+            <input type="hidden" name="idEquipo" th:value="${filaEquipo.equipo.id}"/>
+            <button type="submit" class="btn-confirmar-plantel">Confirmar plantel</button>
+        </form>
+
         <form class="form-jugador"
               th:action="@{/jugadoresTorneo/agregar(idTorneo=${torneo.id})}"
               method="post">
