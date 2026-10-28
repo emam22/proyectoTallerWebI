@@ -24,6 +24,12 @@ public class ControladorJugadores {
   private static final String ERROR_EQUIPO_NO_INSCRIPTO =
     "El equipo no esta inscripto en este torneo.";
   private static final String ID_JUGADOR = "idJugador";
+  private static final List<String> POSICIONES_PLANTEL = List.of(
+    "Arquero",
+    "Defensor",
+    "Mediocampista",
+    "Delantero"
+  );
 
   private static final String OK = "ok";
   private static final String ERROR = "error";
@@ -299,6 +305,86 @@ public class ControladorJugadores {
   }
 
   // =========================
+  // CONFIRMAR PLANTEL
+  // =========================
+
+  @RequestMapping(path = "/jugadoresTorneo/confirmar", method = RequestMethod.POST)
+  public ModelAndView confirmarPlantel(
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    @RequestParam(ID_EQUIPO) Long idEquipo,
+    RedirectAttributes redirectAttributes
+  ) {
+    return confirmarPlantelComun(
+      idTorneo,
+      idEquipo,
+      redirectAttributes,
+      REDIRECT_JUGADORES + idTorneo
+    );
+  }
+
+  @RequestMapping(path = "/jugadoresTorneoAdmin/confirmar", method = RequestMethod.POST)
+  public ModelAndView confirmarPlantelAdmin(
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    @RequestParam(ID_EQUIPO) Long idEquipo,
+    RedirectAttributes redirectAttributes
+  ) {
+    return confirmarPlantelComun(
+      idTorneo,
+      idEquipo,
+      redirectAttributes,
+      REDIRECT_JUGADORES_ADMIN + idTorneo
+    );
+  }
+
+  @RequestMapping(path = "/jugadoresTorneoEditar/confirmar", method = RequestMethod.POST)
+  public ModelAndView confirmarPlantelEditar(
+    @RequestParam(ID_TORNEO) Long idTorneo,
+    @RequestParam(ID_EQUIPO) Long idEquipo,
+    RedirectAttributes redirectAttributes
+  ) {
+    return confirmarPlantelComun(
+      idTorneo,
+      idEquipo,
+      redirectAttributes,
+      redirectJugadoresEditar(idTorneo, idEquipo)
+    );
+  }
+
+  private ModelAndView confirmarPlantelComun(
+    Long idTorneo,
+    Long idEquipo,
+    RedirectAttributes redirectAttributes,
+    String redireccion
+  ) {
+    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+
+    if (torneo == null) {
+      return new ModelAndView(REDIRECT_LOBBY_ADMIN);
+    }
+
+    if (!equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
+      return rechazar(redireccion, ERROR_EQUIPO_NO_INSCRIPTO, redirectAttributes);
+    }
+
+    List<Jugador> jugadores = servicioJugador.obtenerJugadores(idEquipo);
+    List<String> posicionesFaltantes = obtenerPosicionesFaltantes(jugadores);
+
+    if (!posicionesFaltantes.isEmpty()) {
+      return rechazar(
+        redireccion,
+        "No se puede confirmar el plantel. Falta al menos un jugador en las posiciones: " +
+        String.join(", ", posicionesFaltantes) +
+        ".",
+        redirectAttributes
+      );
+    }
+
+    redirectAttributes.addFlashAttribute(OK, "Plantel confirmado correctamente.");
+
+    return new ModelAndView(redireccion);
+  }
+
+  // =========================
   // HABILITAR JUGADOR
   // =========================
 
@@ -475,6 +561,27 @@ public class ControladorJugadores {
     }
 
     return false;
+  }
+
+  private List<String> obtenerPosicionesFaltantes(List<Jugador> jugadores) {
+    List<String> posicionesFaltantes = new ArrayList<>();
+
+    for (String posicion : POSICIONES_PLANTEL) {
+      boolean cubierta = false;
+
+      for (Jugador jugador : jugadores) {
+        if (jugador.getPuesto() != null && posicion.equalsIgnoreCase(jugador.getPuesto().trim())) {
+          cubierta = true;
+          break;
+        }
+      }
+
+      if (!cubierta) {
+        posicionesFaltantes.add(posicion);
+      }
+    }
+
+    return posicionesFaltantes;
   }
 
   private boolean superaMaximo(List<Jugador> jugadores, Torneo torneo) {

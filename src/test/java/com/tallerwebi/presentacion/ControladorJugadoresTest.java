@@ -382,6 +382,74 @@ public class ControladorJugadoresTest {
     assertThat(mav.getViewName(), is("redirect:/lobbyAdmin"));
   }
 
+  @Test
+  public void deberiaConfirmarUnPlantelConTodasLasPosiciones() {
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    inscribirEquipoEnTorneo(1L, 10L, torneo);
+    when(this.servicioJugadorMock.obtenerJugadores(10L))
+      .thenReturn(
+        List.of(
+          jugadorEnPosicion("Arquero"),
+          jugadorEnPosicion("Defensor"),
+          jugadorEnPosicion("Mediocampista"),
+          jugadorEnPosicion("Delantero")
+        )
+      );
+
+    ModelAndView mav = this.controlador.confirmarPlantel(1L, 10L, redirectAttributesMock);
+
+    verify(redirectAttributesMock).addFlashAttribute("ok", "Plantel confirmado correctamente.");
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneo?idTorneo=1"));
+  }
+
+  @Test
+  public void noDeberiaConfirmarUnPlantelSiFaltanPosiciones() {
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    inscribirEquipoEnTorneo(1L, 10L, torneo);
+    when(this.servicioJugadorMock.obtenerJugadores(10L))
+      .thenReturn(List.of(jugadorEnPosicion("Arquero"), jugadorEnPosicion("Delantero")));
+
+    ModelAndView mav = this.controlador.confirmarPlantel(1L, 10L, redirectAttributesMock);
+
+    verify(redirectAttributesMock)
+      .addFlashAttribute(
+        "error",
+        "No se puede confirmar el plantel. Falta al menos un jugador en las posiciones: " +
+        "Defensor, Mediocampista."
+      );
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneo?idTorneo=1"));
+  }
+
+  @Test
+  public void noDeberiaConfirmarUnPlantelVacio() {
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    inscribirEquipoEnTorneo(1L, 10L, torneo);
+    when(this.servicioJugadorMock.obtenerJugadores(10L)).thenReturn(new ArrayList<>());
+
+    ModelAndView mav = this.controlador.confirmarPlantel(1L, 10L, redirectAttributesMock);
+
+    verify(redirectAttributesMock)
+      .addFlashAttribute(
+        "error",
+        "No se puede confirmar el plantel. Falta al menos un jugador en las posiciones: " +
+        "Arquero, Defensor, Mediocampista, Delantero."
+      );
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneo?idTorneo=1"));
+  }
+
+  private Jugador jugadorEnPosicion(String posicion) {
+    Jugador jugador = new Jugador();
+    jugador.setPuesto(posicion);
+
+    return jugador;
+  }
+
   private Jugador jugador(Long id) {
     Jugador jugador = new Jugador();
     jugador.setId(id);
