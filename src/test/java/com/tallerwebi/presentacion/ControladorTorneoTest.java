@@ -426,7 +426,7 @@ public class ControladorTorneoTest {
     );
 
     // Validación
-    assertThat(mav.getViewName(), equalTo("redirect:/editarEquipo?idTorneo=" + idTorneo));
+    assertThat(mav.getViewName(), equalTo("redirect:/editar-equipo?idTorneo=" + idTorneo));
 
     verify(servicioEquipoMock, never()).actualizarEquipo(any());
   }
@@ -1120,5 +1120,37 @@ public class ControladorTorneoTest {
     assertThat(mav.getModel().get("idTorneo"), equalTo(idTorneo));
 
     verify(servicioEquipoTorneoMock, times(1)).obtenerEquiposPorTorneo(idTorneo);
+  }
+
+  @Test
+  public void deberiaMostrarErrorSiLaRutaDelEscudoNoEsValida()
+    throws EquipoExistente, SiglasExistentes {
+    // Preparación
+    Long idEquipo = 1L;
+    Long idTorneo = 2L;
+
+    Equipo equipo = new Equipo();
+    equipo.setId(idEquipo);
+
+    when(servicioEquipoMock.consultarEquipoPorId(idEquipo)).thenReturn(equipo);
+
+    // Ejecución
+    ModelAndView mav = controladorTorneo.actualizarEquipo(
+      idEquipo,
+      idTorneo,
+      "Equipo Nuevo",
+      "EN",
+      "#ffffff",
+      "#000000",
+      "#ff0000",
+      "#00ff00",
+      "ruta-invalida/escudo.png"
+    );
+
+    // Validación
+    assertThat(mav.getViewName(), equalTo("formulario-editar-equipo"));
+    assertThat(mav.getModel().get("error"), equalTo("La ruta del escudo no es válida."));
+
+    verify(servicioEquipoMock, never()).actualizarEquipo(any());
   }
 }

@@ -20,12 +20,14 @@ public class ControladorEscudo {
 
   @ResponseBody
   @PostMapping(value = "/subirEscudo", consumes = "application/octet-stream")
+  /* consume --> método espera recibir el contenido de la petición como datos binarios.*/
   public ResponseEntity<String> subirEscudo(
     @RequestBody byte[] contenido,
     @RequestParam("nombre") String nombreOriginal,
     HttpServletRequest request
   ) {
     ResponseEntity<String> validacion = validarImagen(contenido, nombreOriginal);
+    //representa una rta http, permite devolver estado (si salio bien o hubo error) y contenido
 
     if (validacion != null) {
       return validacion;
@@ -34,7 +36,7 @@ public class ControladorEscudo {
     String extension = obtenerExtension(nombreOriginal);
 
     try {
-      String rutaReal = request.getServletContext().getRealPath("/resources/core/img/escudos");
+      String rutaReal = request.getServletContext().getRealPath("/resources/core/img/escudos"); //se busca si la img esta en esa carpeta
 
       if (rutaReal == null) {
         return ResponseEntity
