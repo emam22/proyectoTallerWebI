@@ -53,6 +53,8 @@ public class ServicioEquipoImpl implements ServicioEquipo {
 
   @Override
   public void actualizarEquipo(Equipo equipo) throws EquipoExistente, SiglasExistentes {
+    Equipo equipoActual = repositorioEquipo.buscarPorId(equipo.getId());
+
     Equipo equipoConMismoNombre = repositorioEquipo.buscarEquipo(equipo.getNombre());
 
     if (equipoConMismoNombre != null && !equipoConMismoNombre.getId().equals(equipo.getId())) {
@@ -63,6 +65,10 @@ public class ServicioEquipoImpl implements ServicioEquipo {
 
     if (equipoConMismasSiglas != null && !equipoConMismasSiglas.getId().equals(equipo.getId())) {
       throw new SiglasExistentes();
+    }
+
+    if (equipo.getEscudo() != null && !equipo.getEscudo().isBlank()) {
+      equipoActual.setEscudo(equipo.getEscudo());
     }
 
     repositorioEquipo.actualizar(equipo);

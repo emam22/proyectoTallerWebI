@@ -160,6 +160,35 @@
             background: #f2f2f2;
         }
 
+        /* ESCUDO DEL EQUIPO */
+        .escudo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .escudo-preview {
+            width: 90px;
+            height: 90px;
+            object-fit: contain;
+            background: white;
+            border-radius: 8px;
+            padding: 5px;
+            border: 1px solid #b6ff00;
+        }
+
+        .escudo-input {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .escudo-input input[type="file"] {
+            max-width: 220px;
+            color: white;
+            font-size: 12px;
+        }
+
         @media (max-width: 700px) {
             .grid-equipo {
                 grid-template-columns: 1fr;
@@ -279,6 +308,36 @@
                     >
                 </div>
 
+                <!-- ESCUDO -->
+                <div class="form-group">
+                    <label for="escudoEquipo">Escudo del equipo</label>
+
+                    <div class="escudo-container">
+                        <img id="previewEscudo"
+                             class="escudo-preview"
+                             th:src="${equipo.escudo != null and !equipo.escudo.isEmpty()}
+         ? @{${equipo.escudo}} : ''"
+                             th:style="${equipo.escudo == null or equipo.escudo.isEmpty()}
+         ? 'display:none' : 'display:block'"
+                             alt="Escudo del equipo">
+
+                        <span id="sinEscudo"
+                              th:unless="${equipo.escudo != null and !equipo.escudo.isEmpty()}">
+    Sin escudo cargado
+</span>
+
+                        <div class="escudo-input">
+                            <input type="file"
+                                   id="escudoEquipo"
+                                   accept="image/png,image/jpeg,image/webp">
+
+                            <input type="hidden"
+                                   id="escudoRuta"
+                                   name="escudoRuta"
+                                   th:value="${equipo.escudo}">
+                        </div>
+                    </div>
+                </div>
 
             </div>
 
@@ -332,6 +391,66 @@
 </div>
 
 <script th:src="@{/js/menu.js}"></script>
+
+<script>
+    const selectorEscudo = document.getElementById("escudoEquipo");
+    const campoRuta = document.getElementById("escudoRuta");
+    const previewEscudo = document.getElementById("previewEscudo");
+    const sinEscudo = document.getElementById("sinEscudo");
+    const formulario = document.querySelector('form[action*="actualizar-equipo"]');
+
+    selectorEscudo.addEventListener("change", async function () {
+        const archivo = selectorEscudo.files[0];
+        if (!archivo) return;
+
+        if (!["image/png", "image/jpeg", "image/webp"].includes(archivo.type)) {
+            alert("Seleccioná una imagen PNG, JPG o WEBP.");
+            selectorEscudo.value = "";
+            return;
+        }
+
+        try {
+            const respuesta = await fetch(
+                "/spring/subirEscudo?nombre=" + encodeURIComponent(archivo.name),
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/octet-stream" },
+                    body: archivo
+                }
+            );
+
+            if (!respuesta.ok) {
+                throw new Error(await respuesta.text());
+            }
+
+            const ruta = (await respuesta.text()).trim();
+            campoRuta.value = ruta;
+
+            previewEscudo.onload = function () {
+                previewEscudo.style.display = "block";
+                sinEscudo.style.display = "none";
+            };
+
+            previewEscudo.onerror = function () {
+                alert("El escudo se guardó, pero no se pudo mostrar. Revisá la ruta de imágenes.");
+            };
+
+            previewEscudo.src = ruta.startsWith("/spring/")
+                ? ruta
+                : "/spring" + (ruta.startsWith("/") ? ruta : "/" + ruta);
+
+        } catch (error) {
+            alert(error.message || "No se pudo cargar el escudo.");
+        }
+    });
+
+    formulario.addEventListener("submit", function (evento) {
+        if (selectorEscudo.files.length > 0 && !campoRuta.value) {
+            evento.preventDefault();
+            alert("Esperá a que termine de cargarse el escudo.");
+        }
+    });
+</script>
 
 </body>
 </html>

@@ -77,6 +77,7 @@ public class ServicioEstadisticaJugadorImpl implements ServicioEstadisticaJugado
     }
   }
 
+  //este metodo devuelve 0 aunque sea null
   private int valorOZero(Integer valor) {
     return valor == null ? 0 : valor;
   }

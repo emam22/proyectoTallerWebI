@@ -285,9 +285,12 @@
                     <div class="input-file-escudo">
                         <input type="file"
                                id="escudoEquipo"
-                               name="escudoEquipo"
-                               accept="image/*">
+                               accept="image/png,image/jpeg,image/webp">
                     </div>
+
+                    <input type="hidden"
+                           id="escudoRuta"
+                           name="escudoRuta">
                 </div>
 
                 <!-- COLORES LOCAL -->
@@ -452,6 +455,58 @@
 </div>
 
 <script th:src="@{/js/menu.js}"></script>
+
+<script>
+    const selectorEscudo = document.getElementById("escudoEquipo");
+    const campoRuta = document.getElementById("escudoRuta");
+    const formulario = document.getElementById("formEquipo");
+
+    selectorEscudo.addEventListener("change", async function () {
+        const archivo = selectorEscudo.files[0];
+        campoRuta.value = "";
+
+        if (!archivo) {
+            return;
+        }
+
+        if (!["image/png", "image/jpeg", "image/webp"].includes(archivo.type)) {
+            alert("Seleccioná una imagen PNG, JPG o WEBP.");
+            selectorEscudo.value = "";
+            return;
+        }
+
+        try {
+            const respuesta = await fetch(
+                "/spring/subirEscudo?nombre=" + encodeURIComponent(archivo.name),
+                {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/octet-stream"
+                    },
+                    body: archivo
+                }
+            );
+
+            if (!respuesta.ok) {
+                const mensaje = await respuesta.text();
+                throw new Error(mensaje || "Error HTTP: " + respuesta.status);
+            }
+
+            campoRuta.value = await respuesta.text();
+        } catch (error) {
+            campoRuta.value = "";
+            selectorEscudo.value = "";
+            alert(error.message);
+        }
+    });
+
+    formulario.addEventListener("submit", function (evento) {
+        if (selectorEscudo.files.length > 0 && !campoRuta.value) {
+            evento.preventDefault();
+            alert("Esperá a que termine de cargarse el escudo.");
+        }
+    });
+</script>
 
 </body>
 </html>

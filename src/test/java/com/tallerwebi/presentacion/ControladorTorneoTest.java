@@ -333,6 +333,7 @@ public class ControladorTorneoTest {
       "#0000FF",
       "#FFFFFF",
       "BOC",
+      null,
       redirectAttributes
     );
 
@@ -389,7 +390,8 @@ public class ControladorTorneoTest {
       "#ffffff",
       "#000000",
       "#ff0000",
-      "#00ff00"
+      "#00ff00",
+      null
     );
 
     // Validación
@@ -419,7 +421,8 @@ public class ControladorTorneoTest {
       "#ffffff",
       "#000000",
       "#ff0000",
-      "#00ff00"
+      "#00ff00",
+      null
     );
 
     // Validación
@@ -771,6 +774,7 @@ public class ControladorTorneoTest {
       "#0000FF",
       "#FFFFFF",
       "BOC",
+      null,
       redirectAttributes
     );
 
@@ -812,6 +816,7 @@ public class ControladorTorneoTest {
       "#0000FF",
       "#FFFFFF",
       "BOC",
+      null,
       redirectAttributes
     );
 

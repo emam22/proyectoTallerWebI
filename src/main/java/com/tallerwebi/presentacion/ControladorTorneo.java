@@ -2,22 +2,18 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.*;
 import com.tallerwebi.dominio.excepcion.*;
+import jakarta.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.*;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -42,6 +38,9 @@ public class ControladorTorneo {
 
   private static final Logger LOGGER = Logger.getLogger(ControladorTorneo.class.getName());
   private static final String EQUIPOS = "equipos";
+
+  private static final String VISTA_FORMULARIO_EDITAR_EQUIPO = "formulario-editar-equipo";
+  private static final String ATRIBUTO_EQUIPO = "equipo";
 
   @Autowired
   public ControladorTorneo(
@@ -152,6 +151,7 @@ public class ControladorTorneo {
     @RequestParam("colorVisitante1") String colorVisitante1,
     @RequestParam("colorVisitante2") String colorVisitante2,
     @RequestParam("siglas") String siglas,
+    @RequestParam(value = "escudoRuta", required = false) String escudoRuta,
     RedirectAttributes redirectAttributes
   ) {
     return obtenerModeloGuardarEquipo(
@@ -162,6 +162,7 @@ public class ControladorTorneo {
       colorVisitante1,
       colorVisitante2,
       siglas,
+      escudoRuta,
       redirectAttributes,
       REDIRECT_CREACION_EQUIPO + idTorneo
     );
@@ -176,6 +177,7 @@ public class ControladorTorneo {
     @RequestParam("colorVisitante1") String colorVisitante1,
     @RequestParam("colorVisitante2") String colorVisitante2,
     @RequestParam("siglas") String siglas,
+    @RequestParam(value = "escudoRuta", required = false) String escudoRuta,
     RedirectAttributes redirectAttributes
   ) {
     return obtenerModeloGuardarEquipo(
@@ -186,6 +188,7 @@ public class ControladorTorneo {
       colorVisitante1,
       colorVisitante2,
       siglas,
+      escudoRuta,
       redirectAttributes,
       REDIRECT_CREACION_EQUIPO_ADMIN + idTorneo
     );
@@ -199,6 +202,7 @@ public class ControladorTorneo {
     String colorVisitante1,
     String colorVisitante2,
     String siglas,
+    String escudoRuta,
     RedirectAttributes redirectAttributes,
     String redireccion
   ) {
@@ -219,6 +223,15 @@ public class ControladorTorneo {
     equipo.setColorVisitante1(colorVisitante1);
     equipo.setColorVisitante2(colorVisitante2);
     equipo.setSiglas(siglas);
+
+    if (escudoRuta != null && !escudoRuta.isBlank()) {
+      if (!escudoRuta.startsWith("/img/escudos/")) {
+        redirectAttributes.addFlashAttribute(ERROR, "La ruta del escudo no es válida.");
+        return new ModelAndView(redireccion);
+      }
+
+      equipo.setEscudo(escudoRuta);
+    }
 
     try {
       servicioEquipoTorneo.crearEquipoEInscribirlo(equipo, torneo);
@@ -445,9 +458,9 @@ public class ControladorTorneo {
       return new ModelAndView("redirect:/editarEquipo?idTorneo=" + idTorneo);
     }
 
-    ModelAndView mav = new ModelAndView("formulario-editar-equipo");
+    ModelAndView mav = new ModelAndView(VISTA_FORMULARIO_EDITAR_EQUIPO);
 
-    mav.addObject("equipo", equipo);
+    mav.addObject(ATRIBUTO_EQUIPO, equipo);
     mav.addObject(ID_TORNEO, idTorneo);
 
     return mav;
@@ -462,12 +475,13 @@ public class ControladorTorneo {
     @RequestParam("colorLocal1") String colorLocal1,
     @RequestParam("colorLocal2") String colorLocal2,
     @RequestParam("colorVisitante1") String colorVisitante1,
-    @RequestParam("colorVisitante2") String colorVisitante2
+    @RequestParam("colorVisitante2") String colorVisitante2,
+    @RequestParam(value = "escudoRuta", required = false) String escudoRuta
   ) {
     Equipo equipo = servicioEquipo.consultarEquipoPorId(idEquipo);
 
     if (equipo == null) {
-      return new ModelAndView("redirect:/editarEquipo?idTorneo=" + idTorneo);
+      return new ModelAndView("redirect:/editar-equipo?idTorneo=" + idTorneo);
     }
 
     equipo.setNombre(nombre);
@@ -477,23 +491,35 @@ public class ControladorTorneo {
     equipo.setColorVisitante1(colorVisitante1);
     equipo.setColorVisitante2(colorVisitante2);
 
+    if (escudoRuta != null && !escudoRuta.isBlank()) {
+      if (!escudoRuta.startsWith("/img/escudos/")) {
+        ModelAndView mav = new ModelAndView(VISTA_FORMULARIO_EDITAR_EQUIPO);
+        mav.addObject(ATRIBUTO_EQUIPO, equipo);
+        mav.addObject(ID_TORNEO, idTorneo);
+        mav.addObject(ERROR, "La ruta del escudo no es válida.");
+        return mav;
+      }
+
+      equipo.setEscudo(escudoRuta);
+    }
+
     try {
       servicioEquipo.actualizarEquipo(equipo);
     } catch (EquipoExistente e) {
-      ModelAndView mav = new ModelAndView("formulario-editar-equipo");
-      mav.addObject("equipo", equipo);
+      ModelAndView mav = new ModelAndView(VISTA_FORMULARIO_EDITAR_EQUIPO);
+      mav.addObject(ATRIBUTO_EQUIPO, equipo);
       mav.addObject(ID_TORNEO, idTorneo);
-      mav.addObject("error", "Ya existe un equipo con ese nombre.");
+      mav.addObject(ERROR, "Ya existe un equipo con ese nombre.");
       return mav;
     } catch (SiglasExistentes e) {
       ModelAndView mav = new ModelAndView("formulario-editar-equipo");
-      mav.addObject("equipo", equipo);
+      mav.addObject(ATRIBUTO_EQUIPO, equipo);
       mav.addObject(ID_TORNEO, idTorneo);
-      mav.addObject("error", "Ya existen equipos con esas siglas.");
+      mav.addObject(ERROR, "Ya existen equipos con esas siglas.");
       return mav;
     }
 
-    return new ModelAndView(REDIRECT_ADMINISTRAR_TORNEO_ADMIN + idTorneo);
+    return new ModelAndView("redirect:/administrarTorneoAdmin/" + idTorneo);
   }
 
   private void validarModificacionTorneo(Long idTorneo) throws FechaLimiteEditarTorneo {
