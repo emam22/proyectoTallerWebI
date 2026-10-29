@@ -6,7 +6,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
-import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
@@ -309,7 +308,7 @@ public class ControladorTorneoTest {
 
   @Test
   public void alGuardarEquipoExistenteDebeMostrarErrorYRedirigir()
-    throws EquipoExistente, SiglasExistentes {
+    throws EquipoExistente, SiglaExistente, SiglaInvalida {
     // preparación
     Long idTorneo = 1L;
 
@@ -369,7 +368,7 @@ public class ControladorTorneoTest {
 
   @Test
   public void deberiaActualizarElEquipoYRedirigirAlAdministrarTorneo()
-    throws EquipoExistente, SiglasExistentes {
+    throws EquipoExistente, SiglaExistente, SiglaInvalida {
     // Preparación
     Long idEquipo = 1L;
     Long idTorneo = 2L;
@@ -377,7 +376,7 @@ public class ControladorTorneoTest {
     Equipo equipo = new Equipo();
     equipo.setId(idEquipo);
     equipo.setNombre("Equipo Viejo");
-    equipo.setSiglas("EV");
+    equipo.setSigla("EV");
 
     when(servicioEquipoMock.consultarEquipoPorId(idEquipo)).thenReturn(equipo);
 
@@ -397,7 +396,7 @@ public class ControladorTorneoTest {
     // Validación
     assertThat(mav.getViewName(), equalTo("redirect:/administrarTorneoAdmin/" + idTorneo));
     assertThat(equipo.getNombre(), equalTo("Equipo Nuevo"));
-    assertThat(equipo.getSiglas(), equalTo("EN"));
+    assertThat(equipo.getSigla(), equalTo("EN"));
     assertThat(equipo.getColorLocal1(), equalTo("#ffffff"));
 
     verify(servicioEquipoMock, times(1)).actualizarEquipo(equipo);
@@ -405,7 +404,7 @@ public class ControladorTorneoTest {
 
   @Test
   public void deberiaRedirigirAEditarEquipoSiElEquipoNoExisteAlActualizar()
-    throws EquipoExistente, SiglasExistentes {
+    throws EquipoExistente, SiglaExistente, SiglaInvalida {
     // Preparación
     Long idEquipo = 99L;
     Long idTorneo = 2L;
@@ -796,7 +795,7 @@ public class ControladorTorneoTest {
 
   @Test
   public void alGuardarEquipoSiElTorneoEstaCompletoDebeRedirigirSinInscribirlo()
-    throws EquipoExistente, SiglasExistentes {
+    throws EquipoExistente, SiglaExistente, SiglaInvalida {
     // Preparación
     Long idTorneo = 1L;
 
@@ -1124,7 +1123,7 @@ public class ControladorTorneoTest {
 
   @Test
   public void deberiaMostrarErrorSiLaRutaDelEscudoNoEsValida()
-    throws EquipoExistente, SiglasExistentes {
+    throws EquipoExistente, SiglaExistente, SiglaInvalida {
     // Preparación
     Long idEquipo = 1L;
     Long idTorneo = 2L;
@@ -1166,5 +1165,122 @@ public class ControladorTorneoTest {
 
     // Verifica la redirección al lobby de admin
     assertThat(mav.getViewName(), equalTo("redirect:/lobbyAdmin")); // O el string constante que uses
+  }
+
+  @Test
+  public void alGuardarEquipoConSiglaInvalidaDebeMostrarErrorYRedirigir() throws Exception {
+    // Preparación
+    Long idTorneo = 1L;
+    Torneo torneo = new Torneo();
+    torneo.setCantidadDeEquipos(10);
+
+    when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+
+    when(servicioEquipoTorneoMock.contarEquiposPorTorneo(idTorneo)).thenReturn(0);
+
+    doThrow(new SiglaInvalida())
+      .when(servicioEquipoTorneoMock)
+      .crearEquipoEInscribirlo(any(Equipo.class), eq(torneo));
+
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    // Ejecución
+    ModelAndView mav = controladorTorneo.guardarEquipo(
+      idTorneo,
+      "Boca Juniors",
+      "Azul",
+      "Amarillo",
+      "Blanco",
+      "Negro",
+      "BO",
+      null,
+      redirectAttributes
+    );
+
+    // Verificación
+    assertEquals("redirect:/creacion-equipo?idTorneo=1", mav.getViewName());
+
+    assertEquals(
+      "La cantidad de letras de la sigla no es válida",
+      redirectAttributes.getFlashAttributes().get("error")
+    );
+
+    verify(servicioEquipoTorneoMock, times(1))
+      .crearEquipoEInscribirlo(any(Equipo.class), eq(torneo));
+  }
+
+  @Test
+  public void alGuardarEquipoAdminConSiglaInvalidaDebeMostrarErrorYRedirigir() throws Exception {
+    // Preparación
+    Long idTorneo = 1L;
+    Torneo torneo = new Torneo();
+    torneo.setCantidadDeEquipos(10);
+
+    when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+    when(servicioEquipoTorneoMock.contarEquiposPorTorneo(idTorneo)).thenReturn(0);
+
+    doThrow(new SiglaInvalida())
+      .when(servicioEquipoTorneoMock)
+      .crearEquipoEInscribirlo(any(Equipo.class), eq(torneo));
+
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    // Ejecución
+    ModelAndView mav = controladorTorneo.guardarEquipoAdmin(
+      idTorneo,
+      "Boca Juniors",
+      "Azul",
+      "Amarillo",
+      "Blanco",
+      "Negro",
+      "BO",
+      null,
+      redirectAttributes
+    );
+
+    // Verificación
+    assertEquals("redirect:/creacion-equipo-admin?idTorneo=1", mav.getViewName());
+
+    assertEquals(
+      "La cantidad de letras de la sigla no es válida",
+      redirectAttributes.getFlashAttributes().get("error")
+    );
+
+    verify(servicioEquipoTorneoMock, times(1))
+      .crearEquipoEInscribirlo(any(Equipo.class), eq(torneo));
+  }
+
+  @Test
+  public void alActualizarEquipoConSiglaInvalidaDebeMostrarError() throws Exception {
+    // Preparación
+    Long idEquipo = 1L;
+    Long idTorneo = 2L;
+
+    Equipo equipo = new Equipo();
+    equipo.setId(idEquipo);
+
+    when(servicioEquipoMock.consultarEquipoPorId(idEquipo)).thenReturn(equipo);
+
+    doThrow(new SiglaInvalida()).when(servicioEquipoMock).actualizarEquipo(equipo);
+
+    // Ejecución
+    ModelAndView mav = controladorTorneo.actualizarEquipo(
+      idEquipo,
+      idTorneo,
+      "Boca Juniors",
+      "BO",
+      "Azul",
+      "Amarillo",
+      "Blanco",
+      "Negro",
+      null
+    );
+
+    // Verificación
+    assertEquals("formulario-editar-equipo", mav.getViewName());
+    assertEquals("La cantidad de letras de la sigla no es válida", mav.getModel().get("error"));
+    assertEquals(idTorneo, mav.getModel().get("idTorneo"));
+
+    verify(servicioEquipoMock, times(1)).actualizarEquipo(equipo);
   }
 }

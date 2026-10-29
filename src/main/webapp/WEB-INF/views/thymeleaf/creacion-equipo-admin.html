@@ -338,21 +338,19 @@
                     </div>
                 </div>
 
-                <!-- SIGLAS -->
+                <!-- SIGLA -->
                 <div class="form-group">
-                    <label for="siglas">
-                        Ingresar siglas (3 a 5 letras)
+                    <label for="sigla">
+                        Ingresar sigla (3 a 5 letras)
                     </label>
 
                     <input
                             type="text"
-                            id="siglas"
-                            name="siglas"
+                            id="sigla"
+                            name="sigla"
                             class="input-text"
                             minlength="3"
                             maxlength="5"
-                            pattern="[A-Za-z]{3,5}"
-                            title="Las siglas deben tener entre 3 y 5 letras."
                             oninput="this.value = this.value.toUpperCase().replace(/[^A-Z]/g, '').slice(0, 5)"
                             required
                     >

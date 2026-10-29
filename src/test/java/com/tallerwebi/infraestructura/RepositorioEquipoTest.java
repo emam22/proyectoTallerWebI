@@ -159,17 +159,17 @@ public class RepositorioEquipoTest {
     // Preparación
     Equipo equipo = new Equipo();
     equipo.setNombre("Boca Juniors");
-    equipo.setSiglas("BOC");
+    equipo.setSigla("BOC");
 
     sessionFactory.getCurrentSession().persist(equipo);
 
     // Ejecución
-    Equipo equipoEncontrado = repositorioEquipo.buscarEquipoPorSiglas("BOC");
+    Equipo equipoEncontrado = repositorioEquipo.buscarEquipoPorSigla("BOC");
 
     // Verificación
     assertThat(equipoEncontrado, is(notNullValue()));
     assertThat(equipoEncontrado.getNombre(), is("Boca Juniors"));
-    assertThat(equipoEncontrado.getSiglas(), is("BOC"));
+    assertThat(equipoEncontrado.getSigla(), is("BOC"));
   }
 
   @Test
@@ -177,7 +177,7 @@ public class RepositorioEquipoTest {
   @Rollback
   public void deberiaRetornarNullSiNoExisteEquipoConEsasSiglas() {
     // Ejecución
-    Equipo equipoEncontrado = repositorioEquipo.buscarEquipoPorSiglas("BOC");
+    Equipo equipoEncontrado = repositorioEquipo.buscarEquipoPorSigla("BOC");
 
     // Verificación
     assertThat(equipoEncontrado, is(nullValue()));

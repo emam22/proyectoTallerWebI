@@ -8,7 +8,8 @@ import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.excepcion.EquipoExistente;
 import com.tallerwebi.dominio.excepcion.EquipoYaInscripto;
-import com.tallerwebi.dominio.excepcion.SiglasExistentes;
+import com.tallerwebi.dominio.excepcion.SiglaExistente;
+import com.tallerwebi.dominio.excepcion.SiglaInvalida;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +38,8 @@ public class ServicioEquipoTorneoTest {
   }
 
   @Test
-  public void deberiaCrearEquipoEInscribirloEnTorneo() throws EquipoExistente, SiglasExistentes {
+  public void deberiaCrearEquipoEInscribirloEnTorneo()
+    throws EquipoExistente, SiglaExistente, SiglaInvalida {
     // preparacion
     Equipo equipo = new Equipo();
     equipo.setNombre("Los Pumas");
@@ -58,7 +60,8 @@ public class ServicioEquipoTorneoTest {
   }
 
   @Test
-  public void deberiaLanzarExcepcionSiElEquipoYaExiste() throws EquipoExistente, SiglasExistentes {
+  public void deberiaLanzarExcepcionSiElEquipoYaExiste()
+    throws EquipoExistente, SiglaExistente, SiglaInvalida {
     // preparacion
     Equipo equipo = new Equipo();
     equipo.setNombre("Los Pumas");
@@ -244,21 +247,21 @@ public class ServicioEquipoTorneoTest {
 
   @Test
   public void deberiaLanzarSiglasExistentesAlCrearEquipoEInscribirlo()
-    throws EquipoExistente, SiglasExistentes {
+    throws EquipoExistente, SiglaExistente, SiglaInvalida {
     // Preparación
     Equipo equipo = new Equipo();
     equipo.setNombre("Boca Juniors");
-    equipo.setSiglas("BOC");
+    equipo.setSigla("BOC");
 
     Torneo torneo = new Torneo();
 
     when(servicioEquipoMock.consultarEquipo("Boca Juniors")).thenReturn(null);
 
-    doThrow(new SiglasExistentes()).when(servicioEquipoMock).registrarEquipo(equipo);
+    doThrow(new SiglaExistente()).when(servicioEquipoMock).registrarEquipo(equipo);
 
     // Ejecución y validación
     assertThrows(
-      SiglasExistentes.class,
+      SiglaExistente.class,
       () -> {
         servicioEquipoTorneo.crearEquipoEInscribirlo(equipo, torneo);
       }
@@ -436,5 +439,32 @@ public class ServicioEquipoTorneoTest {
     // verificacion
     verify(repositorioEquipoTorneoMock, times(1)).buscarEquipoTorneoPorId(idLocal, idTorneo);
     verify(repositorioEquipoTorneoMock, times(1)).buscarEquipoTorneoPorId(idVisitante, idTorneo);
+  }
+
+  @Test
+  public void deberiaLanzarSiglaInvalidaAlCrearEquipoEInscribirlo()
+    throws EquipoExistente, SiglaExistente, SiglaInvalida {
+    // Preparación
+    Equipo equipo = new Equipo();
+    equipo.setNombre("Boca Juniors");
+    equipo.setSigla("BO");
+
+    Torneo torneo = new Torneo();
+
+    when(servicioEquipoMock.consultarEquipo("Boca Juniors")).thenReturn(null);
+
+    doThrow(new SiglaInvalida()).when(servicioEquipoMock).registrarEquipo(equipo);
+
+    // Ejecución y verificación
+    assertThrows(
+      SiglaInvalida.class,
+      () -> servicioEquipoTorneo.crearEquipoEInscribirlo(equipo, torneo)
+    );
+
+    verify(servicioEquipoMock, times(1)).consultarEquipo("Boca Juniors");
+
+    verify(servicioEquipoMock, times(1)).registrarEquipo(equipo);
+
+    verify(repositorioEquipoTorneoMock, never()).guardar(any(EquipoTorneo.class));
   }
 }

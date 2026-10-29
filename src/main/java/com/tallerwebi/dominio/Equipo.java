@@ -2,6 +2,7 @@ package com.tallerwebi.dominio;
 
 import jakarta.persistence.*;
 import java.util.List;
+import java.util.Locale;
 
 @Entity
 public class Equipo {
@@ -17,7 +18,7 @@ public class Equipo {
   private String colorLocal2;
   private String colorVisitante1;
   private String colorVisitante2;
-  private String siglas;
+  private String sigla;
 
   @OneToMany
   private List<Jugador> jugadores;
@@ -107,11 +108,15 @@ public class Equipo {
     this.jugadores = jugadores;
   }
 
-  public String getSiglas() {
-    return siglas;
+  public String getSigla() {
+    return sigla;
   }
 
-  public void setSiglas(String siglas) {
-    this.siglas = siglas;
+  public void setSigla(String sigla) {
+    if (sigla == null) {
+      return;
+    }
+
+    this.sigla = sigla.toUpperCase(Locale.ROOT);
   }
 }

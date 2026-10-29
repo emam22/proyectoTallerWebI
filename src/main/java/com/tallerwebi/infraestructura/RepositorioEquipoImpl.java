@@ -55,13 +55,13 @@ public class RepositorioEquipoImpl implements RepositorioEquipo {
   }
 
   @Override
-  public Equipo buscarEquipoPorSiglas(String siglas) {
-    String hql = "FROM Equipo e WHERE e.siglas = :siglas";
+  public Equipo buscarEquipoPorSigla(String sigla) {
+    String hql = "FROM Equipo e WHERE e.sigla = :sigla";
 
     List<Equipo> equipos = sessionFactory
       .getCurrentSession()
       .createQuery(hql, Equipo.class)
-      .setParameter("siglas", siglas)
+      .setParameter("sigla", sigla)
       .getResultList();
 
     return equipos.isEmpty() ? null : equipos.get(0);

@@ -1,8 +1,8 @@
 package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.excepcion.EquipoExistente;
-import com.tallerwebi.dominio.excepcion.SiglasExistentes;
-import com.tallerwebi.dominio.excepcion.TorneoExistente;
+import com.tallerwebi.dominio.excepcion.SiglaExistente;
+import com.tallerwebi.dominio.excepcion.SiglaInvalida;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,18 +30,20 @@ public class ServicioEquipoImpl implements ServicioEquipo {
   }
 
   @Override
-  public void registrarEquipo(Equipo equipo) throws EquipoExistente, SiglasExistentes {
+  public void registrarEquipo(Equipo equipo) throws EquipoExistente, SiglaExistente, SiglaInvalida {
     Equipo equipoEncontrado = repositorioEquipo.buscarEquipo(equipo.getNombre());
 
     if (equipoEncontrado != null) {
       throw new EquipoExistente();
     }
 
-    Equipo equipoConSiglas = repositorioEquipo.buscarEquipoPorSiglas(equipo.getSiglas());
+    Equipo equipoConSigla = repositorioEquipo.buscarEquipoPorSigla(equipo.getSigla());
 
-    if (equipoConSiglas != null) {
-      throw new SiglasExistentes();
+    if (equipoConSigla != null) {
+      throw new SiglaExistente();
     }
+
+    validarSigla(equipo.getSigla());
 
     repositorioEquipo.guardar(equipo);
   }
@@ -51,8 +53,15 @@ public class ServicioEquipoImpl implements ServicioEquipo {
     return repositorioEquipo.listar();
   }
 
+  private void validarSigla(String sigla) throws SiglaInvalida {
+    if (sigla == null || sigla.trim().length() < 3 || sigla.trim().length() > 5) {
+      throw new SiglaInvalida();
+    }
+  }
+
   @Override
-  public void actualizarEquipo(Equipo equipo) throws EquipoExistente, SiglasExistentes {
+  public void actualizarEquipo(Equipo equipo)
+    throws EquipoExistente, SiglaExistente, SiglaInvalida {
     Equipo equipoActual = repositorioEquipo.buscarPorId(equipo.getId());
 
     Equipo equipoConMismoNombre = repositorioEquipo.buscarEquipo(equipo.getNombre());
@@ -61,15 +70,17 @@ public class ServicioEquipoImpl implements ServicioEquipo {
       throw new EquipoExistente();
     }
 
-    Equipo equipoConMismasSiglas = repositorioEquipo.buscarEquipoPorSiglas(equipo.getSiglas());
+    Equipo equipoConMismaSigla = repositorioEquipo.buscarEquipoPorSigla(equipo.getSigla());
 
-    if (equipoConMismasSiglas != null && !equipoConMismasSiglas.getId().equals(equipo.getId())) {
-      throw new SiglasExistentes();
+    if (equipoConMismaSigla != null && !equipoConMismaSigla.getId().equals(equipo.getId())) {
+      throw new SiglaExistente();
     }
 
     if (equipo.getEscudo() != null && !equipo.getEscudo().isBlank()) {
       equipoActual.setEscudo(equipo.getEscudo());
     }
+
+    validarSigla(equipo.getSigla());
 
     repositorioEquipo.actualizar(equipo);
   }

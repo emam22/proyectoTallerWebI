@@ -8,6 +8,6 @@ public interface RepositorioEquipo {
   void guardar(Equipo equipo);
   List<Equipo> listar();
   void actualizar(Equipo equipo);
-  Equipo buscarEquipoPorSiglas(String siglas);
   Equipo buscarEquipoPorIdJugador(Long idJugador);
+  Equipo buscarEquipoPorSigla(String sigla);
 }

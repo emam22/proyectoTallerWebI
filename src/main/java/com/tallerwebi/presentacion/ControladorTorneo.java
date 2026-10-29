@@ -141,7 +141,6 @@ public class ControladorTorneo {
     return model;
   }
 
-  /*Los parametros deben llegar por ModelAttribute*/
   @RequestMapping(path = "/guardarEquipo", method = RequestMethod.POST)
   public ModelAndView guardarEquipo(
     @RequestParam(ID_TORNEO) Long idTorneo,
@@ -150,7 +149,7 @@ public class ControladorTorneo {
     @RequestParam("colorLocal2") String colorLocal2,
     @RequestParam("colorVisitante1") String colorVisitante1,
     @RequestParam("colorVisitante2") String colorVisitante2,
-    @RequestParam("siglas") String siglas,
+    @RequestParam("sigla") String sigla,
     @RequestParam(value = "escudoRuta", required = false) String escudoRuta,
     RedirectAttributes redirectAttributes
   ) {
@@ -161,7 +160,7 @@ public class ControladorTorneo {
       colorLocal2,
       colorVisitante1,
       colorVisitante2,
-      siglas,
+      sigla,
       escudoRuta,
       redirectAttributes,
       REDIRECT_CREACION_EQUIPO + idTorneo
@@ -176,7 +175,7 @@ public class ControladorTorneo {
     @RequestParam("colorLocal2") String colorLocal2,
     @RequestParam("colorVisitante1") String colorVisitante1,
     @RequestParam("colorVisitante2") String colorVisitante2,
-    @RequestParam("siglas") String siglas,
+    @RequestParam("sigla") String sigla,
     @RequestParam(value = "escudoRuta", required = false) String escudoRuta,
     RedirectAttributes redirectAttributes
   ) {
@@ -187,7 +186,7 @@ public class ControladorTorneo {
       colorLocal2,
       colorVisitante1,
       colorVisitante2,
-      siglas,
+      sigla,
       escudoRuta,
       redirectAttributes,
       REDIRECT_CREACION_EQUIPO_ADMIN + idTorneo
@@ -201,7 +200,7 @@ public class ControladorTorneo {
     String colorLocal2,
     String colorVisitante1,
     String colorVisitante2,
-    String siglas,
+    String sigla,
     String escudoRuta,
     RedirectAttributes redirectAttributes,
     String redireccion
@@ -222,7 +221,7 @@ public class ControladorTorneo {
     equipo.setColorLocal2(colorLocal2);
     equipo.setColorVisitante1(colorVisitante1);
     equipo.setColorVisitante2(colorVisitante2);
-    equipo.setSiglas(siglas);
+    equipo.setSigla(sigla);
 
     if (escudoRuta != null && !escudoRuta.isBlank()) {
       if (!escudoRuta.startsWith("/img/escudos/")) {
@@ -237,8 +236,10 @@ public class ControladorTorneo {
       servicioEquipoTorneo.crearEquipoEInscribirlo(equipo, torneo);
     } catch (EquipoExistente e) {
       redirectAttributes.addFlashAttribute(ERROR, "Ya existe un equipo con ese nombre");
-    } catch (SiglasExistentes e) {
-      redirectAttributes.addFlashAttribute(ERROR, "Ya existe un equipo con esas siglas");
+    } catch (SiglaExistente e) {
+      redirectAttributes.addFlashAttribute(ERROR, "Ya existen equipos con esa sigla");
+    } catch (SiglaInvalida e) {
+      redirectAttributes.addFlashAttribute(ERROR, "La cantidad de letras de la sigla no es válida");
     }
 
     return new ModelAndView(redireccion);
@@ -471,7 +472,7 @@ public class ControladorTorneo {
     @RequestParam(ID_EQUIPO) Long idEquipo,
     @RequestParam(ID_TORNEO) Long idTorneo,
     @RequestParam("nombre") String nombre,
-    @RequestParam("siglas") String siglas,
+    @RequestParam("sigla") String sigla,
     @RequestParam("colorLocal1") String colorLocal1,
     @RequestParam("colorLocal2") String colorLocal2,
     @RequestParam("colorVisitante1") String colorVisitante1,
@@ -485,7 +486,7 @@ public class ControladorTorneo {
     }
 
     equipo.setNombre(nombre);
-    equipo.setSiglas(siglas);
+    equipo.setSigla(sigla);
     equipo.setColorLocal1(colorLocal1);
     equipo.setColorLocal2(colorLocal2);
     equipo.setColorVisitante1(colorVisitante1);
@@ -511,11 +512,17 @@ public class ControladorTorneo {
       mav.addObject(ID_TORNEO, idTorneo);
       mav.addObject(ERROR, "Ya existe un equipo con ese nombre.");
       return mav;
-    } catch (SiglasExistentes e) {
+    } catch (SiglaExistente e) {
       ModelAndView mav = new ModelAndView("formulario-editar-equipo");
       mav.addObject(ATRIBUTO_EQUIPO, equipo);
       mav.addObject(ID_TORNEO, idTorneo);
-      mav.addObject(ERROR, "Ya existen equipos con esas siglas.");
+      mav.addObject(ERROR, "Ya existen equipos con esa sigla.");
+      return mav;
+    } catch (SiglaInvalida e) {
+      ModelAndView mav = new ModelAndView(VISTA_FORMULARIO_EDITAR_EQUIPO);
+      mav.addObject(ATRIBUTO_EQUIPO, equipo);
+      mav.addObject(ID_TORNEO, idTorneo);
+      mav.addObject(ERROR, "La cantidad de letras de la sigla no es válida");
       return mav;
     }
 
