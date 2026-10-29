@@ -9,4 +9,5 @@ public interface RepositorioEquipo {
   List<Equipo> listar();
   void actualizar(Equipo equipo);
   Equipo buscarEquipoPorSiglas(String siglas);
+  Equipo buscarEquipoPorIdJugador(Long idJugador);
 }

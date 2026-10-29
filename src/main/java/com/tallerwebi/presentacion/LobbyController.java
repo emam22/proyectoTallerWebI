@@ -2,6 +2,7 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.stereotype.Controller;
@@ -18,16 +19,19 @@ public class LobbyController {
   private final ServicioEquipoTorneo servicioEquipoTorneo;
   private final ServicioTorneo servicioTorneo;
   private final ServicioEstadisticaJugador servicioEstadisticas;
+  private final ServicioEquipo servicioEquipo;
   private static final String ESTADO_PENDIENTE = "Pendiente";
 
   public LobbyController(
     ServicioEquipoTorneo servicioEquipoTorneo,
     ServicioTorneo servicioTorneo,
-    ServicioEstadisticaJugador servicioEstadisticas
+    ServicioEstadisticaJugador servicioEstadisticas,
+    ServicioEquipo servicioEquipo
   ) {
     this.servicioEquipoTorneo = servicioEquipoTorneo;
     this.servicioTorneo = servicioTorneo;
     this.servicioEstadisticas = servicioEstadisticas;
+    this.servicioEquipo = servicioEquipo;
   }
 
   @RequestMapping("/lobby")
@@ -41,7 +45,11 @@ public class LobbyController {
     model.put("idTorneoActual", idTorneoABuscar);
 
     List<EstadisticaJugador> estadisticas = servicioEstadisticas.obtenerEstadisticas();
+
+    Map<Long, Equipo> equiposPorJugador = obtenerMapaEquiposPorJugador(estadisticas);
+
     model.put("estadisticasJugadores", estadisticas);
+    model.put("equiposPorJugador", equiposPorJugador);
 
     //cant real de equipos agregados
     int totalEquipos = servicioEquipoTorneo.contarEquiposPorTorneo(idTorneoABuscar);
@@ -96,9 +104,47 @@ public class LobbyController {
     Long idTorneoABuscar = idTorneo != null ? idTorneo : 1L;
 
     List<EstadisticaJugador> estadisticas = servicioEstadisticas.obtenerEstadisticas();
+
     model.put("estadisticasDeJugadores", estadisticas);
+    model.put("goleador", obtenerGoleador(estadisticas));
     model.put("idTorneoActual", idTorneoABuscar);
 
     return new ModelAndView("estadisticasDeJugadores", model);
+  }
+
+  private EstadisticaJugador obtenerGoleador(List<EstadisticaJugador> estadisticas) {
+    EstadisticaJugador goleador = null;
+
+    if (estadisticas == null) {
+      return null;
+    }
+
+    for (EstadisticaJugador estadistica : estadisticas) {
+      if (
+        estadistica.getGoles() != null &&
+        (goleador == null || estadistica.getGoles() > goleador.getGoles())
+      ) {
+        goleador = estadistica;
+      }
+    }
+
+    return goleador;
+  }
+
+  private Map<Long, Equipo> obtenerMapaEquiposPorJugador(List<EstadisticaJugador> estadisticas) {
+    Map<Long, Equipo> equipos = new HashMap<>();
+    if (estadisticas == null) {
+      return equipos;
+    }
+
+    for (EstadisticaJugador est : estadisticas) {
+      if (est.getJugador() != null) {
+        Long idJugador = est.getJugador().getId();
+        if (idJugador != null && !equipos.containsKey(idJugador)) {
+          equipos.put(idJugador, servicioEquipo.consultarEquipoJugador(idJugador));
+        }
+      }
+    }
+    return equipos;
   }
 }

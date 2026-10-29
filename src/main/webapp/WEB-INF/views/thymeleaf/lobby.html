@@ -556,12 +556,23 @@
                     <table class="tabla-stats-lateral">
                         <tbody>
                         <tr th:if="${#lists.isEmpty(estadisticasJugadores)}">
-                            <td colspan="6" class="sin-stats">Sin estadísticas registradas</td>
+                            <td colspan="7" class="sin-stats">Sin estadísticas registradas</td>
                         </tr>
 
                         <tr th:each="stat, iter : ${estadisticasJugadores}" th:if="${iter.count le 8}">
-                            <td class="col-jugador" th:text="${stat.jugador.nombre}">Juan</td>
-                            <td class="col-apellido" th:text="${stat.jugador.apellido}">perez</td>
+                            <!-- Escudo y Nombre dentro de la misma celda -->
+                            <td class="col-jugador">
+                    <span th:if="${equiposPorJugador != null and stat.jugador != null and equiposPorJugador.get(stat.jugador.id) != null}">
+                        <img th:src="@{${equiposPorJugador.get(stat.jugador.id).escudo}}"
+                             alt="Escudo"
+                             width="20"
+                             height="20"
+                             style="vertical-align: middle; margin-right: 5px; object-fit: contain;" />
+                    </span>
+                                <span th:text="${stat.jugador != null ? stat.jugador.nombre : 'Sin nombre'}">Juan</span>
+                            </td>
+
+                            <td class="col-apellido" th:text="${stat.jugador != null ? stat.jugador.apellido : ''}">perez</td>
                             <td class="col-stat" th:text="${stat.goles}">0</td>
                             <td class="col-stat" th:text="${stat.asistencias}">0</td>
                             <td class="col-stat" th:text="${stat.participacionesGol}">0</td>
@@ -571,7 +582,6 @@
                         </tbody>
                     </table>
                 </div>
-
             </div>
         </a>
     </div>

@@ -73,4 +73,9 @@ public class ServicioEquipoImpl implements ServicioEquipo {
 
     repositorioEquipo.actualizar(equipo);
   }
+
+  @Override
+  public Equipo consultarEquipoJugador(Long idJugador) {
+    return repositorioEquipo.buscarEquipoPorIdJugador(idJugador);
+  }
 }

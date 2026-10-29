@@ -1,6 +1,7 @@
 package com.tallerwebi.infraestructura;
 
 import com.tallerwebi.dominio.Equipo;
+import com.tallerwebi.dominio.Jugador;
 import com.tallerwebi.dominio.RepositorioEquipo;
 import java.util.List;
 import org.hibernate.SessionFactory;
@@ -64,5 +65,17 @@ public class RepositorioEquipoImpl implements RepositorioEquipo {
       .getResultList();
 
     return equipos.isEmpty() ? null : equipos.get(0);
+  }
+
+  @Override
+  public Equipo buscarEquipoPorIdJugador(Long idJugador) {
+    String hql = "SELECT e FROM Equipo e JOIN e.jugadores j WHERE j.id = :idJugador";
+    List<Equipo> resultados = sessionFactory
+      .getCurrentSession()
+      .createQuery(hql, Equipo.class)
+      .setParameter("idJugador", idJugador)
+      .getResultList();
+
+    return resultados.isEmpty() ? null : resultados.get(0);
   }
 }

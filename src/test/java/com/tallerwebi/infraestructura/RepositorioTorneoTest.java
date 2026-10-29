@@ -131,4 +131,23 @@ public class RepositorioTorneoTest {
     // verificacion
     assertThat(torneos, is(empty()));
   }
+
+  @Transactional
+  @Rollback
+  @Test
+  public void queSePuedaBorrarUnTorneoDeLaBaseDeDatos() {
+    Torneo torneo = new Torneo();
+    torneo.setNombre("Torneo Clausura");
+    sessionFactory.getCurrentSession().persist(torneo);
+
+    sessionFactory.getCurrentSession().flush();
+
+    Long idGenerado = torneo.getId();
+
+    repositorioTorneo.borrar(idGenerado);
+    sessionFactory.getCurrentSession().clear();
+
+    Torneo buscado = sessionFactory.getCurrentSession().get(Torneo.class, idGenerado);
+    assertThat(buscado, nullValue());
+  }
 }

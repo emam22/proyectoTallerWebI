@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.InOrder;
 
 public class ServicioTorneoTest {
 
@@ -20,6 +21,7 @@ public class ServicioTorneoTest {
   private RepositorioTorneo repositorioTorneoMock;
   private RepositorioEquipoImpl repositorioEquipoMock;
   private RepositorioJornada repositorioJornadaMock;
+  private RepositorioEquipoTorneo repositorioEquipoTorneoMock;
 
   @BeforeEach
   public void init() {
@@ -27,12 +29,14 @@ public class ServicioTorneoTest {
     // this.servicioTorneo = new ServicioTorneoImpl(this.repositorioTorneoMock);
     this.repositorioEquipoMock = mock(RepositorioEquipoImpl.class);
     this.repositorioJornadaMock = mock(RepositorioJornada.class);
+    this.repositorioEquipoTorneoMock = mock(RepositorioEquipoTorneo.class);
 
     this.servicioTorneo =
       new ServicioTorneoImpl(
         this.repositorioTorneoMock,
         this.repositorioEquipoMock,
-        this.repositorioJornadaMock
+        this.repositorioJornadaMock,
+        this.repositorioEquipoTorneoMock
       );
   }
 
@@ -399,5 +403,38 @@ public class ServicioTorneoTest {
 
     assertThat(torneo.getJornadas(), hasSize(6));
     assertThat(torneo.getPartidosEnTorneo(), hasSize(12));
+  }
+
+  @Test
+  public void queAlEliminarUnTorneoSeEliminenPrimeroSusEquiposAsociados() {
+    Long idTorneo = 10L;
+    Torneo torneoExistente = new Torneo();
+    torneoExistente.setId(idTorneo);
+
+    // Le decimos al mock que el torneo sí existe para que no corte en el if
+    when(repositorioTorneoMock.buscarTorneoPorId(idTorneo)).thenReturn(torneoExistente);
+
+    // Ejecución
+    servicioTorneo.eliminarTorneo(idTorneo);
+
+    // Verificación de orden
+    InOrder inOrder = inOrder(repositorioEquipoTorneoMock, repositorioTorneoMock);
+    inOrder.verify(repositorioEquipoTorneoMock, times(1)).eliminarPorTorneo(idTorneo);
+    inOrder.verify(repositorioTorneoMock, times(1)).borrar(idTorneo);
+  }
+
+  @Test
+  public void queAlEliminarTorneoExitosamenteSeEliminenSusEquiposYLuegoElTorneo() {
+    Long idTorneo = 10L;
+    Torneo torneoExistente = new Torneo();
+    torneoExistente.setId(idTorneo);
+
+    when(repositorioTorneoMock.buscarTorneoPorId(idTorneo)).thenReturn(torneoExistente);
+
+    servicioTorneo.eliminarTorneo(idTorneo);
+
+    InOrder inOrder = inOrder(repositorioEquipoTorneoMock, repositorioTorneoMock);
+    inOrder.verify(repositorioEquipoTorneoMock, times(1)).eliminarPorTorneo(idTorneo);
+    inOrder.verify(repositorioTorneoMock, times(1)).borrar(idTorneo);
   }
 }

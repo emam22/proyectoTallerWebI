@@ -1153,4 +1153,18 @@ public class ControladorTorneoTest {
 
     verify(servicioEquipoMock, never()).actualizarEquipo(any());
   }
+
+  @Test
+  public void queAlEliminarTorneoRedireccioneAlLobbyAdmin() {
+    Long idTorneo = 1L;
+    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
+
+    ModelAndView mav = controladorTorneo.eliminarTorneoAdmin(idTorneo, redirectAttributes);
+
+    // Verifica que se haya llamado al servicio
+    verify(servicioTorneoMock).eliminarTorneo(idTorneo);
+
+    // Verifica la redirección al lobby de admin
+    assertThat(mav.getViewName(), equalTo("redirect:/lobbyAdmin")); // O el string constante que uses
+  }
 }

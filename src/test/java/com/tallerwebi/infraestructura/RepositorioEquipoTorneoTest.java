@@ -295,4 +295,42 @@ public class RepositorioEquipoTorneoTest {
 
     assertThat(equipoTorneoEliminado, is(nullValue()));
   }
+
+  @Transactional
+  @Rollback
+  @Test
+  public void queSePuedanEliminarLasFilasDeEquipoTorneoPorIdTorneo() {
+    // 1. Guardamos un torneo
+    Torneo torneo = new Torneo();
+    torneo.setNombre("Torneo Prueba");
+    sessionFactory.getCurrentSession().persist(torneo);
+
+    // 2. Guardamos un equipo
+    Equipo equipo = new Equipo();
+    equipo.setNombre("Equipo Prueba");
+    sessionFactory.getCurrentSession().persist(equipo);
+
+    // 3. Guardamos la relación EquipoTorneo
+    EquipoTorneo et = new EquipoTorneo();
+    et.setTorneo(torneo);
+    et.setEquipo(equipo);
+    sessionFactory.getCurrentSession().persist(et);
+
+    sessionFactory.getCurrentSession().flush();
+
+    // 4. Ejecutamos el método a testear
+    repositorioEquipoTorneo.eliminarPorTorneo(torneo.getId());
+
+    sessionFactory.getCurrentSession().flush();
+    sessionFactory.getCurrentSession().clear();
+
+    // 5. Verificamos que ya no existan registros para ese torneo
+    List<EquipoTorneo> restantes = sessionFactory
+      .getCurrentSession()
+      .createQuery("FROM EquipoTorneo et WHERE et.torneo.id = :idTorneo", EquipoTorneo.class)
+      .setParameter("idTorneo", torneo.getId())
+      .getResultList();
+
+    assertThat(restantes.size(), equalTo(0));
+  }
 }
