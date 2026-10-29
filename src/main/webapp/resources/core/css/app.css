@@ -347,23 +347,55 @@ tbody tr:hover {
 .form-confirmar-plantel {
     display: flex;
     justify-content: flex-end;
-    margin: 0 0 14px;
+    margin: 0 0 16px;
 }
 
 .btn-confirmar-plantel {
-    background: var(--accent-soft);
-    color: var(--accent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 38px;
+    padding: 9px 18px;
+    background: var(--accent);
+    color: var(--bg);
     border: 1px solid var(--accent);
-    border-radius: var(--radius-sm);
-    padding: 8px 14px;
+    border-radius: var(--radius-md);
+    font-family: var(--font-base);
     font-size: 12px;
     font-weight: bold;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
     cursor: pointer;
+    box-shadow: 0 3px 8px var(--shadow);
+    transition:
+        background var(--dur-fast) var(--ease),
+        border-color var(--dur-fast) var(--ease),
+        box-shadow var(--dur-fast) var(--ease),
+        transform var(--dur-fast) var(--ease);
 }
 
 .btn-confirmar-plantel:hover {
-    background: var(--accent);
-    color: var(--bg);
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    box-shadow: 0 5px 12px var(--shadow);
+    transform: translateY(-1px);
+}
+
+.btn-confirmar-plantel:active {
+    box-shadow: 0 2px 5px var(--shadow);
+    transform: translateY(0);
+}
+
+.btn-confirmar-plantel:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+    .form-confirmar-plantel,
+    .btn-confirmar-plantel {
+        width: 100%;
+    }
 }
 
 /* =========================
