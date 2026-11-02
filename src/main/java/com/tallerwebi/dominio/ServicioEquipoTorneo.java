@@ -2,6 +2,7 @@ package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.excepcion.EquipoExistente;
 import com.tallerwebi.dominio.excepcion.EquipoYaInscripto;
+import com.tallerwebi.dominio.excepcion.PlantelIncompletoException;
 import com.tallerwebi.dominio.excepcion.SiglaExistente;
 import com.tallerwebi.dominio.excepcion.SiglaInvalida;
 import java.util.List;
@@ -17,6 +18,7 @@ public interface ServicioEquipoTorneo {
   EquipoTorneo consultarEquipoTorneoPorId(Long idEquipo, Long idTorneo);
 
   List<EquipoTorneo> obtenerEquiposPorTorneo(Long idTorneo);
+  void confirmarPlantel(Long idEquipo) throws PlantelIncompletoException;
 
   void actualizarTablaPosiciones(
     Long idTorneo,

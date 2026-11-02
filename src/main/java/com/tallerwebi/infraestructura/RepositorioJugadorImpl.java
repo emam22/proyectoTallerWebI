@@ -48,6 +48,19 @@ public class RepositorioJugadorImpl implements RepositorioJugador {
   }
 
   @Override
+  public List<String> obtenerPosicionesPresentes(Long idEquipo) {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery(
+        "select distinct lower(trim(j.puesto)) from Equipo e join e.jugadores j " +
+        "where e.id = :id and j.puesto is not null",
+        String.class
+      )
+      .setParameter("id", idEquipo)
+      .getResultList();
+  }
+
+  @Override
   public Jugador obtenerJugador(Long idJugador) {
     return sessionFactory
       .getCurrentSession()

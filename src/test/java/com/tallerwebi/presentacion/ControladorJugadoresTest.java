@@ -7,6 +7,7 @@ import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.*;
 import com.tallerwebi.dominio.excepcion.JugadorNoExiste;
+import com.tallerwebi.dominio.excepcion.PlantelIncompletoException;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -383,35 +384,28 @@ public class ControladorJugadoresTest {
   }
 
   @Test
-  public void deberiaConfirmarUnPlantelConTodasLasPosiciones() {
+  public void deberiaConfirmarUnPlantelConTodasLasPosiciones() throws PlantelIncompletoException {
     RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
     Torneo torneo = new Torneo();
     torneo.setId(1L);
     inscribirEquipoEnTorneo(1L, 10L, torneo);
-    when(this.servicioJugadorMock.obtenerJugadores(10L))
-      .thenReturn(
-        List.of(
-          jugadorEnPosicion("Arquero"),
-          jugadorEnPosicion("Defensor"),
-          jugadorEnPosicion("Mediocampista"),
-          jugadorEnPosicion("Delantero")
-        )
-      );
 
     ModelAndView mav = this.controlador.confirmarPlantel(1L, 10L, redirectAttributesMock);
 
+    verify(this.servicioEquipoTorneoMock).confirmarPlantel(10L);
     verify(redirectAttributesMock).addFlashAttribute("ok", "Plantel confirmado correctamente.");
     assertThat(mav.getViewName(), is("redirect:/jugadoresTorneo?idTorneo=1"));
   }
 
   @Test
-  public void noDeberiaConfirmarUnPlantelSiFaltanPosiciones() {
+  public void noDeberiaConfirmarUnPlantelSiFaltanPosiciones() throws PlantelIncompletoException {
     RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
     Torneo torneo = new Torneo();
     torneo.setId(1L);
     inscribirEquipoEnTorneo(1L, 10L, torneo);
-    when(this.servicioJugadorMock.obtenerJugadores(10L))
-      .thenReturn(List.of(jugadorEnPosicion("Arquero"), jugadorEnPosicion("Delantero")));
+    doThrow(new PlantelIncompletoException(List.of("Defensor", "Mediocampista")))
+      .when(this.servicioEquipoTorneoMock)
+      .confirmarPlantel(10L);
 
     ModelAndView mav = this.controlador.confirmarPlantel(1L, 10L, redirectAttributesMock);
 
@@ -425,12 +419,16 @@ public class ControladorJugadoresTest {
   }
 
   @Test
-  public void noDeberiaConfirmarUnPlantelVacio() {
+  public void noDeberiaConfirmarUnPlantelVacio() throws PlantelIncompletoException {
     RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
     Torneo torneo = new Torneo();
     torneo.setId(1L);
     inscribirEquipoEnTorneo(1L, 10L, torneo);
-    when(this.servicioJugadorMock.obtenerJugadores(10L)).thenReturn(new ArrayList<>());
+    doThrow(
+      new PlantelIncompletoException(List.of("Arquero", "Defensor", "Mediocampista", "Delantero"))
+    )
+      .when(this.servicioEquipoTorneoMock)
+      .confirmarPlantel(10L);
 
     ModelAndView mav = this.controlador.confirmarPlantel(1L, 10L, redirectAttributesMock);
 
@@ -441,13 +439,6 @@ public class ControladorJugadoresTest {
         "Arquero, Defensor, Mediocampista, Delantero."
       );
     assertThat(mav.getViewName(), is("redirect:/jugadoresTorneo?idTorneo=1"));
-  }
-
-  private Jugador jugadorEnPosicion(String posicion) {
-    Jugador jugador = new Jugador();
-    jugador.setPuesto(posicion);
-
-    return jugador;
   }
 
   private Jugador jugador(Long id) {

@@ -2,6 +2,7 @@ package com.tallerwebi.presentacion;
 
 import com.tallerwebi.dominio.*;
 import com.tallerwebi.dominio.excepcion.JugadorNoExiste;
+import com.tallerwebi.dominio.excepcion.PlantelIncompletoException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -24,12 +25,6 @@ public class ControladorJugadores {
   private static final String ERROR_EQUIPO_NO_INSCRIPTO =
     "El equipo no esta inscripto en este torneo.";
   private static final String ID_JUGADOR = "idJugador";
-  private static final List<String> POSICIONES_PLANTEL = List.of(
-    "Arquero",
-    "Defensor",
-    "Mediocampista",
-    "Delantero"
-  );
 
   private static final String OK = "ok";
   private static final String ERROR = "error";
@@ -366,14 +361,13 @@ public class ControladorJugadores {
       return rechazar(redireccion, ERROR_EQUIPO_NO_INSCRIPTO, redirectAttributes);
     }
 
-    List<Jugador> jugadores = servicioJugador.obtenerJugadores(idEquipo);
-    List<String> posicionesFaltantes = obtenerPosicionesFaltantes(jugadores);
-
-    if (!posicionesFaltantes.isEmpty()) {
+    try {
+      servicioEquipoTorneo.confirmarPlantel(idEquipo);
+    } catch (PlantelIncompletoException e) {
       return rechazar(
         redireccion,
         "No se puede confirmar el plantel. Falta al menos un jugador en las posiciones: " +
-        String.join(", ", posicionesFaltantes) +
+        String.join(", ", e.getPosicionesFaltantes()) +
         ".",
         redirectAttributes
       );
@@ -561,27 +555,6 @@ public class ControladorJugadores {
     }
 
     return false;
-  }
-
-  private List<String> obtenerPosicionesFaltantes(List<Jugador> jugadores) {
-    List<String> posicionesFaltantes = new ArrayList<>();
-
-    for (String posicion : POSICIONES_PLANTEL) {
-      boolean cubierta = false;
-
-      for (Jugador jugador : jugadores) {
-        if (jugador.getPuesto() != null && posicion.equalsIgnoreCase(jugador.getPuesto().trim())) {
-          cubierta = true;
-          break;
-        }
-      }
-
-      if (!cubierta) {
-        posicionesFaltantes.add(posicion);
-      }
-    }
-
-    return posicionesFaltantes;
   }
 
   private boolean superaMaximo(List<Jugador> jugadores, Torneo torneo) {

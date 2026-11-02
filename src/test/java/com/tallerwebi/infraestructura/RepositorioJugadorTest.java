@@ -109,6 +109,30 @@ public class RepositorioJugadorTest {
   @Test
   @Transactional
   @Rollback
+  public void deberiaObtenerLasPosicionesPresentesNormalizadasYSinDuplicados() {
+    Jugador arquero = new Jugador();
+    arquero.setPuesto(" Arquero ");
+    this.sessionFactory.getCurrentSession().persist(arquero);
+
+    Jugador otroArquero = new Jugador();
+    otroArquero.setPuesto("ARQUERO");
+    this.sessionFactory.getCurrentSession().persist(otroArquero);
+
+    Equipo equipo = new Equipo();
+    equipo.setJugadores(new ArrayList<>());
+    equipo.getJugadores().add(arquero);
+    equipo.getJugadores().add(otroArquero);
+    this.sessionFactory.getCurrentSession().persist(equipo);
+
+    List<String> posiciones = this.repositorioJugador.obtenerPosicionesPresentes(equipo.getId());
+
+    assertThat(posiciones, hasSize(1));
+    assertThat(posiciones.get(0), is("arquero"));
+  }
+
+  @Test
+  @Transactional
+  @Rollback
   public void deberiaActualizarElEstadoDeHabilitacionDeUnJugador() {
     // preparacion
     Jugador jugador = new Jugador();

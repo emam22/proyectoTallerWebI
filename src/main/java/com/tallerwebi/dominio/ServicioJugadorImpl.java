@@ -28,6 +28,11 @@ public class ServicioJugadorImpl implements ServicioJugador {
   }
 
   @Override
+  public List<String> obtenerPosicionesPresentes(Long idEquipo) {
+    return repositorioJugador.obtenerPosicionesPresentes(idEquipo);
+  }
+
+  @Override
   public void agregarJugador(Long idEquipo, Jugador jugador) {
     repositorioJugador.guardar(jugador);
 

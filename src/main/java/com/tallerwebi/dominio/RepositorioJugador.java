@@ -7,5 +7,6 @@ public interface RepositorioJugador {
   void actualizar(Jugador jugador);
   void eliminar(Long idJugador);
   List<Jugador> listarPorEquipo(Long idEquipo);
+  List<String> obtenerPosicionesPresentes(Long idEquipo);
   Jugador obtenerJugador(Long idJugador);
 }

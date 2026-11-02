@@ -8,6 +8,7 @@ import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.excepcion.EquipoExistente;
 import com.tallerwebi.dominio.excepcion.EquipoYaInscripto;
+import com.tallerwebi.dominio.excepcion.PlantelIncompletoException;
 import com.tallerwebi.dominio.excepcion.SiglaExistente;
 import com.tallerwebi.dominio.excepcion.SiglaInvalida;
 import java.util.ArrayList;
@@ -22,17 +23,20 @@ public class ServicioEquipoTorneoTest {
   private RepositorioEquipoTorneo repositorioEquipoTorneoMock;
 
   private ServicioEquipo servicioEquipoMock;
+  private ServicioJugador servicioJugadorMock;
   private RepositorioJornada JornadaTorneoMock;
 
   @BeforeEach
   public void init() {
     this.repositorioEquipoTorneoMock = mock(RepositorioEquipoTorneo.class);
     this.servicioEquipoMock = mock(ServicioEquipo.class);
+    this.servicioJugadorMock = mock(ServicioJugador.class);
     this.JornadaTorneoMock = mock(RepositorioJornada.class);
     this.servicioEquipoTorneo =
       new ServicioEquipoTorneoImpl(
         this.repositorioEquipoTorneoMock,
         this.servicioEquipoMock,
+        this.servicioJugadorMock,
         this.JornadaTorneoMock
       );
   }
@@ -439,6 +443,44 @@ public class ServicioEquipoTorneoTest {
     // verificacion
     verify(repositorioEquipoTorneoMock, times(1)).buscarEquipoTorneoPorId(idLocal, idTorneo);
     verify(repositorioEquipoTorneoMock, times(1)).buscarEquipoTorneoPorId(idVisitante, idTorneo);
+  }
+
+  @Test
+  public void deberiaConfirmarUnPlantelConTodasLasPosiciones() throws PlantelIncompletoException {
+    when(servicioJugadorMock.obtenerPosicionesPresentes(10L))
+      .thenReturn(List.of("arquero", "defensor", "mediocampista", "delantero"));
+
+    servicioEquipoTorneo.confirmarPlantel(10L);
+
+    verify(servicioJugadorMock).obtenerPosicionesPresentes(10L);
+  }
+
+  @Test
+  public void noDeberiaConfirmarUnPlantelSiFaltanPosiciones() {
+    when(servicioJugadorMock.obtenerPosicionesPresentes(10L))
+      .thenReturn(List.of("arquero", "delantero"));
+
+    PlantelIncompletoException excepcion = assertThrows(
+      PlantelIncompletoException.class,
+      () -> servicioEquipoTorneo.confirmarPlantel(10L)
+    );
+
+    assertThat(excepcion.getPosicionesFaltantes(), equalTo(List.of("Defensor", "Mediocampista")));
+  }
+
+  @Test
+  public void noDeberiaConfirmarUnPlantelSinJugadores() {
+    when(servicioJugadorMock.obtenerPosicionesPresentes(10L)).thenReturn(new ArrayList<>());
+
+    PlantelIncompletoException excepcion = assertThrows(
+      PlantelIncompletoException.class,
+      () -> servicioEquipoTorneo.confirmarPlantel(10L)
+    );
+
+    assertThat(
+      excepcion.getPosicionesFaltantes(),
+      equalTo(List.of("Arquero", "Defensor", "Mediocampista", "Delantero"))
+    );
   }
 
   @Test

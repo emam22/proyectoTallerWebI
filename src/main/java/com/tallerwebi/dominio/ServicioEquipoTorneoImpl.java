@@ -2,10 +2,14 @@ package com.tallerwebi.dominio;
 
 import com.tallerwebi.dominio.excepcion.EquipoExistente;
 import com.tallerwebi.dominio.excepcion.EquipoYaInscripto;
+import com.tallerwebi.dominio.excepcion.PlantelIncompletoException;
 import com.tallerwebi.dominio.excepcion.SiglaExistente;
 import com.tallerwebi.dominio.excepcion.SiglaInvalida;
 import jakarta.transaction.Transactional;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +17,15 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class ServicioEquipoTorneoImpl implements ServicioEquipoTorneo {
 
+  private static final List<String> POSICIONES_PLANTEL = List.of(
+    "Arquero",
+    "Defensor",
+    "Mediocampista",
+    "Delantero"
+  );
+
   private ServicioEquipo servicioEquipo;
+  private ServicioJugador servicioJugador;
   private RepositorioEquipoTorneo repositorioEquipoTorneo;
   private RepositorioJornada repositorioJornada;
 
@@ -21,10 +33,12 @@ public class ServicioEquipoTorneoImpl implements ServicioEquipoTorneo {
   public ServicioEquipoTorneoImpl(
     RepositorioEquipoTorneo repositorioEquipoTorneo,
     ServicioEquipo servicioEquipo,
+    ServicioJugador servicioJugador,
     RepositorioJornada repositorioJornada
   ) {
     this.repositorioEquipoTorneo = repositorioEquipoTorneo;
     this.servicioEquipo = servicioEquipo;
+    this.servicioJugador = servicioJugador;
     this.repositorioJornada = repositorioJornada;
   }
 
@@ -112,6 +126,24 @@ public class ServicioEquipoTorneoImpl implements ServicioEquipoTorneo {
   @Override
   public EquipoTorneo consultarEquipoTorneoPorId(Long idEquipo, Long idTorneo) {
     return repositorioEquipoTorneo.buscarEquipoTorneoPorId(idEquipo, idTorneo);
+  }
+
+  @Override
+  public void confirmarPlantel(Long idEquipo) throws PlantelIncompletoException {
+    Set<String> posicionesPresentes = new HashSet<>(
+      servicioJugador.obtenerPosicionesPresentes(idEquipo)
+    );
+    List<String> posicionesFaltantes = new ArrayList<>();
+
+    for (String posicion : POSICIONES_PLANTEL) {
+      if (!posicionesPresentes.contains(posicion.toLowerCase(java.util.Locale.ROOT))) {
+        posicionesFaltantes.add(posicion);
+      }
+    }
+
+    if (!posicionesFaltantes.isEmpty()) {
+      throw new PlantelIncompletoException(posicionesFaltantes);
+    }
   }
 
   @Override
