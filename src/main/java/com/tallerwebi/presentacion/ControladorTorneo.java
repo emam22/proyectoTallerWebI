@@ -156,77 +156,40 @@ public class ControladorTorneo {
   @RequestMapping(path = "/guardarEquipo", method = RequestMethod.POST)
   public ModelAndView guardarEquipo(
     @ModelAttribute(TORNEO_CARGADO) Torneo torneo,
-    @RequestParam("nombreEquipo") String nombreEquipo,
-    @RequestParam("colorLocal1") String colorLocal1,
-    @RequestParam("colorLocal2") String colorLocal2,
-    @RequestParam("colorVisitante1") String colorVisitante1,
-    @RequestParam("colorVisitante2") String colorVisitante2,
-    @RequestParam("sigla") String sigla,
-    @RequestParam(value = "escudoRuta", required = false) String escudoRuta,
+    @ModelAttribute("equipoForm") EquipoForm equipoForm,
     RedirectAttributes redirectAttributes
   ) {
-    Long idTorneo = obtenerIdTorneo(torneo);
-
-    return obtenerModeloGuardarEquipo(
-      torneo,
-      nombreEquipo,
-      colorLocal1,
-      colorLocal2,
-      colorVisitante1,
-      colorVisitante2,
-      sigla,
-      escudoRuta,
-      redirectAttributes,
-      REDIRECT_CREACION_EQUIPO + idTorneo
-    );
+    return guardarEquipoComun(torneo, equipoForm, redirectAttributes, REDIRECT_CREACION_EQUIPO);
   }
 
   @RequestMapping(path = "/guardarEquipoAdmin", method = RequestMethod.POST)
   public ModelAndView guardarEquipoAdmin(
     @ModelAttribute(TORNEO_CARGADO) Torneo torneo,
-    @RequestParam("nombreEquipo") String nombreEquipo,
-    @RequestParam("colorLocal1") String colorLocal1,
-    @RequestParam("colorLocal2") String colorLocal2,
-    @RequestParam("colorVisitante1") String colorVisitante1,
-    @RequestParam("colorVisitante2") String colorVisitante2,
-    @RequestParam("sigla") String sigla,
-    @RequestParam(value = "escudoRuta", required = false) String escudoRuta,
+    @ModelAttribute("equipoForm") EquipoForm equipoForm,
     RedirectAttributes redirectAttributes
   ) {
-    Long idTorneo = obtenerIdTorneo(torneo);
-
-    return obtenerModeloGuardarEquipo(
+    return guardarEquipoComun(
       torneo,
-      nombreEquipo,
-      colorLocal1,
-      colorLocal2,
-      colorVisitante1,
-      colorVisitante2,
-      sigla,
-      escudoRuta,
+      equipoForm,
       redirectAttributes,
-      REDIRECT_CREACION_EQUIPO_ADMIN + idTorneo
+      REDIRECT_CREACION_EQUIPO_ADMIN
     );
   }
 
-  private ModelAndView obtenerModeloGuardarEquipo(
+  private ModelAndView guardarEquipoComun(
     Torneo torneo,
-    String nombreEquipo,
-    String colorLocal1,
-    String colorLocal2,
-    String colorVisitante1,
-    String colorVisitante2,
-    String sigla,
-    String escudoRuta,
+    EquipoForm equipoForm,
     RedirectAttributes redirectAttributes,
-    String redireccion
+    String prefijoRedireccion
   ) {
+    Long idTorneo = obtenerIdTorneo(torneo);
+    String redireccion = prefijoRedireccion + idTorneo;
+
     if (torneo == null) {
       redirectAttributes.addFlashAttribute(ERROR, "No se encontró el torneo.");
       return new ModelAndView(redireccion);
     }
 
-    Long idTorneo = obtenerIdTorneo(torneo);
     int cantidadActual = servicioEquipoTorneo.contarEquiposPorTorneo(idTorneo);
 
     int cantidadNecesaria = torneo.getCantidadDeEquipos();
@@ -236,12 +199,14 @@ public class ControladorTorneo {
     }
 
     Equipo equipo = new Equipo();
-    equipo.setNombre(nombreEquipo);
-    equipo.setColorLocal1(colorLocal1);
-    equipo.setColorLocal2(colorLocal2);
-    equipo.setColorVisitante1(colorVisitante1);
-    equipo.setColorVisitante2(colorVisitante2);
-    equipo.setSigla(sigla);
+    equipo.setNombre(equipoForm.getNombreEquipo());
+    equipo.setColorLocal1(equipoForm.getColorLocal1());
+    equipo.setColorLocal2(equipoForm.getColorLocal2());
+    equipo.setColorVisitante1(equipoForm.getColorVisitante1());
+    equipo.setColorVisitante2(equipoForm.getColorVisitante2());
+    equipo.setSigla(equipoForm.getSigla());
+
+    String escudoRuta = equipoForm.getEscudoRuta();
 
     if (escudoRuta != null && !escudoRuta.isBlank()) {
       if (!escudoRuta.startsWith("/img/escudos/")) {

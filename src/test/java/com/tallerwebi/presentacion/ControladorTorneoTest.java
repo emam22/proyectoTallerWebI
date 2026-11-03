@@ -54,6 +54,18 @@ public class ControladorTorneoTest {
     return equipo;
   }
 
+  private EquipoForm equipoForm(String nombre, String sigla) {
+    EquipoForm form = new EquipoForm();
+    form.setNombreEquipo(nombre);
+    form.setSigla(sigla);
+    form.setColorLocal1("#FF0000");
+    form.setColorLocal2("#FFFFFF");
+    form.setColorVisitante1("#0000FF");
+    form.setColorVisitante2("#FFFFFF");
+
+    return form;
+  }
+
   @Test
   public void alCrearTorneoSeDebeCrearTorneoYRedirigirACreacionDeEquipo() throws Exception {
     // preparacion
@@ -342,13 +354,7 @@ public class ControladorTorneoTest {
     // ejecución
     ModelAndView mav = controladorTorneo.guardarEquipo(
       torneo,
-      "Los Leones",
-      "#FF0000",
-      "#FFFFFF",
-      "#0000FF",
-      "#FFFFFF",
-      "BOC",
-      null,
+      equipoForm("Los Leones", "BOC"),
       redirectAttributes
     );
 
@@ -786,13 +792,7 @@ public class ControladorTorneoTest {
     // Ejecución
     ModelAndView mav = controladorTorneo.guardarEquipo(
       torneo,
-      "Los Leones",
-      "#FF0000",
-      "#FFFFFF",
-      "#0000FF",
-      "#FFFFFF",
-      "BOC",
-      null,
+      equipoForm("Los Leones", "BOC"),
       redirectAttributes
     );
 
@@ -829,13 +829,7 @@ public class ControladorTorneoTest {
     // Ejecución
     ModelAndView mav = controladorTorneo.guardarEquipo(
       torneo,
-      "Los Leones",
-      "#FF0000",
-      "#FFFFFF",
-      "#0000FF",
-      "#FFFFFF",
-      "BOC",
-      null,
+      equipoForm("Los Leones", "BOC"),
       redirectAttributes
     );
 
@@ -1205,13 +1199,7 @@ public class ControladorTorneoTest {
     // Ejecución
     ModelAndView mav = controladorTorneo.guardarEquipo(
       torneo,
-      "Boca Juniors",
-      "Azul",
-      "Amarillo",
-      "Blanco",
-      "Negro",
-      "BO",
-      null,
+      equipoForm("Boca Juniors", "BO"),
       redirectAttributes
     );
 
@@ -1247,13 +1235,7 @@ public class ControladorTorneoTest {
     // Ejecución
     ModelAndView mav = controladorTorneo.guardarEquipoAdmin(
       torneo,
-      "Boca Juniors",
-      "Azul",
-      "Amarillo",
-      "Blanco",
-      "Negro",
-      "BO",
-      null,
+      equipoForm("Boca Juniors", "BO"),
       redirectAttributes
     );
 
