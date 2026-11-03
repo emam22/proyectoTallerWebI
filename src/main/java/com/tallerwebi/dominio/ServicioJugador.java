@@ -12,4 +12,9 @@ public interface ServicioJugador {
   void sancionarJugador(Long idJugador, Integer fechas);
   void cumplirFechaSuspension(Long idJugador);
   void agregarFechasSuspension(Long idJugador, Integer fechas);
+  void inscribirJugadorEnTorneo(Long idJugador, Long idEquipo, Long idTorneo);
+  void sancionarJugadorEnTorneo(Long idJugador, Long idTorneo, Integer fechas);
+  void agregarFechasSuspensionEnTorneo(Long idJugador, Long idTorneo, Integer fechas);
+  void cumplirFechaSuspensionEnTorneo(Long idJugador, Long idTorneo);
+  List<JugadorEquipoTorneo> listarInscripcionesPorEquipoYTorneo(Long idEquipo, Long idTorneo);
 }

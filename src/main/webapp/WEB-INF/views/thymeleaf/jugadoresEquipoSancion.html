@@ -369,17 +369,17 @@
 
                         <td>
                             <div class="estado-sancion"
-                                 th:if="${jugador.fechasSuspensionPendientes != null
-                                         and jugador.fechasSuspensionPendientes > 0}">
-                                <strong th:text="${jugador.fechasSuspensionPendientes}">
+                                 th:if="${sancionesPorJugador[jugador.id] != null
+                                         and sancionesPorJugador[jugador.id] > 0}">
+                                <strong th:text="${sancionesPorJugador[jugador.id]}">
                                     1
                                 </strong>
                                 fecha(s) pendiente(s)
                             </div>
 
                             <div class="estado-sancion"
-                                 th:if="${jugador.fechasSuspensionPendientes == null
-                                         or jugador.fechasSuspensionPendientes == 0}">
+                                 th:if="${sancionesPorJugador[jugador.id] == null
+                                         or sancionesPorJugador[jugador.id] == 0}">
                                 Sin sanción pendiente
                             </div>
                         </td>

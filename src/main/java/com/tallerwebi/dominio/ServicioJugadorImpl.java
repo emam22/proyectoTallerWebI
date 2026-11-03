@@ -12,14 +12,20 @@ public class ServicioJugadorImpl implements ServicioJugador {
 
   private final RepositorioJugador repositorioJugador;
   private final RepositorioEquipo repositorioEquipo;
+  private final RepositorioTorneo repositorioTorneo;
+  private final RepositorioJugadorEquipoTorneo repositorioJugadorEquipoTorneo;
 
   @Autowired
   public ServicioJugadorImpl(
     RepositorioJugador repositorioJugador,
-    RepositorioEquipo repositorioEquipo
+    RepositorioEquipo repositorioEquipo,
+    RepositorioTorneo repositorioTorneo,
+    RepositorioJugadorEquipoTorneo repositorioJugadorEquipoTorneo
   ) {
     this.repositorioJugador = repositorioJugador;
     this.repositorioEquipo = repositorioEquipo;
+    this.repositorioTorneo = repositorioTorneo;
+    this.repositorioJugadorEquipoTorneo = repositorioJugadorEquipoTorneo;
   }
 
   @Override
@@ -129,6 +135,96 @@ public class ServicioJugadorImpl implements ServicioJugador {
     jugador.setEstadoSancion("SANCIONADO");
 
     repositorioJugador.actualizar(jugador);
+  }
+
+  @Override
+  public void inscribirJugadorEnTorneo(Long idJugador, Long idEquipo, Long idTorneo) {
+    if (idJugador == null || idEquipo == null || idTorneo == null) {
+      return;
+    }
+
+    if (repositorioJugadorEquipoTorneo.buscarPorJugadorYTorneo(idJugador, idTorneo) != null) {
+      return;
+    }
+
+    Jugador jugador = repositorioJugador.obtenerJugador(idJugador);
+    Equipo equipo = repositorioEquipo.buscarPorId(idEquipo);
+    Torneo torneo = repositorioTorneo.buscarTorneoPorId(idTorneo);
+
+    if (jugador == null || equipo == null || torneo == null) {
+      return;
+    }
+
+    JugadorEquipoTorneo inscripcion = new JugadorEquipoTorneo();
+    inscripcion.setJugador(jugador);
+    inscripcion.setEquipo(equipo);
+    inscripcion.setTorneo(torneo);
+
+    repositorioJugadorEquipoTorneo.guardar(inscripcion);
+  }
+
+  @Override
+  public void sancionarJugadorEnTorneo(Long idJugador, Long idTorneo, Integer fechas) {
+    if (fechas == null || fechas <= 0) {
+      throw new IllegalArgumentException("La cantidad de fechas debe ser mayor a cero.");
+    }
+
+    JugadorEquipoTorneo inscripcion = repositorioJugadorEquipoTorneo.buscarPorJugadorYTorneo(
+      idJugador,
+      idTorneo
+    );
+
+    if (inscripcion == null) {
+      return;
+    }
+
+    Integer pendientes = inscripcion.getFechasSuspensionPendientes() == null
+      ? 0
+      : inscripcion.getFechasSuspensionPendientes();
+
+    inscripcion.setFechasSuspensionPendientes(pendientes + fechas);
+    inscripcion.setEstadoSancion("SANCIONADO");
+    repositorioJugadorEquipoTorneo.guardar(inscripcion);
+  }
+
+  @Override
+  public void agregarFechasSuspensionEnTorneo(Long idJugador, Long idTorneo, Integer fechas) {
+    if (fechas == null || fechas <= 0) {
+      return;
+    }
+
+    sancionarJugadorEnTorneo(idJugador, idTorneo, fechas);
+  }
+
+  @Override
+  public void cumplirFechaSuspensionEnTorneo(Long idJugador, Long idTorneo) {
+    JugadorEquipoTorneo inscripcion = repositorioJugadorEquipoTorneo.buscarPorJugadorYTorneo(
+      idJugador,
+      idTorneo
+    );
+
+    if (inscripcion == null) {
+      return;
+    }
+
+    Integer pendientes = inscripcion.getFechasSuspensionPendientes();
+
+    if (pendientes == null || pendientes <= 0) {
+      return;
+    }
+
+    pendientes--;
+    inscripcion.setFechasSuspensionPendientes(pendientes);
+    inscripcion.setEstadoSancion(pendientes == 0 ? "SIN_SANCION" : "SANCIONADO");
+    repositorioJugadorEquipoTorneo.guardar(inscripcion);
+  }
+
+  @Override
+  public List<JugadorEquipoTorneo> listarInscripcionesPorEquipoYTorneo(
+    Long idEquipo,
+    Long idTorneo
+  ) {
+    return repositorioJugadorEquipoTorneo.listarPorEquipoYTorneo(idEquipo, idTorneo);
   }
 
   @Override

@@ -106,7 +106,7 @@ public class ServicioEstadisticasJugadorTest {
 
     assertThat(estadisticas.getAmarillas(), equalTo(1));
     verify(repoEstadisticasMock).actualizarEstadisticasJugador(estadisticas);
-    verify(servicioJugadorMock, never()).agregarFechasSuspension(1L, 1);
+    verify(servicioJugadorMock, never()).agregarFechasSuspensionEnTorneo(1L, 10L, 1);
   }
 
   @Test
@@ -128,7 +128,7 @@ public class ServicioEstadisticasJugadorTest {
 
     assertThat(estadisticas.getRojas(), equalTo(1));
     verify(repoEstadisticasMock).actualizarEstadisticasJugador(estadisticas);
-    verify(servicioJugadorMock).agregarFechasSuspension(1L, 1);
+    verify(servicioJugadorMock).agregarFechasSuspensionEnTorneo(1L, 10L, 1);
   }
 
   @Test

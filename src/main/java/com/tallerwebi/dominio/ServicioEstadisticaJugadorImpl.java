@@ -73,7 +73,7 @@ public class ServicioEstadisticaJugadorImpl implements ServicioEstadisticaJugado
     repoEstadisticas.actualizarEstadisticasJugador(estadisticas);
 
     if (amarillasDespues % limite == 0) {
-      servicioJugador.agregarFechasSuspension(idJugador, 1);
+      servicioJugador.agregarFechasSuspensionEnTorneo(idJugador, idTorneo, 1);
     }
   }
 
@@ -92,7 +92,7 @@ public class ServicioEstadisticaJugadorImpl implements ServicioEstadisticaJugado
 
     repoEstadisticas.actualizarEstadisticasJugador(estadisticas);
 
-    servicioJugador.agregarFechasSuspension(idJugador, 1);
+    servicioJugador.agregarFechasSuspensionEnTorneo(idJugador, idTorneo, 1);
   }
 
   private EstadisticaJugador obtenerEstadisticasValidadas(Long idJugador, Long idTorneo) {

@@ -4,6 +4,7 @@ import com.tallerwebi.dominio.*;
 import com.tallerwebi.dominio.excepcion.JugadorNoExiste;
 import com.tallerwebi.dominio.excepcion.PlantelIncompletoException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -244,6 +245,8 @@ public class ControladorJugadores {
 
       return new ModelAndView(redireccion);
     }
+
+    servicioJugador.inscribirJugadorEnTorneo(jugador.getId(), idEquipo, idTorneo);
 
     redirectAttributes.addFlashAttribute(OK, "Jugador agregado correctamente.");
 
@@ -542,9 +545,24 @@ public class ControladorJugadores {
       return new ModelAndView("redirect:/elegirEquipoSancion?idTorneo=" + idTorneo);
     }
 
+    Map<Long, Integer> sancionesPorJugador = new HashMap<>();
+
+    for (JugadorEquipoTorneo inscripcion : servicioJugador.listarInscripcionesPorEquipoYTorneo(
+      idEquipo,
+      idTorneo
+    )) {
+      if (inscripcion.getJugador() != null) {
+        sancionesPorJugador.put(
+          inscripcion.getJugador().getId(),
+          inscripcion.getFechasSuspensionPendientes()
+        );
+      }
+    }
+
     ModelAndView modelo = new ModelAndView("jugadoresEquipoSancion");
     modelo.addObject(ATRIBUTO_EQUIPO, equipo);
     modelo.addObject("jugadores", jugadores);
+    modelo.addObject("sancionesPorJugador", sancionesPorJugador);
     modelo.addObject(ID_TORNEO, idTorneo);
 
     return modelo;
@@ -584,7 +602,7 @@ public class ControladorJugadores {
       );
     }
 
-    servicioJugador.sancionarJugador(jugador.getId(), fechas);
+    servicioJugador.sancionarJugadorEnTorneo(jugador.getId(), idTorneo, fechas);
 
     redirectAttributes.addFlashAttribute(OK, "Jugador sancionado por " + fechas + " fecha(s).");
 

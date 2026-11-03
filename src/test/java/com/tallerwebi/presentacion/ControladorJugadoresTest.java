@@ -534,7 +534,7 @@ public class ControladorJugadoresTest {
         );
 
     //verificacion
-    verify(this.servicioJugadorMock).sancionarJugador(99L, 1);
+    verify(this.servicioJugadorMock).sancionarJugadorEnTorneo(99L, 1L, 1);
     verify(redirectAttributesMock).addFlashAttribute("ok", "Jugador sancionado por 1 fecha(s).");
     assertThat(mav.getViewName(), is("redirect:/jugadoresEquipoSancion?idTorneo=1&idEquipo=10"));
   }
