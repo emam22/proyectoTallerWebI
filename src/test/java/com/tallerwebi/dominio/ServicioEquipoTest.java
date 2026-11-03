@@ -2,22 +2,31 @@ package com.tallerwebi.dominio;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.endsWith;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.excepcion.EquipoExistente;
 import com.tallerwebi.dominio.excepcion.SiglaExistente;
 import com.tallerwebi.dominio.excepcion.SiglaInvalida;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 public class ServicioEquipoTest {
 
   private ServicioEquipo servicioEquipo;
 
   private RepositorioEquipo repositorioEquipoMock;
+
+  @TempDir
+  Path directorioTemporal;
 
   @BeforeEach
   public void init() {
@@ -243,5 +252,62 @@ public class ServicioEquipoTest {
 
     // Verificación
     verify(repositorioEquipoMock, never()).actualizar(any());
+  }
+
+  //test subirEscudo
+  @Test
+  public void deberiaSubirEscudoPNGCorrectamente() throws IOException {
+    byte[] contenido = { (byte) 0x89, 0x50, 0x4E, 0x47 };
+
+    String ruta = servicioEquipo.subirEscudo(
+      contenido,
+      "escudo.png",
+      directorioTemporal.toString()
+    );
+
+    assertThat(ruta, endsWith(".png"));
+  }
+
+  @Test
+  public void deberiaSubirEscudoJPGCorrectamente() throws IOException {
+    byte[] contenido = { (byte) 0xFF, (byte) 0xD8, (byte) 0xFF };
+
+    String ruta = servicioEquipo.subirEscudo(
+      contenido,
+      "escudo.jpg",
+      directorioTemporal.toString()
+    );
+
+    assertThat(ruta, endsWith(".jpg"));
+  }
+
+  @Test
+  public void deberiaSubirEscudoWEBPCorrectamente() throws IOException {
+    byte[] contenido = new byte[12];
+
+    System.arraycopy(new byte[] { 'R', 'I', 'F', 'F' }, 0, contenido, 0, 4);
+    System.arraycopy(new byte[] { 'W', 'E', 'B', 'P' }, 0, contenido, 8, 4);
+
+    String ruta = servicioEquipo.subirEscudo(
+      contenido,
+      "escudo.webp",
+      directorioTemporal.toString()
+    );
+
+    assertThat(ruta, endsWith(".webp"));
+  }
+
+  @Test
+  public void deberiaSubirEscudoSVGCorrectamente() throws IOException {
+    String svg = "<svg xmlns=\"http://www.w3.org/2000/svg\"></svg>";
+    byte[] contenido = svg.getBytes(StandardCharsets.UTF_8);
+
+    String ruta = servicioEquipo.subirEscudo(
+      contenido,
+      "escudo.svg",
+      directorioTemporal.toString()
+    );
+
+    assertThat(ruta, endsWith(".svg"));
   }
 }

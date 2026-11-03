@@ -12,4 +12,6 @@ public interface ServicioEquipo {
   List<Equipo> obtenerEquipos();
   Equipo consultarEquipoJugador(Long idJugador);
   void actualizarEquipo(Equipo equipo) throws EquipoExistente, SiglaExistente, SiglaInvalida;
+  String subirEscudo(byte[] contenido, String nombreOriginal, String rutaReal)
+    throws java.io.IOException;
 }

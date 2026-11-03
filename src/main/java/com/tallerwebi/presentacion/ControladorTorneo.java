@@ -579,4 +579,30 @@ public class ControladorTorneo {
 
     return new ModelAndView("elegirEquipoSancion", modelo);
   }
+
+  //subir escudo
+  @ResponseBody
+  @PostMapping(value = "/subirEscudo", consumes = "application/octet-stream")
+  public ResponseEntity<String> subirEscudo(
+    @RequestBody byte[] contenido,
+    @RequestParam("nombre") String nombreOriginal,
+    HttpServletRequest request
+  ) {
+    String rutaReal = request.getServletContext().getRealPath("/resources/core/img/escudos");
+
+    if (rutaReal == null) {
+      return ResponseEntity
+        .internalServerError()
+        .body("No se encontró el directorio para guardar los escudos.");
+    }
+
+    try {
+      String ruta = servicioEquipo.subirEscudo(contenido, nombreOriginal, rutaReal);
+      return ResponseEntity.ok(ruta);
+    } catch (IllegalArgumentException e) {
+      return ResponseEntity.badRequest().body(e.getMessage());
+    } catch (IOException e) {
+      return ResponseEntity.internalServerError().body("No se pudo guardar el escudo.");
+    }
+  }
 }
