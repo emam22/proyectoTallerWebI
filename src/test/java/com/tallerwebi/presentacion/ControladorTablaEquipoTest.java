@@ -32,12 +32,11 @@ public class ControladorTablaEquipoTest {
     Torneo torneoMock = mock(Torneo.class);
     List<EquipoTorneo> tablaMock = List.of(mock(EquipoTorneo.class));
 
-    when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneoMock);
-
+    when(torneoMock.getId()).thenReturn(idTorneo);
     when(servicioEquipoTorneoMock.obtenerEstadisticas(idTorneo)).thenReturn(tablaMock);
 
     // Ejecución
-    ModelAndView mav = controladorTablaEquipos.irATablaEquipos(idTorneo);
+    ModelAndView mav = controladorTablaEquipos.irATablaEquipos(torneoMock);
 
     // Validación
     assertThat(mav.getViewName(), equalToIgnoringCase("tablaEquipos"));
@@ -46,16 +45,12 @@ public class ControladorTablaEquipoTest {
 
     assertThat(mav.getModel().get("tablaPosiciones"), equalTo(tablaMock));
 
-    verify(servicioTorneoMock, times(1)).consultarTorneoPorId(idTorneo);
-
     verify(servicioEquipoTorneoMock, times(1)).obtenerEstadisticas(idTorneo);
   }
 
   @Test
   public void alIrATablaEquiposSinIdSeDebeMostrarLaVista() {
     // Preparación
-    when(servicioTorneoMock.consultarTorneoPorId(null)).thenReturn(null);
-
     when(servicioEquipoTorneoMock.obtenerEstadisticas(null)).thenReturn(List.of());
 
     // Ejecución
@@ -68,8 +63,18 @@ public class ControladorTablaEquipoTest {
 
     assertThat(mav.getModel().get("tablaPosiciones"), equalTo(List.of()));
 
-    verify(servicioTorneoMock, times(1)).consultarTorneoPorId(null);
-
     verify(servicioEquipoTorneoMock, times(1)).obtenerEstadisticas(null);
+  }
+
+  @Test
+  public void cargarTorneoDebeConsultarElServicioCuandoHayId() {
+    Long idTorneo = 1L;
+    Torneo torneo = new Torneo();
+    when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+
+    Torneo resultado = controladorTablaEquipos.cargarTorneo(idTorneo);
+
+    assertThat(resultado, equalTo(torneo));
+    verify(servicioTorneoMock, times(1)).consultarTorneoPorId(idTorneo);
   }
 }

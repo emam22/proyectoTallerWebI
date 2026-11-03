@@ -6,6 +6,7 @@ import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -60,10 +61,13 @@ public class LobbyAdminController {
     return new ModelAndView("administrarTorneoAdmin", model);
   }
 
-  @GetMapping("/fixtureTorneoAdmin")
-  public ModelAndView verFixtureAdmin(@RequestParam("idTorneo") Long idTorneo) {
-    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+  @ModelAttribute("torneo")
+  public Torneo cargarTorneo(@RequestParam(value = "idTorneo", required = false) Long idTorneo) {
+    return idTorneo == null ? null : servicioTorneo.consultarTorneoPorId(idTorneo);
+  }
 
+  @GetMapping("/fixtureTorneoAdmin")
+  public ModelAndView verFixtureAdmin(@ModelAttribute("torneo") Torneo torneo) {
     if (torneo == null) {
       return new ModelAndView("redirect:/lobbyAdmin");
     }
@@ -71,7 +75,7 @@ public class LobbyAdminController {
     Map<String, Object> model = new ModelMap();
 
     model.put("torneo", torneo);
-    model.put("jornadas", servicioTorneo.obtenerJornadasPorTorneo(idTorneo));
+    model.put("jornadas", servicioTorneo.obtenerJornadasPorTorneo(torneo.getId()));
 
     return new ModelAndView("fixtureTorneoAdmin", model);
   }
