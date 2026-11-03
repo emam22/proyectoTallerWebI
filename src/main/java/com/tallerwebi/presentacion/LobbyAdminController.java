@@ -14,6 +14,8 @@ import org.springframework.web.servlet.ModelAndView;
 @Controller
 public class LobbyAdminController {
 
+  private static final String ATRIBUTO_TORNEO = "torneo";
+
   private final ServicioEquipoTorneo servicioEquipoTorneo;
   private final ServicioTorneo servicioTorneo;
 
@@ -52,7 +54,7 @@ public class LobbyAdminController {
     List<EquipoTorneo> tabla = servicioEquipoTorneo.obtenerEstadisticas(idTorneo);
     List<Jornada> jornadas = servicioTorneo.obtenerJornadasPorTorneo(idTorneo);
 
-    model.put("torneo", torneo);
+    model.put(ATRIBUTO_TORNEO, torneo);
     model.put("tablaPosiciones", tabla);
     model.put("idTorneoActual", idTorneo);
     model.put("jornadas", jornadas);
@@ -61,20 +63,20 @@ public class LobbyAdminController {
     return new ModelAndView("administrarTorneoAdmin", model);
   }
 
-  @ModelAttribute("torneo")
+  @ModelAttribute(ATRIBUTO_TORNEO)
   public Torneo cargarTorneo(@RequestParam(value = "idTorneo", required = false) Long idTorneo) {
     return idTorneo == null ? null : servicioTorneo.consultarTorneoPorId(idTorneo);
   }
 
   @GetMapping("/fixtureTorneoAdmin")
-  public ModelAndView verFixtureAdmin(@ModelAttribute("torneo") Torneo torneo) {
+  public ModelAndView verFixtureAdmin(@ModelAttribute(ATRIBUTO_TORNEO) Torneo torneo) {
     if (torneo == null) {
       return new ModelAndView("redirect:/lobbyAdmin");
     }
 
     Map<String, Object> model = new ModelMap();
 
-    model.put("torneo", torneo);
+    model.put(ATRIBUTO_TORNEO, torneo);
     model.put("jornadas", servicioTorneo.obtenerJornadasPorTorneo(torneo.getId()));
 
     return new ModelAndView("fixtureTorneoAdmin", model);

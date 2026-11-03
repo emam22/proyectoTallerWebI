@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 @Transactional
 public class ServicioJugadorImpl implements ServicioJugador {
 
+  private static final String ESTADO_SANCIONADO = "SANCIONADO";
+
   private final RepositorioJugador repositorioJugador;
   private final RepositorioEquipo repositorioEquipo;
   private final RepositorioTorneo repositorioTorneo;
@@ -86,7 +88,7 @@ public class ServicioJugadorImpl implements ServicioJugador {
     }
 
     jugador.setFechasSuspensionPendientes(fechasPendientes + fechas);
-    jugador.setEstadoSancion("SANCIONADO");
+    jugador.setEstadoSancion(ESTADO_SANCIONADO);
 
     // jugador.setHabilitado(false);
 
@@ -113,7 +115,7 @@ public class ServicioJugadorImpl implements ServicioJugador {
     if (pendientes == 0) {
       jugador.setEstadoSancion("SIN_SANCION");
     } else {
-      jugador.setEstadoSancion("SANCIONADO");
+      jugador.setEstadoSancion(ESTADO_SANCIONADO);
     }
 
     repositorioJugador.actualizar(jugador);
@@ -132,7 +134,7 @@ public class ServicioJugadorImpl implements ServicioJugador {
       : jugador.getFechasSuspensionPendientes();
 
     jugador.setFechasSuspensionPendientes(pendientes + fechas);
-    jugador.setEstadoSancion("SANCIONADO");
+    jugador.setEstadoSancion(ESTADO_SANCIONADO);
 
     repositorioJugador.actualizar(jugador);
   }
@@ -183,7 +185,7 @@ public class ServicioJugadorImpl implements ServicioJugador {
       : inscripcion.getFechasSuspensionPendientes();
 
     inscripcion.setFechasSuspensionPendientes(pendientes + fechas);
-    inscripcion.setEstadoSancion("SANCIONADO");
+    inscripcion.setEstadoSancion(ESTADO_SANCIONADO);
     repositorioJugadorEquipoTorneo.guardar(inscripcion);
   }
 
@@ -215,7 +217,7 @@ public class ServicioJugadorImpl implements ServicioJugador {
 
     pendientes--;
     inscripcion.setFechasSuspensionPendientes(pendientes);
-    inscripcion.setEstadoSancion(pendientes == 0 ? "SIN_SANCION" : "SANCIONADO");
+    inscripcion.setEstadoSancion(pendientes == 0 ? "SIN_SANCION" : ESTADO_SANCIONADO);
     repositorioJugadorEquipoTorneo.guardar(inscripcion);
   }
 

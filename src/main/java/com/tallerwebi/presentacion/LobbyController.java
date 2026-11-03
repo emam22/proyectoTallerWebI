@@ -68,34 +68,12 @@ public class LobbyController {
 
     List<Jornada> jornadas = servicioTorneo.obtenerJornadasPorTorneo(idTorneoABuscar);
 
-    String proximaFechaNombre = "Fixture no generado"; // se buscaria la primer fecha a simular
-
-    for (Jornada jornada : jornadas) {
-      if (ESTADO_PENDIENTE.equalsIgnoreCase(jornada.getEstado())) {
-        proximaFechaNombre = "Fecha " + jornada.getNumero();
-        break;
-      }
-    }
-
-    if (!jornadas.isEmpty() && "Fixture no generado".equals(proximaFechaNombre)) {
-      proximaFechaNombre = "No hay fechas pendientes"; // cuando hay jornadas pero se terminan
-    }
+    String proximaFechaNombre = obtenerProximaFechaNombre(jornadas);
 
     //mostar jornadas en card FIXTURE
-    List<Jornada> proximasJornadas = new ArrayList<Jornada>();
-
-    for (Jornada jornada : jornadas) {
-      if (ESTADO_PENDIENTE.equalsIgnoreCase(jornada.getEstado())) {
-        proximasJornadas.add(jornada);
-      }
-
-      if (proximasJornadas.size() == MAX_JORNADAS_A_MOSTRAR_EN_LOBBY) {
-        break;
-      }
-    }
+    List<Jornada> proximasJornadas = obtenerProximasJornadas(jornadas);
 
     model.put("proximasJornadas", proximasJornadas);
-
     model.put("proximaFechaNombre", proximaFechaNombre);
 
     return new ModelAndView("lobby", model);
@@ -114,6 +92,39 @@ public class LobbyController {
     model.put("idTorneoActual", idTorneoABuscar);
 
     return new ModelAndView("estadisticasDeJugadores", model);
+  }
+
+  private String obtenerProximaFechaNombre(List<Jornada> jornadas) {
+    String proximaFechaNombre = "Fixture no generado";
+
+    for (Jornada jornada : jornadas) {
+      if (ESTADO_PENDIENTE.equalsIgnoreCase(jornada.getEstado())) {
+        proximaFechaNombre = "Fecha " + jornada.getNumero();
+        break;
+      }
+    }
+
+    if (!jornadas.isEmpty() && "Fixture no generado".equals(proximaFechaNombre)) {
+      proximaFechaNombre = "No hay fechas pendientes";
+    }
+
+    return proximaFechaNombre;
+  }
+
+  private List<Jornada> obtenerProximasJornadas(List<Jornada> jornadas) {
+    List<Jornada> proximasJornadas = new ArrayList<>();
+
+    for (Jornada jornada : jornadas) {
+      if (ESTADO_PENDIENTE.equalsIgnoreCase(jornada.getEstado())) {
+        proximasJornadas.add(jornada);
+      }
+
+      if (proximasJornadas.size() == MAX_JORNADAS_A_MOSTRAR_EN_LOBBY) {
+        break;
+      }
+    }
+
+    return proximasJornadas;
   }
 
   private EstadisticaJugador obtenerGoleador(List<EstadisticaJugador> estadisticas) {
