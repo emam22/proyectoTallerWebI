@@ -25,6 +25,8 @@ public class ControladorTorneo {
   private ServicioEquipo servicioEquipo;
 
   private static final String TORNEO = "torneo";
+  private static final String TORNEO_CARGADO = "torneoCargado";
+  private static final String EQUIPO_CARGADO = "equipoCargado";
   private static final String ID_TORNEO = "idTorneo";
   private static final String ID_EQUIPO = "idEquipo";
   private static final String REDIRECT_CREACION_EQUIPO = "redirect:/creacion-equipo?idTorneo=";
@@ -51,6 +53,16 @@ public class ControladorTorneo {
     this.servicioTorneo = servicioTorneo;
     this.servicioEquipoTorneo = servicioEquipoTorneo;
     this.servicioEquipo = servicioEquipo;
+  }
+
+  @ModelAttribute(TORNEO_CARGADO)
+  public Torneo cargarTorneo(@RequestParam(value = ID_TORNEO, required = false) Long idTorneo) {
+    return idTorneo == null ? null : servicioTorneo.consultarTorneoPorId(idTorneo);
+  }
+
+  @ModelAttribute(EQUIPO_CARGADO)
+  public Equipo cargarEquipo(@RequestParam(value = ID_EQUIPO, required = false) Long idEquipo) {
+    return idEquipo == null ? null : servicioEquipo.consultarEquipoPorId(idEquipo);
   }
 
   @RequestMapping(path = "/formulario-torneo", method = RequestMethod.GET)
@@ -143,7 +155,7 @@ public class ControladorTorneo {
 
   @RequestMapping(path = "/guardarEquipo", method = RequestMethod.POST)
   public ModelAndView guardarEquipo(
-    @RequestParam(ID_TORNEO) Long idTorneo,
+    @ModelAttribute(TORNEO_CARGADO) Torneo torneo,
     @RequestParam("nombreEquipo") String nombreEquipo,
     @RequestParam("colorLocal1") String colorLocal1,
     @RequestParam("colorLocal2") String colorLocal2,
@@ -153,8 +165,10 @@ public class ControladorTorneo {
     @RequestParam(value = "escudoRuta", required = false) String escudoRuta,
     RedirectAttributes redirectAttributes
   ) {
+    Long idTorneo = obtenerIdTorneo(torneo);
+
     return obtenerModeloGuardarEquipo(
-      idTorneo,
+      torneo,
       nombreEquipo,
       colorLocal1,
       colorLocal2,
@@ -169,7 +183,7 @@ public class ControladorTorneo {
 
   @RequestMapping(path = "/guardarEquipoAdmin", method = RequestMethod.POST)
   public ModelAndView guardarEquipoAdmin(
-    @RequestParam(ID_TORNEO) Long idTorneo,
+    @ModelAttribute(TORNEO_CARGADO) Torneo torneo,
     @RequestParam("nombreEquipo") String nombreEquipo,
     @RequestParam("colorLocal1") String colorLocal1,
     @RequestParam("colorLocal2") String colorLocal2,
@@ -179,8 +193,10 @@ public class ControladorTorneo {
     @RequestParam(value = "escudoRuta", required = false) String escudoRuta,
     RedirectAttributes redirectAttributes
   ) {
+    Long idTorneo = obtenerIdTorneo(torneo);
+
     return obtenerModeloGuardarEquipo(
-      idTorneo,
+      torneo,
       nombreEquipo,
       colorLocal1,
       colorLocal2,
@@ -194,7 +210,7 @@ public class ControladorTorneo {
   }
 
   private ModelAndView obtenerModeloGuardarEquipo(
-    Long idTorneo,
+    Torneo torneo,
     String nombreEquipo,
     String colorLocal1,
     String colorLocal2,
@@ -205,8 +221,12 @@ public class ControladorTorneo {
     RedirectAttributes redirectAttributes,
     String redireccion
   ) {
-    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+    if (torneo == null) {
+      redirectAttributes.addFlashAttribute(ERROR, "No se encontró el torneo.");
+      return new ModelAndView(redireccion);
+    }
 
+    Long idTorneo = obtenerIdTorneo(torneo);
     int cantidadActual = servicioEquipoTorneo.contarEquiposPorTorneo(idTorneo);
 
     int cantidadNecesaria = torneo.getCantidadDeEquipos();
@@ -268,13 +288,15 @@ public class ControladorTorneo {
 
   @RequestMapping(path = "/cargar-equipo-existente", method = RequestMethod.POST)
   public ModelAndView cargarEquipoExistente(
-    @RequestParam(ID_EQUIPO) Long idEquipo,
-    @RequestParam(ID_TORNEO) Long idTorneo,
+    @ModelAttribute(EQUIPO_CARGADO) Equipo equipo,
+    @ModelAttribute(TORNEO_CARGADO) Torneo torneo,
     RedirectAttributes redirectAttributes
   ) {
+    Long idTorneo = obtenerIdTorneo(torneo);
+
     return cargarEquipoExistenteComun(
-      idEquipo,
-      idTorneo,
+      equipo,
+      torneo,
       redirectAttributes,
       REDIRECT_CREACION_EQUIPO + idTorneo
     );
@@ -282,26 +304,30 @@ public class ControladorTorneo {
 
   @RequestMapping(path = "/cargar-equipo-existente-admin", method = RequestMethod.POST)
   public ModelAndView cargarEquipoExistenteAdmin(
-    @RequestParam(ID_EQUIPO) Long idEquipo,
-    @RequestParam(ID_TORNEO) Long idTorneo,
+    @ModelAttribute(EQUIPO_CARGADO) Equipo equipo,
+    @ModelAttribute(TORNEO_CARGADO) Torneo torneo,
     RedirectAttributes redirectAttributes
   ) {
+    Long idTorneo = obtenerIdTorneo(torneo);
+
     return cargarEquipoExistenteComun(
-      idEquipo,
-      idTorneo,
+      equipo,
+      torneo,
       redirectAttributes,
       REDIRECT_CREACION_EQUIPO_ADMIN + idTorneo
     );
   }
 
   private ModelAndView cargarEquipoExistenteComun(
-    Long idEquipo,
-    Long idTorneo,
+    Equipo equipo,
+    Torneo torneo,
     RedirectAttributes redirectAttributes,
     String redireccion
   ) {
-    Equipo equipo = servicioEquipo.consultarEquipoPorId(idEquipo);
-    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+    if (equipo == null || torneo == null) {
+      redirectAttributes.addFlashAttribute(ERROR, "No se encontró el equipo o el torneo.");
+      return new ModelAndView(redireccion);
+    }
 
     try {
       servicioEquipoTorneo.inscribirEquipoExistente(equipo, torneo);
@@ -314,35 +340,37 @@ public class ControladorTorneo {
 
   @RequestMapping(path = "/finalizarTorneo", method = RequestMethod.POST)
   public ModelAndView finalizarTorneo(
-    @RequestParam(ID_TORNEO) Long idTorneo,
+    @ModelAttribute(TORNEO_CARGADO) Torneo torneo,
     RedirectAttributes redirectAttributes
   ) {
-    return finalizarTorneoComun(idTorneo, redirectAttributes, REDIRECT_LOBBY_ADMIN);
+    return finalizarTorneoComun(torneo, redirectAttributes, REDIRECT_LOBBY_ADMIN);
   }
 
   @RequestMapping(path = "/finalizarTorneoAdmin", method = RequestMethod.POST)
   public ModelAndView finalizarTorneoAdmin(
-    @RequestParam(ID_TORNEO) Long idTorneo,
+    @ModelAttribute(TORNEO_CARGADO) Torneo torneo,
     RedirectAttributes redirectAttributes
   ) {
+    Long idTorneo = obtenerIdTorneo(torneo);
+
     return finalizarTorneoComun(
-      idTorneo,
+      torneo,
       redirectAttributes,
       REDIRECT_ADMINISTRAR_TORNEO_ADMIN + idTorneo
     );
   }
 
   private ModelAndView finalizarTorneoComun(
-    Long idTorneo,
+    Torneo torneo,
     RedirectAttributes redirectAttributes,
     String redireccion
   ) {
-    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
-
     if (torneo == null) {
       redirectAttributes.addFlashAttribute(ERROR, "No se encontró el torneo.");
       return new ModelAndView(redireccion);
     }
+
+    Long idTorneo = obtenerIdTorneo(torneo);
 
     try {
       List<EquipoTorneo> inscripciones = servicioEquipoTorneo.obtenerEquiposPorTorneo(idTorneo);
@@ -417,10 +445,13 @@ public class ControladorTorneo {
 
   @RequestMapping(path = "/desvincular-equipo", method = RequestMethod.POST)
   public ModelAndView desvincularEquipo(
-    @RequestParam(ID_EQUIPO) Long idEquipo,
-    @RequestParam(ID_TORNEO) Long idTorneo,
+    @ModelAttribute(EQUIPO_CARGADO) Equipo equipo,
+    @ModelAttribute(TORNEO_CARGADO) Torneo torneo,
     RedirectAttributes redirectAttributes
   ) {
+    Long idEquipo = obtenerIdEquipo(equipo);
+    Long idTorneo = obtenerIdTorneo(torneo);
+
     servicioEquipoTorneo.desvincularEquipo(idEquipo, idTorneo);
 
     redirectAttributes.addFlashAttribute("mensaje", "Equipo desvinculado correctamente");
@@ -469,8 +500,8 @@ public class ControladorTorneo {
 
   @RequestMapping(path = "/actualizar-equipo", method = RequestMethod.POST)
   public ModelAndView actualizarEquipo(
-    @RequestParam(ID_EQUIPO) Long idEquipo,
-    @RequestParam(ID_TORNEO) Long idTorneo,
+    @ModelAttribute(EQUIPO_CARGADO) Equipo equipo,
+    @ModelAttribute(TORNEO_CARGADO) Torneo torneo,
     @RequestParam("nombre") String nombre,
     @RequestParam("sigla") String sigla,
     @RequestParam("colorLocal1") String colorLocal1,
@@ -479,7 +510,7 @@ public class ControladorTorneo {
     @RequestParam("colorVisitante2") String colorVisitante2,
     @RequestParam(value = "escudoRuta", required = false) String escudoRuta
   ) {
-    Equipo equipo = servicioEquipo.consultarEquipoPorId(idEquipo);
+    Long idTorneo = obtenerIdTorneo(torneo);
 
     if (equipo == null) {
       return new ModelAndView("redirect:/editar-equipo?idTorneo=" + idTorneo);
@@ -529,8 +560,19 @@ public class ControladorTorneo {
     return new ModelAndView("redirect:/administrarTorneoAdmin/" + idTorneo);
   }
 
+  private Long obtenerIdTorneo(Torneo torneo) {
+    return torneo == null ? null : torneo.getId();
+  }
+
+  private Long obtenerIdEquipo(Equipo equipo) {
+    return equipo == null ? null : equipo.getId();
+  }
+
   private void validarModificacionTorneo(Long idTorneo) throws FechaLimiteEditarTorneo {
-    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+    validarModificacionTorneo(servicioTorneo.consultarTorneoPorId(idTorneo));
+  }
+
+  private void validarModificacionTorneo(Torneo torneo) throws FechaLimiteEditarTorneo {
     if (torneo != null && !torneo.permiteModificaciones()) {
       throw new FechaLimiteEditarTorneo(
         "La fecha actual es mayor a la permitida para hacer cambios en el torneo."
@@ -540,11 +582,13 @@ public class ControladorTorneo {
 
   @RequestMapping(path = "/eliminarTorneo", method = RequestMethod.GET)
   public ModelAndView eliminarTorneoAdmin(
-    @RequestParam(ID_TORNEO) Long idTorneo,
+    @ModelAttribute(TORNEO_CARGADO) Torneo torneo,
     RedirectAttributes redirectAttributes
   ) {
+    Long idTorneo = obtenerIdTorneo(torneo);
+
     try {
-      validarModificacionTorneo(idTorneo);
+      validarModificacionTorneo(torneo);
       servicioTorneo.eliminarTorneo(idTorneo);
       redirectAttributes.addFlashAttribute("mensaje", "Torneo eliminado correctamente.");
       return new ModelAndView(REDIRECT_LOBBY_ADMIN);

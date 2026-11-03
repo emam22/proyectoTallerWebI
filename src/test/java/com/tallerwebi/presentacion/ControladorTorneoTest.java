@@ -39,6 +39,21 @@ public class ControladorTorneoTest {
       new ControladorTorneo(servicioTorneoMock, servicioEquipoTorneoMock, servicioEquipoMock);
   }
 
+  private Torneo torneoConId(Long id) {
+    Torneo torneo = new Torneo();
+    torneo.setId(id);
+    torneo.setFechaInicio(LocalDateTime.now().plusDays(5));
+
+    return torneo;
+  }
+
+  private Equipo equipoConId(Long id) {
+    Equipo equipo = new Equipo();
+    equipo.setId(id);
+
+    return equipo;
+  }
+
   @Test
   public void alCrearTorneoSeDebeCrearTorneoYRedirigirACreacionDeEquipo() throws Exception {
     // preparacion
@@ -223,7 +238,7 @@ public class ControladorTorneoTest {
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
     // ejecución
-    ModelAndView mav = controladorTorneo.finalizarTorneo(1L, redirectAttributes);
+    ModelAndView mav = controladorTorneo.finalizarTorneo(torneo, redirectAttributes);
 
     // validación
 
@@ -313,6 +328,7 @@ public class ControladorTorneoTest {
     Long idTorneo = 1L;
 
     Torneo torneo = mock(Torneo.class);
+    when(torneo.getId()).thenReturn(idTorneo);
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
     when(torneo.getCantidadDeEquipos()).thenReturn(4);
     when(servicioEquipoTorneoMock.contarEquiposPorTorneo(idTorneo)).thenReturn(0);
@@ -325,7 +341,7 @@ public class ControladorTorneoTest {
 
     // ejecución
     ModelAndView mav = controladorTorneo.guardarEquipo(
-      idTorneo,
+      torneo,
       "Los Leones",
       "#FF0000",
       "#FFFFFF",
@@ -353,7 +369,11 @@ public class ControladorTorneoTest {
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
     // ejecucion
-    ModelAndView mav = controladorTorneo.desvincularEquipo(idEquipo, idTorneo, redirectAttributes);
+    ModelAndView mav = controladorTorneo.desvincularEquipo(
+      equipoConId(idEquipo),
+      torneoConId(idTorneo),
+      redirectAttributes
+    );
 
     // verificacion
     verify(servicioEquipoTorneoMock).desvincularEquipo(idEquipo, idTorneo);
@@ -382,8 +402,8 @@ public class ControladorTorneoTest {
 
     // Ejecución
     ModelAndView mav = controladorTorneo.actualizarEquipo(
-      idEquipo,
-      idTorneo,
+      equipo,
+      torneoConId(idTorneo),
       "Equipo Nuevo",
       "EN",
       "#ffffff",
@@ -413,8 +433,8 @@ public class ControladorTorneoTest {
 
     // Ejecución
     ModelAndView mav = controladorTorneo.actualizarEquipo(
-      idEquipo,
-      idTorneo,
+      null,
+      torneoConId(idTorneo),
       "Nombre",
       "NOM",
       "#ffffff",
@@ -432,13 +452,10 @@ public class ControladorTorneoTest {
 
   @Test
   public void finalizarTorneoSiNoExisteDeberiaRedirigirAlLobbyAdmin() {
-    // Preparación
-    when(servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(null);
-
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
     // Ejecución
-    ModelAndView mav = controladorTorneo.finalizarTorneo(1L, redirectAttributes);
+    ModelAndView mav = controladorTorneo.finalizarTorneo(null, redirectAttributes);
 
     // Validación
     assertThat(mav.getViewName(), equalTo("redirect:/lobbyAdmin"));
@@ -469,7 +486,7 @@ public class ControladorTorneoTest {
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
     // Ejecución
-    ModelAndView mav = controladorTorneo.finalizarTorneo(1L, redirectAttributes);
+    ModelAndView mav = controladorTorneo.finalizarTorneo(torneo, redirectAttributes);
 
     // Validación
     assertThat(mav.getViewName(), equalTo("redirect:/lobbyAdmin"));
@@ -511,7 +528,7 @@ public class ControladorTorneoTest {
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
     // Ejecución
-    ModelAndView mav = controladorTorneo.finalizarTorneo(1L, redirectAttributes);
+    ModelAndView mav = controladorTorneo.finalizarTorneo(torneo, redirectAttributes);
 
     // Validación
     assertThat(mav.getViewName(), equalTo("redirect:/lobbyAdmin"));
@@ -534,7 +551,7 @@ public class ControladorTorneoTest {
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
     // Ejecución
-    ModelAndView mav = controladorTorneo.finalizarTorneo(1L, redirectAttributes);
+    ModelAndView mav = controladorTorneo.finalizarTorneo(torneo, redirectAttributes);
 
     // Validación
     assertThat(mav.getViewName(), equalTo("redirect:/lobbyAdmin"));
@@ -577,7 +594,7 @@ public class ControladorTorneoTest {
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
     // Ejecución
-    ModelAndView mav = controladorTorneo.finalizarTorneo(1L, redirectAttributes);
+    ModelAndView mav = controladorTorneo.finalizarTorneo(torneo, redirectAttributes);
 
     // Validación
     assertThat(mav.getViewName(), equalTo("redirect:/lobbyAdmin"));
@@ -623,7 +640,7 @@ public class ControladorTorneoTest {
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
     // Ejecución
-    ModelAndView mav = controladorTorneo.finalizarTorneo(1L, redirectAttributes);
+    ModelAndView mav = controladorTorneo.finalizarTorneo(torneo, redirectAttributes);
 
     // Validación
     assertThat(mav.getViewName(), equalTo("redirect:/lobbyAdmin"));
@@ -635,6 +652,7 @@ public class ControladorTorneoTest {
   public void finalizarTorneoSiLasJornadasSonNullDeberiaGenerarFixture() {
     Torneo torneo = mock(Torneo.class);
 
+    when(torneo.getId()).thenReturn(1L);
     when(servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(torneo);
     when(torneo.getCantidadDeEquipos()).thenReturn(2);
 
@@ -657,7 +675,7 @@ public class ControladorTorneoTest {
 
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
-    ModelAndView resultado = controladorTorneo.finalizarTorneo(1L, redirectAttributes);
+    ModelAndView resultado = controladorTorneo.finalizarTorneo(torneo, redirectAttributes);
 
     assertEquals("redirect:/lobbyAdmin", resultado.getViewName());
   }
@@ -758,6 +776,7 @@ public class ControladorTorneoTest {
     Long idTorneo = 1L;
 
     Torneo torneo = mock(Torneo.class);
+    when(torneo.getId()).thenReturn(idTorneo);
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
     when(torneo.getCantidadDeEquipos()).thenReturn(4);
     when(servicioEquipoTorneoMock.contarEquiposPorTorneo(idTorneo)).thenReturn(2);
@@ -766,7 +785,7 @@ public class ControladorTorneoTest {
 
     // Ejecución
     ModelAndView mav = controladorTorneo.guardarEquipo(
-      idTorneo,
+      torneo,
       "Los Leones",
       "#FF0000",
       "#FFFFFF",
@@ -800,6 +819,7 @@ public class ControladorTorneoTest {
     Long idTorneo = 1L;
 
     Torneo torneo = mock(Torneo.class);
+    when(torneo.getId()).thenReturn(idTorneo);
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
     when(torneo.getCantidadDeEquipos()).thenReturn(4);
     when(servicioEquipoTorneoMock.contarEquiposPorTorneo(idTorneo)).thenReturn(4);
@@ -808,7 +828,7 @@ public class ControladorTorneoTest {
 
     // Ejecución
     ModelAndView mav = controladorTorneo.guardarEquipo(
-      idTorneo,
+      torneo,
       "Los Leones",
       "#FF0000",
       "#FFFFFF",
@@ -937,18 +957,16 @@ public class ControladorTorneoTest {
     Long idTorneo = 1L;
 
     Equipo equipo = new Equipo();
+    equipo.setId(idEquipo);
     Torneo torneo = new Torneo();
+    torneo.setId(idTorneo);
 
     when(servicioEquipoMock.consultarEquipoPorId(idEquipo)).thenReturn(equipo);
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
 
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
-    ModelAndView mav = controladorTorneo.cargarEquipoExistente(
-      idEquipo,
-      idTorneo,
-      redirectAttributes
-    );
+    ModelAndView mav = controladorTorneo.cargarEquipoExistente(equipo, torneo, redirectAttributes);
 
     assertEquals("redirect:/creacion-equipo?idTorneo=1", mav.getViewName());
 
@@ -961,7 +979,9 @@ public class ControladorTorneoTest {
     Long idTorneo = 1L;
 
     Equipo equipo = new Equipo();
+    equipo.setId(idEquipo);
     Torneo torneo = new Torneo();
+    torneo.setId(idTorneo);
 
     when(servicioEquipoMock.consultarEquipoPorId(idEquipo)).thenReturn(equipo);
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
@@ -972,11 +992,7 @@ public class ControladorTorneoTest {
 
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
-    ModelAndView mav = controladorTorneo.cargarEquipoExistente(
-      idEquipo,
-      idTorneo,
-      redirectAttributes
-    );
+    ModelAndView mav = controladorTorneo.cargarEquipoExistente(equipo, torneo, redirectAttributes);
 
     assertEquals("redirect:/creacion-equipo?idTorneo=1", mav.getViewName());
     assertEquals(
@@ -995,7 +1011,7 @@ public class ControladorTorneoTest {
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
-    ModelAndView mav = controladorTorneo.eliminarTorneoAdmin(idTorneo, redirectAttributes);
+    ModelAndView mav = controladorTorneo.eliminarTorneoAdmin(torneo, redirectAttributes);
 
     verify(servicioTorneoMock, times(1)).eliminarTorneo(idTorneo);
     assertThat(mav.getViewName(), equalTo("redirect:/lobbyAdmin"));
@@ -1016,7 +1032,7 @@ public class ControladorTorneoTest {
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
-    ModelAndView mav = controladorTorneo.eliminarTorneoAdmin(idTorneo, redirectAttributes);
+    ModelAndView mav = controladorTorneo.eliminarTorneoAdmin(torneo, redirectAttributes);
 
     verify(servicioTorneoMock, never()).eliminarTorneo(idTorneo);
     assertThat(mav.getViewName(), equalTo("redirect:/administrarTorneoAdmin/1"));
@@ -1088,7 +1104,7 @@ public class ControladorTorneoTest {
       .eliminarTorneo(idTorneo);
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
-    ModelAndView mav = controladorTorneo.eliminarTorneoAdmin(idTorneo, redirectAttributes);
+    ModelAndView mav = controladorTorneo.eliminarTorneoAdmin(torneo, redirectAttributes);
 
     assertThat(mav.getViewName(), equalTo("redirect:/administrarTorneoAdmin/1"));
     assertThat(redirectAttributes.getFlashAttributes().get("error"), notNullValue());
@@ -1135,8 +1151,8 @@ public class ControladorTorneoTest {
 
     // Ejecución
     ModelAndView mav = controladorTorneo.actualizarEquipo(
-      idEquipo,
-      idTorneo,
+      equipo,
+      torneoConId(idTorneo),
       "Equipo Nuevo",
       "EN",
       "#ffffff",
@@ -1156,9 +1172,10 @@ public class ControladorTorneoTest {
   @Test
   public void queAlEliminarTorneoRedireccioneAlLobbyAdmin() {
     Long idTorneo = 1L;
+    Torneo torneo = torneoConId(idTorneo);
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
-    ModelAndView mav = controladorTorneo.eliminarTorneoAdmin(idTorneo, redirectAttributes);
+    ModelAndView mav = controladorTorneo.eliminarTorneoAdmin(torneo, redirectAttributes);
 
     // Verifica que se haya llamado al servicio
     verify(servicioTorneoMock).eliminarTorneo(idTorneo);
@@ -1172,6 +1189,7 @@ public class ControladorTorneoTest {
     // Preparación
     Long idTorneo = 1L;
     Torneo torneo = new Torneo();
+    torneo.setId(idTorneo);
     torneo.setCantidadDeEquipos(10);
 
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
@@ -1186,7 +1204,7 @@ public class ControladorTorneoTest {
 
     // Ejecución
     ModelAndView mav = controladorTorneo.guardarEquipo(
-      idTorneo,
+      torneo,
       "Boca Juniors",
       "Azul",
       "Amarillo",
@@ -1214,6 +1232,7 @@ public class ControladorTorneoTest {
     // Preparación
     Long idTorneo = 1L;
     Torneo torneo = new Torneo();
+    torneo.setId(idTorneo);
     torneo.setCantidadDeEquipos(10);
 
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
@@ -1227,7 +1246,7 @@ public class ControladorTorneoTest {
 
     // Ejecución
     ModelAndView mav = controladorTorneo.guardarEquipoAdmin(
-      idTorneo,
+      torneo,
       "Boca Juniors",
       "Azul",
       "Amarillo",
@@ -1265,8 +1284,8 @@ public class ControladorTorneoTest {
 
     // Ejecución
     ModelAndView mav = controladorTorneo.actualizarEquipo(
-      idEquipo,
-      idTorneo,
+      equipo,
+      torneoConId(idTorneo),
       "Boca Juniors",
       "BO",
       "Azul",

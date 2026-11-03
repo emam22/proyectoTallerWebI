@@ -20,6 +20,7 @@ public class ControladorJugadoresTest {
 
   private ServicioTorneo servicioTorneoMock;
   private ServicioEquipoTorneo servicioEquipoTorneoMock;
+  private ServicioEquipo servicioEquipoMock;
   private ServicioJugador servicioJugadorMock;
   private ControladorJugadores controlador;
   private ServicioEstadisticaJugador servicioEstadisticasMock;
@@ -28,12 +29,14 @@ public class ControladorJugadoresTest {
   public void init() {
     this.servicioTorneoMock = mock(ServicioTorneo.class);
     this.servicioEquipoTorneoMock = mock(ServicioEquipoTorneo.class);
+    this.servicioEquipoMock = mock(ServicioEquipo.class);
     this.servicioJugadorMock = mock(ServicioJugador.class);
     this.servicioEstadisticasMock = mock(ServicioEstadisticaJugador.class);
     this.controlador =
       new ControladorJugadores(
         this.servicioTorneoMock,
         this.servicioEquipoTorneoMock,
+        this.servicioEquipoMock,
         this.servicioJugadorMock,
         this.servicioEstadisticasMock
       );
@@ -112,8 +115,8 @@ public class ControladorJugadoresTest {
     // ejecucion
     ModelAndView mav =
       this.controlador.agregarJugador(
-          1L,
-          10L,
+          torneo,
+          equipo(10L),
           "Lionel",
           "Messi",
           10,
@@ -143,7 +146,15 @@ public class ControladorJugadoresTest {
     when(this.servicioJugadorMock.obtenerJugadores(20L)).thenReturn(new ArrayList<>());
 
     // ejecucion
-    this.controlador.agregarJugador(2L, 20L, "Ana", "Gomez", null, null, redirectAttributesMock);
+    this.controlador.agregarJugador(
+        torneo,
+        equipo(20L),
+        "Ana",
+        "Gomez",
+        null,
+        null,
+        redirectAttributesMock
+      );
 
     // verificacion
     verify(this.servicioJugadorMock).agregarJugador(eq(20L), any(Jugador.class));
@@ -161,8 +172,8 @@ public class ControladorJugadoresTest {
     // ejecucion
     ModelAndView mav =
       this.controlador.agregarJugador(
-          1L,
-          99L,
+          torneo,
+          equipo(99L),
           "Juan",
           "Perez",
           5,
@@ -190,8 +201,8 @@ public class ControladorJugadoresTest {
     // ejecucion
     ModelAndView mav =
       this.controlador.agregarJugador(
-          1L,
-          10L,
+          torneo,
+          equipo(10L),
           "Juan",
           "Perez",
           5,
@@ -220,8 +231,8 @@ public class ControladorJugadoresTest {
     // ejecucion
     ModelAndView mav =
       this.controlador.agregarJugador(
-          1L,
-          10L,
+          torneo,
+          equipo(10L),
           "Juan",
           "Perez",
           10,
@@ -247,7 +258,8 @@ public class ControladorJugadoresTest {
       .thenReturn(List.of(new Jugador(), new Jugador()));
 
     // ejecucion
-    ModelAndView mav = this.controlador.eliminarJugador(1L, 10L, 99L, redirectAttributesMock);
+    ModelAndView mav =
+      this.controlador.eliminarJugador(torneo, equipo(10L), jugador(99L), redirectAttributesMock);
 
     // verificacion
     verify(this.servicioJugadorMock).eliminarJugador(eq(10L), eq(99L));
@@ -265,7 +277,8 @@ public class ControladorJugadoresTest {
     when(this.servicioEquipoTorneoMock.obtenerEquiposPorTorneo(1L)).thenReturn(new ArrayList<>());
 
     // ejecucion
-    ModelAndView mav = this.controlador.eliminarJugador(1L, 99L, 5L, redirectAttributesMock);
+    ModelAndView mav =
+      this.controlador.eliminarJugador(torneo, equipo(99L), jugador(5L), redirectAttributesMock);
 
     // verificacion
     verify(this.servicioJugadorMock, never()).eliminarJugador(any(), any());
@@ -285,7 +298,8 @@ public class ControladorJugadoresTest {
       .thenReturn(List.of(new Jugador(), new Jugador()));
 
     // ejecucion
-    ModelAndView mav = this.controlador.eliminarJugador(1L, 10L, 99L, redirectAttributesMock);
+    ModelAndView mav =
+      this.controlador.eliminarJugador(torneo, equipo(10L), jugador(99L), redirectAttributesMock);
 
     // verificacion
     verify(this.servicioJugadorMock, never()).eliminarJugador(any(), any());
@@ -304,7 +318,13 @@ public class ControladorJugadoresTest {
 
     // ejecucion
     ModelAndView mav =
-      this.controlador.habilitarJugador(1L, 10L, 99L, true, redirectAttributesMock);
+      this.controlador.habilitarJugador(
+          torneo,
+          equipo(10L),
+          jugador(99L),
+          true,
+          redirectAttributesMock
+        );
 
     // verificacion
     verify(this.servicioJugadorMock).habilitarJugador(eq(99L), eq(true));
@@ -323,7 +343,13 @@ public class ControladorJugadoresTest {
 
     // ejecucion
     ModelAndView mav =
-      this.controlador.habilitarJugador(1L, 10L, 99L, false, redirectAttributesMock);
+      this.controlador.habilitarJugador(
+          torneo,
+          equipo(10L),
+          jugador(99L),
+          false,
+          redirectAttributesMock
+        );
 
     // verificacion
     verify(this.servicioJugadorMock).habilitarJugador(eq(99L), eq(false));
@@ -341,7 +367,14 @@ public class ControladorJugadoresTest {
     when(this.servicioEquipoTorneoMock.obtenerEquiposPorTorneo(1L)).thenReturn(new ArrayList<>());
 
     // ejecucion
-    ModelAndView mav = this.controlador.habilitarJugador(1L, 99L, 5L, true, redirectAttributesMock);
+    ModelAndView mav =
+      this.controlador.habilitarJugador(
+          torneo,
+          equipo(99L),
+          jugador(5L),
+          true,
+          redirectAttributesMock
+        );
 
     // verificacion
     verify(this.servicioJugadorMock, never()).habilitarJugador(any(), anyBoolean());
@@ -360,7 +393,13 @@ public class ControladorJugadoresTest {
 
     // ejecucion
     ModelAndView mav =
-      this.controlador.habilitarJugador(1L, 10L, 99L, true, redirectAttributesMock);
+      this.controlador.habilitarJugador(
+          torneo,
+          equipo(10L),
+          jugador(99L),
+          true,
+          redirectAttributesMock
+        );
 
     // verificacion
     verify(this.servicioJugadorMock, never()).habilitarJugador(any(), anyBoolean());
@@ -376,7 +415,13 @@ public class ControladorJugadoresTest {
 
     // ejecucion
     ModelAndView mav =
-      this.controlador.habilitarJugador(7L, 10L, 99L, true, redirectAttributesMock);
+      this.controlador.habilitarJugador(
+          null,
+          equipo(10L),
+          jugador(99L),
+          true,
+          redirectAttributesMock
+        );
 
     // verificacion
     verify(this.servicioJugadorMock, never()).habilitarJugador(any(), anyBoolean());
@@ -390,7 +435,8 @@ public class ControladorJugadoresTest {
     torneo.setId(1L);
     inscribirEquipoEnTorneo(1L, 10L, torneo);
 
-    ModelAndView mav = this.controlador.confirmarPlantel(1L, 10L, redirectAttributesMock);
+    ModelAndView mav =
+      this.controlador.confirmarPlantel(torneo, equipo(10L), redirectAttributesMock);
 
     verify(this.servicioEquipoTorneoMock).confirmarPlantel(10L);
     verify(redirectAttributesMock).addFlashAttribute("ok", "Plantel confirmado correctamente.");
@@ -407,7 +453,8 @@ public class ControladorJugadoresTest {
       .when(this.servicioEquipoTorneoMock)
       .confirmarPlantel(10L);
 
-    ModelAndView mav = this.controlador.confirmarPlantel(1L, 10L, redirectAttributesMock);
+    ModelAndView mav =
+      this.controlador.confirmarPlantel(torneo, equipo(10L), redirectAttributesMock);
 
     verify(redirectAttributesMock)
       .addFlashAttribute(
@@ -430,7 +477,8 @@ public class ControladorJugadoresTest {
       .when(this.servicioEquipoTorneoMock)
       .confirmarPlantel(10L);
 
-    ModelAndView mav = this.controlador.confirmarPlantel(1L, 10L, redirectAttributesMock);
+    ModelAndView mav =
+      this.controlador.confirmarPlantel(torneo, equipo(10L), redirectAttributesMock);
 
     verify(redirectAttributesMock)
       .addFlashAttribute(
@@ -439,6 +487,13 @@ public class ControladorJugadoresTest {
         "Arquero, Defensor, Mediocampista, Delantero."
       );
     assertThat(mav.getViewName(), is("redirect:/jugadoresTorneo?idTorneo=1"));
+  }
+
+  private Equipo equipo(Long id) {
+    Equipo equipo = new Equipo();
+    equipo.setId(id);
+
+    return equipo;
   }
 
   private Jugador jugador(Long id) {
@@ -469,7 +524,14 @@ public class ControladorJugadoresTest {
     when(this.servicioJugadorMock.obtenerJugadores(10L)).thenReturn(List.of(jugador(99L)));
 
     //ejecucion
-    ModelAndView mav = this.controlador.sancionarJugador(1L, 10L, 99L, 1, redirectAttributesMock);
+    ModelAndView mav =
+      this.controlador.sancionarJugador(
+          torneo,
+          equipo(10L),
+          jugador(99L),
+          1,
+          redirectAttributesMock
+        );
 
     //verificacion
     verify(this.servicioJugadorMock).sancionarJugador(99L, 1);
@@ -486,7 +548,14 @@ public class ControladorJugadoresTest {
     inscribirEquipoEnTorneo(1L, 10L, torneo);
     when(this.servicioJugadorMock.obtenerJugadores(10L)).thenReturn(new ArrayList<>());
 
-    ModelAndView mav = this.controlador.sancionarJugador(1L, 10L, 99L, 2, redirectAttributesMock);
+    ModelAndView mav =
+      this.controlador.sancionarJugador(
+          torneo,
+          equipo(10L),
+          jugador(99L),
+          2,
+          redirectAttributesMock
+        );
 
     verify(this.servicioJugadorMock, never()).sancionarJugador(any(), any());
     verify(redirectAttributesMock).addFlashAttribute(eq("error"), anyString());

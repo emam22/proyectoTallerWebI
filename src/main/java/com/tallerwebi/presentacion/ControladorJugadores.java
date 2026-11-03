@@ -9,6 +9,7 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -25,6 +26,9 @@ public class ControladorJugadores {
   private static final String ERROR_EQUIPO_NO_INSCRIPTO =
     "El equipo no esta inscripto en este torneo.";
   private static final String ID_JUGADOR = "idJugador";
+  private static final String ATRIBUTO_TORNEO = "torneo";
+  private static final String ATRIBUTO_EQUIPO = "equipo";
+  private static final String ATRIBUTO_JUGADOR = "jugador";
 
   private static final String OK = "ok";
   private static final String ERROR = "error";
@@ -32,6 +36,7 @@ public class ControladorJugadores {
 
   private final ServicioTorneo servicioTorneo;
   private final ServicioEquipoTorneo servicioEquipoTorneo;
+  private final ServicioEquipo servicioEquipo;
   private final ServicioJugador servicioJugador;
   private final ServicioEstadisticaJugador servicioEstadisticas;
 
@@ -39,13 +44,30 @@ public class ControladorJugadores {
   public ControladorJugadores(
     ServicioTorneo servicioTorneo,
     ServicioEquipoTorneo servicioEquipoTorneo,
+    ServicioEquipo servicioEquipo,
     ServicioJugador servicioJugador,
     ServicioEstadisticaJugador servicioEstadisticas
   ) {
     this.servicioTorneo = servicioTorneo;
     this.servicioEquipoTorneo = servicioEquipoTorneo;
+    this.servicioEquipo = servicioEquipo;
     this.servicioJugador = servicioJugador;
     this.servicioEstadisticas = servicioEstadisticas;
+  }
+
+  @ModelAttribute(ATRIBUTO_TORNEO)
+  public Torneo cargarTorneo(@RequestParam(value = ID_TORNEO, required = false) Long idTorneo) {
+    return idTorneo == null ? null : servicioTorneo.consultarTorneoPorId(idTorneo);
+  }
+
+  @ModelAttribute(ATRIBUTO_EQUIPO)
+  public Equipo cargarEquipo(@RequestParam(value = ID_EQUIPO, required = false) Long idEquipo) {
+    return idEquipo == null ? null : servicioEquipo.consultarEquipoPorId(idEquipo);
+  }
+
+  @ModelAttribute(ATRIBUTO_JUGADOR)
+  public Jugador cargarJugador(@RequestParam(value = ID_JUGADOR, required = false) Long idJugador) {
+    return idJugador == null ? null : servicioJugador.consultarJugador(idJugador);
   }
 
   // =========================
@@ -69,7 +91,7 @@ public class ControladorJugadores {
   ) {
     ModelAndView modelo = gestionarJugadoresComun(idTorneo, "jugadoresTorneoEditar");
 
-    if (modelo.getModel().containsKey("torneo")) {
+    if (modelo.getModel().containsKey(ATRIBUTO_TORNEO)) {
       modelo.addObject(ID_EQUIPO, idEquipo);
     }
 
@@ -84,7 +106,7 @@ public class ControladorJugadores {
     }
 
     Map<String, Object> model = new ModelMap();
-    model.put("torneo", torneo);
+    model.put(ATRIBUTO_TORNEO, torneo);
     model.put("equipos", equiposConJugadores(idTorneo));
     model.put(ID_TORNEO, idTorneo);
 
@@ -97,17 +119,19 @@ public class ControladorJugadores {
 
   @RequestMapping(path = "/jugadoresTorneo/agregar", method = RequestMethod.POST)
   public ModelAndView agregarJugador(
-    @RequestParam(ID_TORNEO) Long idTorneo,
-    @RequestParam(ID_EQUIPO) Long idEquipo,
+    @ModelAttribute(ATRIBUTO_TORNEO) Torneo torneo,
+    @ModelAttribute(ATRIBUTO_EQUIPO) Equipo equipo,
     @RequestParam("nombre") String nombre,
     @RequestParam("apellido") String apellido,
     @RequestParam(value = "dorsal", required = false) Integer dorsal,
     @RequestParam(value = "puesto", required = false) String puesto,
     RedirectAttributes redirectAttributes
   ) throws JugadorNoExiste {
+    Long idTorneo = obtenerIdTorneo(torneo);
+
     return agregarJugadorComun(
-      idTorneo,
-      idEquipo,
+      torneo,
+      equipo,
       nombre,
       apellido,
       dorsal,
@@ -119,17 +143,19 @@ public class ControladorJugadores {
 
   @RequestMapping(path = "/jugadoresTorneoAdmin/agregar", method = RequestMethod.POST)
   public ModelAndView agregarJugadorAdmin(
-    @RequestParam(ID_TORNEO) Long idTorneo,
-    @RequestParam(ID_EQUIPO) Long idEquipo,
+    @ModelAttribute(ATRIBUTO_TORNEO) Torneo torneo,
+    @ModelAttribute(ATRIBUTO_EQUIPO) Equipo equipo,
     @RequestParam("nombre") String nombre,
     @RequestParam("apellido") String apellido,
     @RequestParam(value = "dorsal", required = false) Integer dorsal,
     @RequestParam(value = "puesto", required = false) String puesto,
     RedirectAttributes redirectAttributes
   ) throws JugadorNoExiste {
+    Long idTorneo = obtenerIdTorneo(torneo);
+
     return agregarJugadorComun(
-      idTorneo,
-      idEquipo,
+      torneo,
+      equipo,
       nombre,
       apellido,
       dorsal,
@@ -141,17 +167,20 @@ public class ControladorJugadores {
 
   @RequestMapping(path = "/jugadoresTorneoEditar/agregar", method = RequestMethod.POST)
   public ModelAndView agregarJugadorEditar(
-    @RequestParam(ID_TORNEO) Long idTorneo,
-    @RequestParam(ID_EQUIPO) Long idEquipo,
+    @ModelAttribute(ATRIBUTO_TORNEO) Torneo torneo,
+    @ModelAttribute(ATRIBUTO_EQUIPO) Equipo equipo,
     @RequestParam("nombre") String nombre,
     @RequestParam("apellido") String apellido,
     @RequestParam(value = "dorsal", required = false) Integer dorsal,
     @RequestParam(value = "puesto", required = false) String puesto,
     RedirectAttributes redirectAttributes
   ) throws JugadorNoExiste {
+    Long idTorneo = obtenerIdTorneo(torneo);
+    Long idEquipo = obtenerIdEquipo(equipo);
+
     return agregarJugadorComun(
-      idTorneo,
-      idEquipo,
+      torneo,
+      equipo,
       nombre,
       apellido,
       dorsal,
@@ -162,8 +191,8 @@ public class ControladorJugadores {
   }
 
   private ModelAndView agregarJugadorComun(
-    Long idTorneo,
-    Long idEquipo,
+    Torneo torneo,
+    Equipo equipo,
     String nombre,
     String apellido,
     Integer dorsal,
@@ -171,9 +200,14 @@ public class ControladorJugadores {
     RedirectAttributes redirectAttributes,
     String redireccion
   ) throws JugadorNoExiste {
-    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+    if (torneo == null) {
+      return new ModelAndView(REDIRECT_LOBBY_ADMIN);
+    }
 
-    if (torneo == null || !equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
+    Long idTorneo = torneo.getId();
+    Long idEquipo = obtenerIdEquipo(equipo);
+
+    if (equipo == null || !equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
       return rechazar(redireccion, ERROR_EQUIPO_NO_INSCRIPTO, redirectAttributes);
     }
 
@@ -222,15 +256,17 @@ public class ControladorJugadores {
 
   @RequestMapping(path = "/jugadoresTorneo/eliminar", method = RequestMethod.POST)
   public ModelAndView eliminarJugador(
-    @RequestParam(ID_TORNEO) Long idTorneo,
-    @RequestParam(ID_EQUIPO) Long idEquipo,
-    @RequestParam(ID_JUGADOR) Long idJugador,
+    @ModelAttribute(ATRIBUTO_TORNEO) Torneo torneo,
+    @ModelAttribute(ATRIBUTO_EQUIPO) Equipo equipo,
+    @ModelAttribute(ATRIBUTO_JUGADOR) Jugador jugador,
     RedirectAttributes redirectAttributes
   ) {
+    Long idTorneo = obtenerIdTorneo(torneo);
+
     return eliminarJugadorComun(
-      idTorneo,
-      idEquipo,
-      idJugador,
+      torneo,
+      equipo,
+      jugador,
       redirectAttributes,
       REDIRECT_JUGADORES + idTorneo
     );
@@ -238,15 +274,17 @@ public class ControladorJugadores {
 
   @RequestMapping(path = "/jugadoresTorneoAdmin/eliminar", method = RequestMethod.POST)
   public ModelAndView eliminarJugadorAdmin(
-    @RequestParam(ID_TORNEO) Long idTorneo,
-    @RequestParam(ID_EQUIPO) Long idEquipo,
-    @RequestParam(ID_JUGADOR) Long idJugador,
+    @ModelAttribute(ATRIBUTO_TORNEO) Torneo torneo,
+    @ModelAttribute(ATRIBUTO_EQUIPO) Equipo equipo,
+    @ModelAttribute(ATRIBUTO_JUGADOR) Jugador jugador,
     RedirectAttributes redirectAttributes
   ) {
+    Long idTorneo = obtenerIdTorneo(torneo);
+
     return eliminarJugadorComun(
-      idTorneo,
-      idEquipo,
-      idJugador,
+      torneo,
+      equipo,
+      jugador,
       redirectAttributes,
       REDIRECT_JUGADORES_ADMIN + idTorneo
     );
@@ -254,31 +292,43 @@ public class ControladorJugadores {
 
   @RequestMapping(path = "/jugadoresTorneoEditar/eliminar", method = RequestMethod.POST)
   public ModelAndView eliminarJugadorEditar(
-    @RequestParam(ID_TORNEO) Long idTorneo,
-    @RequestParam(ID_EQUIPO) Long idEquipo,
-    @RequestParam(ID_JUGADOR) Long idJugador,
+    @ModelAttribute(ATRIBUTO_TORNEO) Torneo torneo,
+    @ModelAttribute(ATRIBUTO_EQUIPO) Equipo equipo,
+    @ModelAttribute(ATRIBUTO_JUGADOR) Jugador jugador,
     RedirectAttributes redirectAttributes
   ) {
+    Long idTorneo = obtenerIdTorneo(torneo);
+    Long idEquipo = obtenerIdEquipo(equipo);
+
     return eliminarJugadorComun(
-      idTorneo,
-      idEquipo,
-      idJugador,
+      torneo,
+      equipo,
+      jugador,
       redirectAttributes,
       redirectJugadoresEditar(idTorneo, idEquipo)
     );
   }
 
   private ModelAndView eliminarJugadorComun(
-    Long idTorneo,
-    Long idEquipo,
-    Long idJugador,
+    Torneo torneo,
+    Equipo equipo,
+    Jugador jugador,
     RedirectAttributes redirectAttributes,
     String redireccion
   ) {
-    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+    if (torneo == null) {
+      return new ModelAndView(REDIRECT_LOBBY_ADMIN);
+    }
 
-    if (torneo == null || !equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
+    Long idTorneo = torneo.getId();
+    Long idEquipo = obtenerIdEquipo(equipo);
+
+    if (equipo == null || !equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
       return rechazar(redireccion, ERROR_EQUIPO_NO_INSCRIPTO, redirectAttributes);
+    }
+
+    if (jugador == null) {
+      return rechazar(redireccion, "El jugador no pertenece a este equipo.", redirectAttributes);
     }
 
     List<Jugador> jugadores = servicioJugador.obtenerJugadores(idEquipo);
@@ -291,6 +341,7 @@ public class ControladorJugadores {
       );
     }
 
+    Long idJugador = jugador.getId();
     servicioEstadisticas.eliminarEstadisticas(idJugador);
     servicioJugador.eliminarJugador(idEquipo, idJugador);
 
@@ -305,27 +356,26 @@ public class ControladorJugadores {
 
   @RequestMapping(path = "/jugadoresTorneo/confirmar", method = RequestMethod.POST)
   public ModelAndView confirmarPlantel(
-    @RequestParam(ID_TORNEO) Long idTorneo,
-    @RequestParam(ID_EQUIPO) Long idEquipo,
+    @ModelAttribute(ATRIBUTO_TORNEO) Torneo torneo,
+    @ModelAttribute(ATRIBUTO_EQUIPO) Equipo equipo,
     RedirectAttributes redirectAttributes
   ) {
-    return confirmarPlantelComun(
-      idTorneo,
-      idEquipo,
-      redirectAttributes,
-      REDIRECT_JUGADORES + idTorneo
-    );
+    Long idTorneo = obtenerIdTorneo(torneo);
+
+    return confirmarPlantelComun(torneo, equipo, redirectAttributes, REDIRECT_JUGADORES + idTorneo);
   }
 
   @RequestMapping(path = "/jugadoresTorneoAdmin/confirmar", method = RequestMethod.POST)
   public ModelAndView confirmarPlantelAdmin(
-    @RequestParam(ID_TORNEO) Long idTorneo,
-    @RequestParam(ID_EQUIPO) Long idEquipo,
+    @ModelAttribute(ATRIBUTO_TORNEO) Torneo torneo,
+    @ModelAttribute(ATRIBUTO_EQUIPO) Equipo equipo,
     RedirectAttributes redirectAttributes
   ) {
+    Long idTorneo = obtenerIdTorneo(torneo);
+
     return confirmarPlantelComun(
-      idTorneo,
-      idEquipo,
+      torneo,
+      equipo,
       redirectAttributes,
       REDIRECT_JUGADORES_ADMIN + idTorneo
     );
@@ -333,31 +383,35 @@ public class ControladorJugadores {
 
   @RequestMapping(path = "/jugadoresTorneoEditar/confirmar", method = RequestMethod.POST)
   public ModelAndView confirmarPlantelEditar(
-    @RequestParam(ID_TORNEO) Long idTorneo,
-    @RequestParam(ID_EQUIPO) Long idEquipo,
+    @ModelAttribute(ATRIBUTO_TORNEO) Torneo torneo,
+    @ModelAttribute(ATRIBUTO_EQUIPO) Equipo equipo,
     RedirectAttributes redirectAttributes
   ) {
+    Long idTorneo = obtenerIdTorneo(torneo);
+    Long idEquipo = obtenerIdEquipo(equipo);
+
     return confirmarPlantelComun(
-      idTorneo,
-      idEquipo,
+      torneo,
+      equipo,
       redirectAttributes,
       redirectJugadoresEditar(idTorneo, idEquipo)
     );
   }
 
   private ModelAndView confirmarPlantelComun(
-    Long idTorneo,
-    Long idEquipo,
+    Torneo torneo,
+    Equipo equipo,
     RedirectAttributes redirectAttributes,
     String redireccion
   ) {
-    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
-
     if (torneo == null) {
       return new ModelAndView(REDIRECT_LOBBY_ADMIN);
     }
 
-    if (!equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
+    Long idTorneo = torneo.getId();
+    Long idEquipo = obtenerIdEquipo(equipo);
+
+    if (equipo == null || !equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
       return rechazar(redireccion, ERROR_EQUIPO_NO_INSCRIPTO, redirectAttributes);
     }
 
@@ -384,16 +438,18 @@ public class ControladorJugadores {
 
   @RequestMapping(path = "/jugadoresTorneoAdmin/habilitar", method = RequestMethod.POST)
   public ModelAndView habilitarJugador(
-    @RequestParam(ID_TORNEO) Long idTorneo,
-    @RequestParam(ID_EQUIPO) Long idEquipo,
-    @RequestParam(ID_JUGADOR) Long idJugador,
+    @ModelAttribute(ATRIBUTO_TORNEO) Torneo torneo,
+    @ModelAttribute(ATRIBUTO_EQUIPO) Equipo equipo,
+    @ModelAttribute(ATRIBUTO_JUGADOR) Jugador jugador,
     @RequestParam(value = "habilitado", required = false) Boolean habilitado,
     RedirectAttributes redirectAttributes
   ) {
+    Long idTorneo = obtenerIdTorneo(torneo);
+
     return habilitarJugadorComun(
-      idTorneo,
-      idEquipo,
-      idJugador,
+      torneo,
+      equipo,
+      jugador,
       habilitado,
       redirectAttributes,
       REDIRECT_JUGADORES_ADMIN + idTorneo
@@ -402,16 +458,19 @@ public class ControladorJugadores {
 
   @RequestMapping(path = "/jugadoresTorneoEditar/habilitar", method = RequestMethod.POST)
   public ModelAndView habilitarJugadorEditar(
-    @RequestParam(ID_TORNEO) Long idTorneo,
-    @RequestParam(ID_EQUIPO) Long idEquipo,
-    @RequestParam(ID_JUGADOR) Long idJugador,
+    @ModelAttribute(ATRIBUTO_TORNEO) Torneo torneo,
+    @ModelAttribute(ATRIBUTO_EQUIPO) Equipo equipo,
+    @ModelAttribute(ATRIBUTO_JUGADOR) Jugador jugador,
     @RequestParam(value = "habilitado", required = false) Boolean habilitado,
     RedirectAttributes redirectAttributes
   ) {
+    Long idTorneo = obtenerIdTorneo(torneo);
+    Long idEquipo = obtenerIdEquipo(equipo);
+
     return habilitarJugadorComun(
-      idTorneo,
-      idEquipo,
-      idJugador,
+      torneo,
+      equipo,
+      jugador,
       habilitado,
       redirectAttributes,
       redirectJugadoresEditar(idTorneo, idEquipo)
@@ -419,30 +478,31 @@ public class ControladorJugadores {
   }
 
   private ModelAndView habilitarJugadorComun(
-    Long idTorneo,
-    Long idEquipo,
-    Long idJugador,
+    Torneo torneo,
+    Equipo equipo,
+    Jugador jugador,
     Boolean habilitado,
     RedirectAttributes redirectAttributes,
     String redireccion
   ) {
-    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
-
     if (torneo == null) {
       return new ModelAndView(REDIRECT_LOBBY_ADMIN);
     }
 
-    if (!equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
+    Long idTorneo = torneo.getId();
+    Long idEquipo = obtenerIdEquipo(equipo);
+
+    if (equipo == null || !equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
       return rechazar(redireccion, ERROR_EQUIPO_NO_INSCRIPTO, redirectAttributes);
     }
 
-    if (!perteneceAlEquipo(idEquipo, idJugador)) {
+    if (jugador == null || !perteneceAlEquipo(idEquipo, jugador.getId())) {
       return rechazar(redireccion, "El jugador no pertenece a este equipo.", redirectAttributes);
     }
 
     boolean nuevoEstado = habilitado != null && habilitado;
 
-    servicioJugador.habilitarJugador(idJugador, nuevoEstado);
+    servicioJugador.habilitarJugador(jugador.getId(), nuevoEstado);
 
     redirectAttributes.addFlashAttribute(
       OK,
@@ -483,7 +543,7 @@ public class ControladorJugadores {
     }
 
     ModelAndView modelo = new ModelAndView("jugadoresEquipoSancion");
-    modelo.addObject("equipo", equipo);
+    modelo.addObject(ATRIBUTO_EQUIPO, equipo);
     modelo.addObject("jugadores", jugadores);
     modelo.addObject(ID_TORNEO, idTorneo);
 
@@ -493,26 +553,26 @@ public class ControladorJugadores {
   //sancionar jugador
   @RequestMapping(path = "/jugadoresTorneoAdmin/sancionar", method = RequestMethod.POST)
   public ModelAndView sancionarJugador(
-    @RequestParam("idTorneo") Long idTorneo,
-    @RequestParam("idEquipo") Long idEquipo,
-    @RequestParam(ID_JUGADOR) Long idJugador,
+    @ModelAttribute(ATRIBUTO_TORNEO) Torneo torneo,
+    @ModelAttribute(ATRIBUTO_EQUIPO) Equipo equipo,
+    @ModelAttribute(ATRIBUTO_JUGADOR) Jugador jugador,
     @RequestParam("fechas") Integer fechas,
     RedirectAttributes redirectAttributes
   ) {
+    Long idTorneo = obtenerIdTorneo(torneo);
+    Long idEquipo = obtenerIdEquipo(equipo);
     String redireccion =
       "redirect:/jugadoresEquipoSancion?idTorneo=" + idTorneo + "&idEquipo=" + idEquipo;
-
-    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
 
     if (torneo == null) {
       return new ModelAndView(REDIRECT_LOBBY_ADMIN);
     }
 
-    if (!equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
+    if (equipo == null || !equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
       return rechazar(redireccion, ERROR_EQUIPO_NO_INSCRIPTO, redirectAttributes);
     }
 
-    if (!perteneceAlEquipo(idEquipo, idJugador)) {
+    if (jugador == null || !perteneceAlEquipo(idEquipo, jugador.getId())) {
       return rechazar(redireccion, "El jugador no pertenece a este equipo.", redirectAttributes);
     }
 
@@ -524,7 +584,7 @@ public class ControladorJugadores {
       );
     }
 
-    servicioJugador.sancionarJugador(idJugador, fechas);
+    servicioJugador.sancionarJugador(jugador.getId(), fechas);
 
     redirectAttributes.addFlashAttribute(OK, "Jugador sancionado por " + fechas + " fecha(s).");
 
@@ -534,6 +594,14 @@ public class ControladorJugadores {
   // =========================
   // MÉTODOS AUXILIARES
   // =========================
+
+  private Long obtenerIdTorneo(Torneo torneo) {
+    return torneo == null ? null : torneo.getId();
+  }
+
+  private Long obtenerIdEquipo(Equipo equipo) {
+    return equipo == null ? null : equipo.getId();
+  }
 
   private ModelAndView rechazar(
     String vista,
