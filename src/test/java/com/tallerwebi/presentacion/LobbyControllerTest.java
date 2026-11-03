@@ -56,7 +56,9 @@ public class LobbyControllerTest {
     when(servicioEstadisticasMock.obtenerEstadisticas()).thenReturn(estadisticas);
 
     // Ejecución
-    ModelAndView mav = lobbyController.verEstadisticasJugadores(1L);
+    Torneo torneoStats = new Torneo();
+    torneoStats.setId(1L);
+    ModelAndView mav = lobbyController.verEstadisticasJugadores(torneoStats);
 
     // Validación
     assertThat(mav.getViewName(), equalToIgnoringCase("estadisticasDeJugadores"));
@@ -107,7 +109,9 @@ public class LobbyControllerTest {
     when(servicioEstadisticasMock.obtenerEstadisticas()).thenReturn(stats);
     when(servicioEquipoMock.consultarEquipoJugador(5L)).thenReturn(equipo);
 
-    ModelAndView mav = lobbyController.irALobby(idTorneo);
+    Torneo torneoLobby = new Torneo();
+    torneoLobby.setId(idTorneo);
+    ModelAndView mav = lobbyController.irALobby(torneoLobby);
 
     assertThat(mav.getViewName(), equalTo("lobby"));
     assertThat(mav.getModel().get("estadisticasJugadores"), notNullValue());
@@ -124,7 +128,9 @@ public class LobbyControllerTest {
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(new Torneo());
     when(servicioEstadisticasMock.obtenerEstadisticas()).thenReturn(new ArrayList<>());
 
-    ModelAndView mav = lobbyController.irALobby(idTorneo);
+    Torneo torneoLobby = new Torneo();
+    torneoLobby.setId(idTorneo);
+    ModelAndView mav = lobbyController.irALobby(torneoLobby);
 
     assertThat(mav.getViewName(), equalTo("lobby"));
   }

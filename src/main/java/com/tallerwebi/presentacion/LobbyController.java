@@ -8,6 +8,7 @@ import java.util.Map;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
@@ -34,11 +35,16 @@ public class LobbyController {
     this.servicioEquipo = servicioEquipo;
   }
 
+  @ModelAttribute("torneo")
+  public Torneo cargarTorneo(@RequestParam(value = "idTorneo", required = false) Long idTorneo) {
+    return idTorneo == null ? null : servicioTorneo.consultarTorneoPorId(idTorneo);
+  }
+
   @RequestMapping("/lobby")
-  public ModelAndView irALobby(@RequestParam(value = "idTorneo", required = false) Long idTorneo) {
+  public ModelAndView irALobby(@ModelAttribute("torneo") Torneo torneo) {
     Map<String, Object> model = new ModelMap();
 
-    Long idTorneoABuscar = idTorneo != null ? idTorneo : 1L;
+    Long idTorneoABuscar = torneo != null && torneo.getId() != null ? torneo.getId() : 1L;
 
     List<EquipoTorneo> tabla = servicioEquipoTorneo.obtenerEstadisticas(idTorneoABuscar);
     model.put("tablaPosiciones", tabla);
@@ -96,12 +102,10 @@ public class LobbyController {
   }
 
   @GetMapping("/estadisticasDeJugadores")
-  public ModelAndView verEstadisticasJugadores(
-    @RequestParam(value = "idTorneo", required = false) Long idTorneo
-  ) {
+  public ModelAndView verEstadisticasJugadores(@ModelAttribute("torneo") Torneo torneo) {
     Map<String, Object> model = new ModelMap();
 
-    Long idTorneoABuscar = idTorneo != null ? idTorneo : 1L;
+    Long idTorneoABuscar = torneo != null && torneo.getId() != null ? torneo.getId() : 1L;
 
     List<EstadisticaJugador> estadisticas = servicioEstadisticas.obtenerEstadisticas();
 
