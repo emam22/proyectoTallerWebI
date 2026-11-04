@@ -3,8 +3,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const adminEmail = urlParams.get("email");
 const adminPassword = urlParams.get("password");
 
-// Reemplazar por tu Public Key de Sandbox de Mercado Pago
-const mp = new MercadoPago("TEST-8198ecc1-8632-48e8-b2ca-5939a2d9bb40", {
+const mp = new MercadoPago("TEST-YOUR-PUBLIC-KEY", {
     locale: "es-AR"
 });
 
@@ -30,7 +29,7 @@ const renderPaymentBrick = async (bricksBuilderInstance) => {
         },
         callbacks: {
             onReady: () => {
-                // Brick listo para interactuar
+                // Brick listo
             },
             onSubmit: ({ formData }) => {
                 return new Promise((resolve, reject) => {
@@ -78,7 +77,7 @@ const renderPaymentBrick = async (bricksBuilderInstance) => {
                         });
                 });
             },
-            onError: (error) => {
+            onError: () => {
                 alert("Error al cargar la pasarela de pagos.");
                 window.location.href = "/spring/nuevo-usuario";
             }
