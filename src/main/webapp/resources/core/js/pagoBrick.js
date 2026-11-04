@@ -3,7 +3,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const adminEmail = urlParams.get("email");
 const adminPassword = urlParams.get("password");
 
-const mp = new MercadoPago("TEST-YOUR-PUBLIC-KEY", {
+const mp = new MercadoPago("TEST-8198ecc1-8632-48e8-b2ca-5939a2d9bb40", {
     locale: "es-AR"
 });
 
