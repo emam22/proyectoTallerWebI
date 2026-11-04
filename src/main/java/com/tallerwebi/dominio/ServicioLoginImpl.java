@@ -51,8 +51,9 @@ public class ServicioLoginImpl implements ServicioLogin {
     }
   }
 
+  @Override
   @SuppressWarnings({ "PMD.CyclomaticComplexity", "PMD.AvoidLiteralsInIfCondition" }) // Ignora complejidad y literales aquí
-  private String validarFortaleza(String password) {
+  public String validarFortaleza(String password) {
     if (password == null || password.trim().isEmpty()) {
       return "INVALIDA";
     }

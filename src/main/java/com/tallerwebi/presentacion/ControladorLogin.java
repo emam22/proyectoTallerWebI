@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,8 @@ import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 public class ControladorLogin {
+
+  private static final String REDIRECT_LOGIN = "redirect:/login";
 
   private ServicioLogin servicioLogin;
 
@@ -34,7 +37,7 @@ public class ControladorLogin {
   @RequestMapping("/logout")
   public ModelAndView logout(HttpServletRequest request) {
     request.getSession().invalidate();
-    return new ModelAndView("redirect:/login");
+    return new ModelAndView(REDIRECT_LOGIN);
   }
 
   @RequestMapping(path = "/validar-login", method = RequestMethod.POST)
@@ -72,7 +75,12 @@ public class ControladorLogin {
       model.put("error", "Error al registrar el nuevo usuario");
       return new ModelAndView("nuevo-usuario", model);
     }
-    return new ModelAndView("redirect:/login");
+    return new ModelAndView(REDIRECT_LOGIN);
+  }
+
+  @RequestMapping(path = "/pagar-inscripcion", method = RequestMethod.POST)
+  public ModelAndView pagarInscripcion() {
+    return new ModelAndView("redirect:/pagar-inscripcion");
   }
 
   @RequestMapping(path = "/nuevo-usuario", method = RequestMethod.GET)
@@ -89,6 +97,6 @@ public class ControladorLogin {
 
   @RequestMapping(path = "/", method = RequestMethod.GET)
   public ModelAndView inicio() {
-    return new ModelAndView("redirect:/login");
+    return new ModelAndView(REDIRECT_LOGIN);
   }
 }

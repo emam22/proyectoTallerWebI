@@ -200,4 +200,11 @@ public class ControladorLoginTest {
     // validacion
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/login"));
   }
+
+  @Test
+  public void pagarInscripcionPostDeberiaRedirigirAPagarInscripcion() {
+    ModelAndView modelAndView = controladorLogin.pagarInscripcion();
+
+    assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/pagar-inscripcion"));
+  }
 }
