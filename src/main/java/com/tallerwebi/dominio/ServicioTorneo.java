@@ -7,7 +7,8 @@ import java.util.List;
 public interface ServicioTorneo {
   Torneo consultarTorneoPorId(Long id);
   Torneo consultarTorneo(String nombre);
-  void registrarTorneo(Torneo torneo) throws TorneoExistente, Exception;
+  void registrarTorneo(Torneo torneo, Usuario usuario) throws TorneoExistente, Exception;
+
   List<Torneo> obtenerTorneos();
   List<Jornada> obtenerJornadasPorTorneo(Long torneoId);
   void crearTorneoConFixture(Torneo torneo, List<Long> idsEquipos)
@@ -20,4 +21,5 @@ public interface ServicioTorneo {
   void eliminarTorneo(Long id);
 
   void finalizarTorneo(Long idTorneo) throws TorneoExistente, Exception;
+  List<Torneo> buscarTorneosPorUsuario(Long idUsuario);
 }

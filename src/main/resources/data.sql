@@ -1,13 +1,16 @@
-INSERT INTO Usuario(id, email, password, rol, activo) VALUES(null, 'test@unlam.edu.ar', 'test', 'ADMIN', true);
+INSERT INTO Usuario(id, email, password, rol, activo) VALUES(1, 'test@unlam.edu.ar', 'test', 'ADMIN', true);
 
 INSERT INTO Usuario(id, activo, email, password, rol) VALUES(2, true, 'admin@gmail.com', '1234', 'ADMIN');
 
 INSERT INTO Usuario(id, activo, email, password, rol) VALUES(3, true, 'usuario@gmail.com', '1234', 'USUARIO');
 
 
-INSERT INTO Torneo(cantidadAmaSusp, cantidadDeEquipos, cantidadMaxJugadores, cantidadMinJugadores, idaYVuelta, id, nombre)
-Values(2, 2, 20, 11, null, 1,'copa');
+INSERT INTO Torneo (nombre, fechaInicio, cantidadDeEquipos, cantidadMinJugadores, cantidadMaxJugadores, cantidadAmaSusp, idaYVuelta, usuario_id)
+VALUES ('Copa Apertura 2027', '2027-03-15 18:00:00', 8, 11, 23, 2, true, 2);
 
+
+INSERT INTO Torneo (nombre, fechaInicio, cantidadDeEquipos, cantidadMinJugadores, cantidadMaxJugadores, cantidadAmaSusp, idaYVuelta, usuario_id)
+VALUES ('Copa Clausura 2027', '2027-03-15 18:00:00', 8, 11, 23, 2, true, 1);
 
 INSERT INTO Equipo(id, codigo, colorLocal1, colorLocal2, colorVisitante1, colorVisitante2, escudo, nombre)
 Values(1, 'CABJ', 'a', 'b', 'c', 'd', 'e', 'Boca');
@@ -72,5 +75,3 @@ Values(0, 2, 2, 0, 0, 2, 0, 10, 10, 1);
 delete from EquipoTorneo;
 
 delete from Equipo;
-
-delete from Torneo;

@@ -26,6 +26,10 @@ public class Torneo {
   private Integer cantidadAmaSusp;
   private Boolean idaYVuelta;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "usuario_id", nullable = false)
+  private Usuario usuario;
+
   @OneToMany(mappedBy = "torneo", cascade = CascadeType.ALL)
   private List<Jornada> jornadas = new ArrayList<>();
 
@@ -96,6 +100,14 @@ public class Torneo {
 
   public void setIdaYVuelta(Boolean idaYVuelta) {
     this.idaYVuelta = idaYVuelta;
+  }
+
+  public Usuario getUsuario() {
+    return usuario;
+  }
+
+  public void setUsuario(Usuario usuario) {
+    this.usuario = usuario;
   }
 
   public void agregarJornada(Jornada jornada) {

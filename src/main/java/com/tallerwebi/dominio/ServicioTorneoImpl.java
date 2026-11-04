@@ -1,9 +1,7 @@
 package com.tallerwebi.dominio;
 
-import com.tallerwebi.dominio.excepcion.FechaLimiteEditarTorneo;
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
 import com.tallerwebi.infraestructura.RepositorioEquipoImpl;
-import com.tallerwebi.infraestructura.RepositorioEquipoTorneoImpl;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,39 +47,38 @@ public class ServicioTorneoImpl implements ServicioTorneo {
   }
 
   @Override
-  public void registrarTorneo(Torneo torneo) throws TorneoExistente, Exception {
-    validarDatosTorneo(torneo);
-
+  public void registrarTorneo(Torneo torneo, Usuario usuario) throws TorneoExistente, Exception {
     Torneo torneoEncontrado = repositorioTorneo.buscarTorneo(torneo.getNombre());
 
     if (torneoEncontrado != null) {
       throw new TorneoExistente();
     }
 
+    torneo.setUsuario(usuario);
     repositorioTorneo.guardar(torneo);
   }
 
-  private void validarDatosTorneo(Torneo torneo) {
-    if (torneo == null) {
-      throw new IllegalArgumentException("El torneo no puede ser nulo");
-    }
+  /*private void validarDatosTorneo (Torneo torneo){
+      if (torneo == null) {
+        throw new IllegalArgumentException("El torneo no puede ser nulo");
+      }
 
-    if (torneo.getCantidadMaxJugadores() <= torneo.getCantidadMinJugadores()) {
-      throw new IllegalArgumentException(
-        "La cantidad máxima de jugadores debe ser mayor que la mínima"
-      );
-    }
+      if (torneo.getCantidadMaxJugadores() <= torneo.getCantidadMinJugadores()) {
+        throw new IllegalArgumentException(
+                "La cantidad máxima de jugadores debe ser mayor que la mínima"
+        );
+      }
 
-    if (
-      torneo.getFechaInicio() == null ||
-      torneo.getFechaInicio().isBefore(java.time.LocalDateTime.now())
-    ) {
-      throw new IllegalArgumentException(
-        "No puedes iniciar un torneo con una fecha anterior a la actual"
-      );
+      if (
+              torneo.getFechaInicio() == null ||
+                      torneo.getFechaInicio().isBefore(java.time.LocalDateTime.now())
+      ) {
+        throw new IllegalArgumentException(
+                "No puedes iniciar un torneo con una fecha anterior a la actual"
+        );
+      }
     }
-  }
-
+*/
   @Override
   public List<Torneo> obtenerTorneos() {
     return repositorioTorneo.listar();
@@ -324,5 +321,10 @@ public class ServicioTorneoImpl implements ServicioTorneo {
     ) {
       crearTorneoConFixture(torneo, idsEquipos);
     }
+  }
+
+  @Override
+  public List<Torneo> buscarTorneosPorUsuario(Long idUsuario) {
+    return repositorioTorneo.buscarTorneosPorUsuario(idUsuario);
   }
 }

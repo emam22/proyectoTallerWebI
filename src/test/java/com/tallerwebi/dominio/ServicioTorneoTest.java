@@ -73,10 +73,11 @@ public class ServicioTorneoTest {
   public void registrarTorneoSiNoExisteDeberiaGuardarlo() throws TorneoExistente, Exception {
     // preparacion
     Torneo torneo = torneoValido("nuevoTorneo");
+    Usuario usuario = mock(Usuario.class);
     when(this.repositorioTorneoMock.buscarTorneo(torneo.getNombre())).thenReturn(null);
 
     // ejecucion
-    this.servicioTorneo.registrarTorneo(torneo);
+    this.servicioTorneo.registrarTorneo(torneo, usuario);
 
     // validacion
     verify(this.repositorioTorneoMock, times(1)).guardar(torneo);
@@ -86,10 +87,11 @@ public class ServicioTorneoTest {
   public void registrarTorneoSiExisteDeberiaLanzarExcepcion() {
     // preparacion
     Torneo torneo = torneoValido("MegaFutbol");
+    Usuario usuario = mock(Usuario.class);
     when(this.repositorioTorneoMock.buscarTorneo(torneo.getNombre())).thenReturn(new Torneo());
 
     // ejecucion y validacion
-    assertThrows(TorneoExistente.class, () -> this.servicioTorneo.registrarTorneo(torneo));
+    assertThrows(TorneoExistente.class, () -> this.servicioTorneo.registrarTorneo(torneo, usuario));
     verify(this.repositorioTorneoMock, times(0)).guardar(torneo);
   }
 

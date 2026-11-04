@@ -60,6 +60,8 @@ public class RepositorioPartidoTest {
     // preparacion
     Torneo torneo = new Torneo();
     torneo.setNombre("Clausura");
+    torneo.setUsuario(crearUsuario());
+
     sessionFactory.getCurrentSession().persist(torneo);
 
     Equipo equipoLocal = new Equipo();
@@ -88,5 +90,17 @@ public class RepositorioPartidoTest {
 
     assertThat(partidoBuscado, is(notNullValue()));
     assertThat(partidoBuscado.getId(), equalTo(partido.getId()));
+  }
+
+  private Usuario crearUsuario() {
+    Usuario usuario = new Usuario();
+    usuario.setEmail("admin@test.com");
+    usuario.setPassword("123456");
+    usuario.setRol("admin");
+    usuario.setActivo(true);
+
+    sessionFactory.getCurrentSession().persist(usuario);
+
+    return usuario;
   }
 }

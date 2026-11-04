@@ -3,6 +3,7 @@ package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.*;
 import com.tallerwebi.dominio.excepcion.*;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -40,16 +41,19 @@ public class ControladorTorneo {
 
   private static final String VISTA_FORMULARIO_EDITAR_EQUIPO = "formulario-editar-equipo";
   private static final String ATRIBUTO_EQUIPO = "equipo";
+  private ValidadorTorneo validadorTorneo;
 
   @Autowired
   public ControladorTorneo(
     ServicioTorneo servicioTorneo,
     ServicioEquipoTorneo servicioEquipoTorneo,
-    ServicioEquipo servicioEquipo
+    ServicioEquipo servicioEquipo,
+    ValidadorTorneo validadorTorneo
   ) {
     this.servicioTorneo = servicioTorneo;
     this.servicioEquipoTorneo = servicioEquipoTorneo;
     this.servicioEquipo = servicioEquipo;
+    this.validadorTorneo = validadorTorneo;
   }
 
   @ModelAttribute(TORNEO_CARGADO)
@@ -71,19 +75,36 @@ public class ControladorTorneo {
 
   @RequestMapping(path = "/crearTorneo", method = RequestMethod.POST)
   public ModelAndView crearTorneo(
-    @ModelAttribute(TORNEO) Torneo torneo,
+    @ModelAttribute("torneo") Torneo torneo,
+    HttpServletRequest request,
     RedirectAttributes redirectAttributes
   ) {
-    try {
-      servicioTorneo.registrarTorneo(torneo);
+    if (!validadorTorneo.tieneCantidadJugadoresValida(torneo)) {
+      redirectAttributes.addFlashAttribute(
+        ERROR,
+        "La cantidad máxima de jugadores debe ser mayor que la mínima"
+      );
 
-      return new ModelAndView(REDIRECT_CREACION_EQUIPO + torneo.getId());
-    } catch (TorneoExistente e) {
-      redirectAttributes.addFlashAttribute(ERROR, "Ya existe un torneo con este nombre");
-    } catch (IllegalArgumentException e) {
-      redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
-    } catch (Exception e) {
-      redirectAttributes.addFlashAttribute(ERROR, "Error al crear el torneo");
+      return new ModelAndView(REDIRECT_FORMULARIO_TORNEO);
+    }
+
+    if (!validadorTorneo.tieneFechaInicioValida(torneo)) {
+      redirectAttributes.addFlashAttribute(
+        ERROR,
+        "No puedes iniciar un torneo con una fecha anterior a la actual"
+      );
+      return new ModelAndView(REDIRECT_FORMULARIO_TORNEO);
+    }
+
+    Usuario usuario = (Usuario) request.getSession().getAttribute("USUARIO");
+    if (!esAdministrador(usuario)) {
+      redirectAttributes.addFlashAttribute(ERROR, "No tienes permisos para crear un torneo");
+
+      return new ModelAndView("redirect:/login");
+    }
+
+    if (!registrarTorneo(torneo, usuario, redirectAttributes)) {
+      return new ModelAndView(REDIRECT_FORMULARIO_TORNEO);
     }
 
     return new ModelAndView(REDIRECT_FORMULARIO_TORNEO);
@@ -492,15 +513,8 @@ public class ControladorTorneo {
   }
 
   private void validarModificacionTorneo(Long idTorneo) throws FechaLimiteEditarTorneo {
-    validarModificacionTorneo(servicioTorneo.consultarTorneoPorId(idTorneo));
-  }
-
-  private void validarModificacionTorneo(Torneo torneo) throws FechaLimiteEditarTorneo {
-    if (torneo != null && !torneo.permiteModificaciones()) {
-      throw new FechaLimiteEditarTorneo(
-        "La fecha actual es mayor a la permitida para hacer cambios en el torneo."
-      );
-    }
+    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+    validadorTorneo.validarModificacion(torneo);
   }
 
   @RequestMapping(path = "/eliminarTorneo", method = RequestMethod.GET)
@@ -511,7 +525,7 @@ public class ControladorTorneo {
     Long idTorneo = obtenerIdTorneo(torneo);
 
     try {
-      validarModificacionTorneo(torneo);
+      validarModificacionTorneo(idTorneo);
       servicioTorneo.eliminarTorneo(idTorneo);
       redirectAttributes.addFlashAttribute("mensaje", "Torneo eliminado correctamente.");
       return new ModelAndView(REDIRECT_LOBBY_ADMIN);
@@ -567,5 +581,26 @@ public class ControladorTorneo {
       // Error al crear el directorio o guardar el archivo.
       return ResponseEntity.internalServerError().body("No se pudo guardar el escudo.");
     }
+  }
+
+  private boolean esAdministrador(Usuario usuario) {
+    return usuario != null && "admin".equalsIgnoreCase(usuario.getRol());
+  }
+
+  private boolean registrarTorneo(
+    Torneo torneo,
+    Usuario usuario,
+    RedirectAttributes redirectAttributes
+  ) {
+    try {
+      servicioTorneo.registrarTorneo(torneo, usuario);
+      return true;
+    } catch (TorneoExistente e) {
+      redirectAttributes.addFlashAttribute(ERROR, "Ya existe un torneo con este nombre");
+    } catch (Exception e) {
+      redirectAttributes.addFlashAttribute(ERROR, "Error al crear el torneo");
+    }
+
+    return false;
   }
 }

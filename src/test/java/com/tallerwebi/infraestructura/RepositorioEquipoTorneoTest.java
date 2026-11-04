@@ -3,10 +3,7 @@ package com.tallerwebi.infraestructura;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-import com.tallerwebi.dominio.Equipo;
-import com.tallerwebi.dominio.EquipoTorneo;
-import com.tallerwebi.dominio.RepositorioEquipoTorneo;
-import com.tallerwebi.dominio.Torneo;
+import com.tallerwebi.dominio.*;
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -59,6 +56,7 @@ public class RepositorioEquipoTorneoTest {
     // preparacion
     Torneo torneo = new Torneo();
     torneo.setNombre("MegaFutbol");
+    torneo.setUsuario(crearUsuario());
 
     sessionFactory.getCurrentSession().persist(torneo);
 
@@ -102,6 +100,7 @@ public class RepositorioEquipoTorneoTest {
     // preparacion
     Torneo torneo = new Torneo();
     torneo.setNombre("MegaFutbol");
+    torneo.setUsuario(crearUsuario());
 
     Equipo equipo = new Equipo();
     equipo.setNombre("Los Pumas");
@@ -133,9 +132,11 @@ public class RepositorioEquipoTorneoTest {
     // preparación
     Torneo torneo1 = new Torneo();
     torneo1.setNombre("MegaFutbol");
+    torneo1.setUsuario(crearUsuario());
 
     Torneo torneo2 = new Torneo();
     torneo2.setNombre("SuperLiga");
+    torneo2.setUsuario(crearUsuario());
 
     Equipo equipo = new Equipo();
     equipo.setNombre("Los Pumas");
@@ -167,6 +168,7 @@ public class RepositorioEquipoTorneoTest {
     // preparacion
     Torneo torneo = new Torneo();
     torneo.setNombre("Torneo de prueba");
+    torneo.setUsuario(crearUsuario());
 
     sessionFactory.getCurrentSession().persist(torneo);
 
@@ -233,6 +235,8 @@ public class RepositorioEquipoTorneoTest {
     // preparacion
     Torneo torneo = new Torneo();
     torneo.setNombre("Torneo de prueba");
+    torneo.setUsuario(crearUsuario());
+
     sessionFactory.getCurrentSession().persist(torneo);
 
     Equipo equipo = new Equipo();
@@ -268,6 +272,8 @@ public class RepositorioEquipoTorneoTest {
     // preparacion
     Torneo torneo = new Torneo();
     torneo.setNombre("Torneo de prueba");
+    torneo.setUsuario(crearUsuario());
+
     sessionFactory.getCurrentSession().persist(torneo);
 
     Equipo equipo = new Equipo();
@@ -303,6 +309,8 @@ public class RepositorioEquipoTorneoTest {
     // 1. Guardamos un torneo
     Torneo torneo = new Torneo();
     torneo.setNombre("Torneo Prueba");
+    torneo.setUsuario(crearUsuario());
+
     sessionFactory.getCurrentSession().persist(torneo);
 
     // 2. Guardamos un equipo
@@ -332,5 +340,17 @@ public class RepositorioEquipoTorneoTest {
       .getResultList();
 
     assertThat(restantes.size(), equalTo(0));
+  }
+
+  private Usuario crearUsuario() {
+    Usuario usuario = new Usuario();
+    usuario.setEmail("admin@test.com");
+    usuario.setPassword("123456");
+    usuario.setRol("admin");
+    usuario.setActivo(true);
+
+    sessionFactory.getCurrentSession().persist(usuario);
+
+    return usuario;
   }
 }

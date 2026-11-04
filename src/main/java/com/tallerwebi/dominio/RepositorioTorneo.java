@@ -8,4 +8,5 @@ public interface RepositorioTorneo {
   void guardar(Torneo torneo);
   List<Torneo> listar();
   void borrar(Long id);
+  List<Torneo> buscarTorneosPorUsuario(Long idUsuario);
 }

@@ -49,16 +49,23 @@ public class ControladorLogin {
       datosLogin.getEmail(),
       datosLogin.getPassword()
     );
+
     String rol = usuarioBuscado == null ? null : usuarioBuscado.getRol();
+
     if (usuarioBuscado != null && "admin".equalsIgnoreCase(rol)) {
       request.getSession().setAttribute("ROL", rol);
+      request.getSession().setAttribute("USUARIO", usuarioBuscado);
+
       return new ModelAndView("redirect:/lobbyAdmin");
     } else if (usuarioBuscado != null && "usuario".equalsIgnoreCase(rol)) {
       request.getSession().setAttribute("ROL", rol);
+      request.getSession().setAttribute("USUARIO", usuarioBuscado);
+
       return new ModelAndView("redirect:/elegirTorneo");
     } else {
       Map<String, Object> model = new ModelMap();
       model.put("error", "Usuario o clave incorrecta");
+
       return new ModelAndView("login", model);
     }
   }

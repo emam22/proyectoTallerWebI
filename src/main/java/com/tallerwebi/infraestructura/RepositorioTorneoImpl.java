@@ -56,4 +56,13 @@ public class RepositorioTorneoImpl implements RepositorioTorneo {
       .setParameter("id", id)
       .executeUpdate();
   }
+
+  @Override
+  public List<Torneo> buscarTorneosPorUsuario(Long idUsuario) {
+    return sessionFactory
+      .getCurrentSession()
+      .createQuery("FROM Torneo t WHERE t.usuario.id = :idUsuario", Torneo.class)
+      .setParameter("idUsuario", idUsuario)
+      .getResultList();
+  }
 }

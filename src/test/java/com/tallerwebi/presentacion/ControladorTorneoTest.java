@@ -11,6 +11,8 @@ import static org.mockito.Mockito.*;
 
 import com.tallerwebi.dominio.*;
 import com.tallerwebi.dominio.excepcion.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -28,6 +30,10 @@ public class ControladorTorneoTest {
   private ServicioTorneo servicioTorneoMock;
   private ServicioEquipoTorneo servicioEquipoTorneoMock;
   private ServicioEquipo servicioEquipoMock;
+  private Usuario usuarioMock;
+  private HttpServletRequest requestMock;
+  private HttpSession sessionMock;
+  private ValidadorTorneo validadorTorneoMock;
 
   @BeforeEach
   public void init() {
@@ -35,8 +41,17 @@ public class ControladorTorneoTest {
     servicioTorneoMock = mock(ServicioTorneo.class);
     servicioEquipoTorneoMock = mock(ServicioEquipoTorneo.class);
     servicioEquipoMock = mock(ServicioEquipo.class);
+    usuarioMock = mock(Usuario.class);
+    requestMock = mock(HttpServletRequest.class);
+    sessionMock = mock(HttpSession.class);
+    validadorTorneoMock = mock(ValidadorTorneo.class);
     controladorTorneo =
-      new ControladorTorneo(servicioTorneoMock, servicioEquipoTorneoMock, servicioEquipoMock);
+      new ControladorTorneo(
+        servicioTorneoMock,
+        servicioEquipoTorneoMock,
+        servicioEquipoMock,
+        validadorTorneoMock
+      );
   }
 
   private Torneo torneoConId(Long id) {
@@ -70,34 +85,42 @@ public class ControladorTorneoTest {
   public void alCrearTorneoSeDebeCrearTorneoYRedirigirACreacionDeEquipo() throws Exception {
     // preparacion
     when(torneoMock.getId()).thenReturn(5L);
-    when(torneoMock.getCantidadMinJugadores()).thenReturn(11);
-    when(torneoMock.getCantidadMaxJugadores()).thenReturn(23);
-    when(torneoMock.getFechaInicio()).thenReturn(LocalDateTime.now().plusDays(7));
+    when(usuarioMock.getRol()).thenReturn("admin");
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioMock);
+    when(validadorTorneoMock.tieneCantidadJugadoresValida(torneoMock)).thenReturn(true);
+
+    when(validadorTorneoMock.tieneFechaInicioValida(torneoMock)).thenReturn(true);
 
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
     // ejecucion
-    ModelAndView mav = controladorTorneo.crearTorneo(torneoMock, redirectAttributes);
+    ModelAndView mav = controladorTorneo.crearTorneo(torneoMock, requestMock, redirectAttributes);
 
     // validacion
     assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/creacion-equipo?idTorneo=5"));
 
-    verify(servicioTorneoMock, times(1)).registrarTorneo(torneoMock);
+    verify(servicioTorneoMock, times(1)).registrarTorneo(torneoMock, usuarioMock);
   }
 
   @Test
   public void siElTorneoYaExisteSeDebeVolverALFormulario() throws Exception {
     // Preparación
-    when(torneoMock.getCantidadMinJugadores()).thenReturn(11);
-    when(torneoMock.getCantidadMaxJugadores()).thenReturn(23);
-    when(torneoMock.getFechaInicio()).thenReturn(LocalDateTime.now().plusDays(7));
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioMock);
+    when(usuarioMock.getRol()).thenReturn("admin");
+    when(validadorTorneoMock.tieneCantidadJugadoresValida(torneoMock)).thenReturn(true);
 
-    doThrow(TorneoExistente.class).when(servicioTorneoMock).registrarTorneo(torneoMock);
+    when(validadorTorneoMock.tieneFechaInicioValida(torneoMock)).thenReturn(true);
+
+    doThrow(TorneoExistente.class)
+      .when(servicioTorneoMock)
+      .registrarTorneo(torneoMock, usuarioMock);
 
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
     // Ejecución
-    ModelAndView mav = controladorTorneo.crearTorneo(torneoMock, redirectAttributes);
+    ModelAndView mav = controladorTorneo.crearTorneo(torneoMock, requestMock, redirectAttributes);
 
     // Validación
     assertThat(mav.getViewName(), equalToIgnoringCase("redirect:/formulario-torneo"));
@@ -111,16 +134,25 @@ public class ControladorTorneoTest {
   @Test
   public void errorEnRegistrarTorneoDeberiaVolverAFormularioTorneoYMostrarError() throws Exception {
     // preparacion
-    when(torneoMock.getCantidadMinJugadores()).thenReturn(11);
-    when(torneoMock.getCantidadMaxJugadores()).thenReturn(23);
-    when(torneoMock.getFechaInicio()).thenReturn(LocalDateTime.now().plusDays(7));
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioMock);
+    when(usuarioMock.getRol()).thenReturn("admin");
+    when(validadorTorneoMock.tieneCantidadJugadoresValida(torneoMock)).thenReturn(true);
 
-    doThrow(RuntimeException.class).when(servicioTorneoMock).registrarTorneo(torneoMock);
+    when(validadorTorneoMock.tieneFechaInicioValida(torneoMock)).thenReturn(true);
+
+    doThrow(RuntimeException.class)
+      .when(servicioTorneoMock)
+      .registrarTorneo(torneoMock, usuarioMock);
 
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
     // ejecucion
-    ModelAndView modelAndView = controladorTorneo.crearTorneo(torneoMock, redirectAttributes);
+    ModelAndView modelAndView = controladorTorneo.crearTorneo(
+      torneoMock,
+      requestMock,
+      redirectAttributes
+    );
 
     // validacion
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("redirect:/formulario-torneo"));
@@ -170,15 +202,19 @@ public class ControladorTorneoTest {
     Torneo torneo = new Torneo();
     torneo.setId(5L);
     torneo.setNombre("MegaFutbol");
-    torneo.setCantidadMaxJugadores(23);
-    torneo.setCantidadMinJugadores(11);
     torneo.setCantidadDeEquipos(8);
-    torneo.setFechaInicio(LocalDateTime.now().plusDays(5));
+
+    when(validadorTorneoMock.tieneCantidadJugadoresValida(torneo)).thenReturn(true);
+
+    when(validadorTorneoMock.tieneFechaInicioValida(torneo)).thenReturn(true);
+    when(requestMock.getSession()).thenReturn(sessionMock);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioMock);
+    when(usuarioMock.getRol()).thenReturn("admin");
 
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
     //ejecucion
-    ModelAndView mav = controladorTorneo.crearTorneo(torneo, redirectAttributes);
+    ModelAndView mav = controladorTorneo.crearTorneo(torneo, requestMock, redirectAttributes);
 
     // validacion
     assertThat(mav.getViewName(), equalTo("redirect:/creacion-equipo?idTorneo=5"));
@@ -290,11 +326,12 @@ public class ControladorTorneoTest {
     // preparación
     when(torneoMock.getCantidadMinJugadores()).thenReturn(11);
     when(torneoMock.getCantidadMaxJugadores()).thenReturn(11);
+    when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioMock);
 
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
     // ejecución
-    ModelAndView mav = controladorTorneo.crearTorneo(torneoMock, redirectAttributes);
+    ModelAndView mav = controladorTorneo.crearTorneo(torneoMock, requestMock, redirectAttributes);
 
     // validación
     assertThat(mav.getViewName(), equalTo("redirect:/formulario-torneo"));
@@ -303,7 +340,7 @@ public class ControladorTorneoTest {
       equalTo("La cantidad máxima de jugadores debe ser mayor que la mínima")
     );
 
-    verify(servicioTorneoMock, never()).registrarTorneo(torneoMock);
+    verify(servicioTorneoMock, never()).registrarTorneo(torneoMock, usuarioMock);
   }
 
   @Test
@@ -1016,14 +1053,24 @@ public class ControladorTorneoTest {
   }
 
   @Test
-  public void eliminarTorneoFueraDeFechaLimiteDebeRedirigirConError() {
+  public void eliminarTorneoFueraDeFechaLimiteDebeRedirigirConError()
+    throws FechaLimiteEditarTorneo {
     Long idTorneo = 1L;
+
     Torneo torneo = new Torneo();
     torneo.setId(idTorneo);
-    // Fecha en el pasado o a menos de 24 hs para forzar la excepción
     torneo.setFechaInicio(LocalDateTime.now().plusHours(10));
 
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+
+    doThrow(
+      new FechaLimiteEditarTorneo(
+        "La fecha actual es mayor a la permitida para hacer cambios en el torneo."
+      )
+    )
+      .when(validadorTorneoMock)
+      .validarModificacion(torneo);
+
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
     ModelAndView mav = controladorTorneo.eliminarTorneoAdmin(torneo, redirectAttributes);
@@ -1036,11 +1083,21 @@ public class ControladorTorneoTest {
   @Test
   public void crearEquipoAdminFueraDeFechaLimiteDebeRedirigirConError() throws Exception {
     Long idTorneo = 1L;
+
     Torneo torneo = new Torneo();
     torneo.setId(idTorneo);
-    torneo.setFechaInicio(LocalDateTime.now().plusHours(5)); // Dispara FechaLimiteEditarTorneo
+    torneo.setFechaInicio(LocalDateTime.now().plusHours(5));
 
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+
+    doThrow(
+      new FechaLimiteEditarTorneo(
+        "La fecha actual es mayor a la permitida para hacer cambios en el torneo."
+      )
+    )
+      .when(validadorTorneoMock)
+      .validarModificacion(torneo);
+
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
     ModelAndView mav = controladorTorneo.crearEquipoAdmin(idTorneo, redirectAttributes);
@@ -1057,6 +1114,15 @@ public class ControladorTorneoTest {
     torneo.setFechaInicio(LocalDateTime.now().plusHours(10)); // Vencido plazo
 
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+
+    doThrow(
+      new FechaLimiteEditarTorneo(
+        "La fecha actual es mayor a la permitida para hacer cambios en el torneo."
+      )
+    )
+      .when(validadorTorneoMock)
+      .validarModificacion(torneo);
+
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
     ModelAndView mav = controladorTorneo.mostrarEquiposParaEditar(idTorneo, redirectAttributes);
@@ -1074,6 +1140,15 @@ public class ControladorTorneoTest {
     torneo.setFechaInicio(LocalDateTime.now().plusHours(10)); // Vencido plazo
 
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
+
+    doThrow(
+      new FechaLimiteEditarTorneo(
+        "La fecha actual es mayor a la permitida para hacer cambios en el torneo."
+      )
+    )
+      .when(validadorTorneoMock)
+      .validarModificacion(torneo);
+
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
     ModelAndView mav = controladorTorneo.mostrarEquiposParaDesvincular(

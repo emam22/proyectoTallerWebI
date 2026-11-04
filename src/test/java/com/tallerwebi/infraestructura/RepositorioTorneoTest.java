@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 
 import com.tallerwebi.dominio.RepositorioTorneo;
 import com.tallerwebi.dominio.Torneo;
+import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -39,6 +40,7 @@ public class RepositorioTorneoTest {
     //preparacion
     Torneo torneo = new Torneo();
     torneo.setNombre(nombreTorneo);
+    torneo.setUsuario(crearUsuario());
 
     //ejecucion
     repositorioTorneo.guardar(torneo);
@@ -73,6 +75,7 @@ public class RepositorioTorneoTest {
     //preparacion
     Torneo torneo = new Torneo();
     torneo.setNombre("MegaFutbol");
+    torneo.setUsuario(crearUsuario());
 
     //ejecucion
     sessionFactory.getCurrentSession().persist(torneo);
@@ -105,9 +108,11 @@ public class RepositorioTorneoTest {
     // preparacion
     Torneo torneo1 = new Torneo();
     torneo1.setNombre("Campito");
+    torneo1.setUsuario(crearUsuario());
 
     Torneo torneo2 = new Torneo();
     torneo2.setNombre("MegaFutbol");
+    torneo2.setUsuario(crearUsuario());
 
     sessionFactory.getCurrentSession().persist(torneo1);
 
@@ -138,6 +143,8 @@ public class RepositorioTorneoTest {
   public void queSePuedaBorrarUnTorneoDeLaBaseDeDatos() {
     Torneo torneo = new Torneo();
     torneo.setNombre("Torneo Clausura");
+    torneo.setUsuario(crearUsuario());
+
     sessionFactory.getCurrentSession().persist(torneo);
 
     sessionFactory.getCurrentSession().flush();
@@ -149,5 +156,17 @@ public class RepositorioTorneoTest {
 
     Torneo buscado = sessionFactory.getCurrentSession().get(Torneo.class, idGenerado);
     assertThat(buscado, nullValue());
+  }
+
+  private Usuario crearUsuario() {
+    Usuario usuario = new Usuario();
+    usuario.setEmail("admin@test.com");
+    usuario.setPassword("123456");
+    usuario.setRol("admin");
+    usuario.setActivo(true);
+
+    sessionFactory.getCurrentSession().persist(usuario);
+
+    return usuario;
   }
 }

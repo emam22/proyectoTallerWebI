@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.tallerwebi.dominio.Jornada;
 import com.tallerwebi.dominio.Torneo;
+import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.infraestructura.config.HibernateInfraestructuraTestConfig;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
@@ -39,6 +40,7 @@ public class RepositorioJornadaTest {
   public void deberiaGuardarUnaJornada() {
     //given
     Torneo torneo = givenCreacionTorneo("Mega Futbol");
+    torneo.setUsuario(crearUsuario());
 
     sessionFactory.getCurrentSession().persist(torneo);
 
@@ -77,6 +79,8 @@ public class RepositorioJornadaTest {
   public void deberiaGuardarTodasLasJornadasDelTorneoDelFixture() {
     //given
     Torneo torneo = givenCreacionTorneo("Mega Futbol");
+    torneo.setUsuario(crearUsuario());
+
     sessionFactory.getCurrentSession().persist(torneo);
 
     Jornada j1 = new Jornada();
@@ -107,6 +111,8 @@ public class RepositorioJornadaTest {
     //given
     Torneo torneo1 = givenCreacionTorneo("Mega Futbol");
     Torneo torneo2 = givenCreacionTorneo("Futbol Nocturno");
+    torneo1.setUsuario(crearUsuario());
+    torneo2.setUsuario(crearUsuario());
 
     sessionFactory.getCurrentSession().persist(torneo1);
     sessionFactory.getCurrentSession().persist(torneo2);
@@ -137,6 +143,8 @@ public class RepositorioJornadaTest {
   public void deberiaObtenerLasJornadasOrdenadasPorNumero() {
     // given
     Torneo torneo = givenCreacionTorneo("Mega Futbol");
+    torneo.setUsuario(crearUsuario());
+
     sessionFactory.getCurrentSession().persist(torneo);
 
     Jornada j3 = new Jornada();
@@ -162,5 +170,17 @@ public class RepositorioJornadaTest {
     assertThat(jornadas.get(0).getNumero(), is(1));
     assertThat(jornadas.get(1).getNumero(), is(2));
     assertThat(jornadas.get(2).getNumero(), is(3));
+  }
+
+  private Usuario crearUsuario() {
+    Usuario usuario = new Usuario();
+    usuario.setEmail("admin@test.com");
+    usuario.setPassword("123456");
+    usuario.setRol("admin");
+    usuario.setActivo(true);
+
+    sessionFactory.getCurrentSession().persist(usuario);
+
+    return usuario;
   }
 }

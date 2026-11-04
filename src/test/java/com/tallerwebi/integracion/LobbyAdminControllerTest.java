@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.tallerwebi.dominio.Torneo;
+import com.tallerwebi.dominio.Usuario;
 import com.tallerwebi.integracion.config.HibernateTestConfig;
 import com.tallerwebi.integracion.config.SpringWebTestConfig;
 import java.time.LocalDateTime;
@@ -63,6 +64,7 @@ public class LobbyAdminControllerTest {
     Torneo torneo = new Torneo();
     torneo.setNombre("Torneo Clausura");
     torneo.setFechaInicio(LocalDateTime.now().plusDays(5));
+    torneo.setUsuario(crearUsuario());
 
     this.sessionFactory.getCurrentSession().save(torneo);
 
@@ -80,5 +82,17 @@ public class LobbyAdminControllerTest {
     assert modelAndView != null;
     assertThat(modelAndView.getModel().get("idTorneoActual"), equalTo(idTorneo));
     assertThat(modelAndView.getViewName(), equalToIgnoringCase("administrarTorneoAdmin"));
+  }
+
+  private Usuario crearUsuario() {
+    Usuario usuario = new Usuario();
+    usuario.setEmail("admin@test.com");
+    usuario.setPassword("123456");
+    usuario.setRol("admin");
+    usuario.setActivo(true);
+
+    sessionFactory.getCurrentSession().persist(usuario);
+
+    return usuario;
   }
 }
