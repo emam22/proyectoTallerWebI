@@ -1,33 +1,38 @@
-// 1. Obtener email y password pasados por parámetro desde la pantalla de registro
+/* global MercadoPago */
 const urlParams = new URLSearchParams(window.location.search);
-const adminEmail = urlParams.get('email') || "alumno_unlam_pago@gmail.com";
-const adminPassword = urlParams.get('password') || "";
+const adminEmail = urlParams.get("email");
+const adminPassword = urlParams.get("password");
 
-// 2. Inicializar SDK de Mercado Pago
-const mp = new MercadoPago('TEST-8198ecc1-8632-48e8-b2ca-5939a2d9bb40', {
-    locale: 'es-AR'
+// Reemplazar por tu Public Key de Sandbox de Mercado Pago
+const mp = new MercadoPago("TEST-8198ecc1-8632-48e8-b2ca-5939a2d9bb40", {
+    locale: "es-AR"
 });
+
 const bricksBuilder = mp.bricks();
 
-const renderPaymentBrick = async (bricksBuilder) => {
+const renderPaymentBrick = async (bricksBuilderInstance) => {
     const settings = {
         initialization: {
-            amount: 5000,
+            amount: 5000.0,
+            preferenceId: null,
             payer: {
-                email: adminEmail
+                email: adminEmail || "alumno_unlam_pago@gmail.com"
             }
         },
         customization: {
             paymentMethods: {
+                ticket: "all",
+                bankTransfer: "all",
                 creditCard: "all",
-                debitCard: "all"
+                debitCard: "all",
+                mercadoPago: "all"
             }
         },
         callbacks: {
             onReady: () => {
-                console.log("Payment Brick montado exitosamente");
+                // Brick listo para interactuar
             },
-            onSubmit: ({ selectedPaymentMethod, formData }) => {
+            onSubmit: ({ formData }) => {
                 return new Promise((resolve, reject) => {
                     fetch("/spring/api/pagos/procesar", {
                         method: "POST",
@@ -46,47 +51,43 @@ const renderPaymentBrick = async (bricksBuilder) => {
                             password: adminPassword
                         })
                     })
-                        .then(async response => {
+                        .then(async (response) => {
                             const data = await response.json();
 
-                            // 1. Error del backend (ej: contraseña débil o vacía)
                             if (!response.ok || data.status === "error") {
                                 alert("No se pudo completar el registro: " + (data.mensaje || "Datos inválidos"));
                                 reject();
-                                // Redirigir al registro (podés pasar el email para conservarlo si querés)
                                 window.location.href = "/spring/nuevo-usuario";
                                 return;
                             }
 
-                            // 2. Pago aprobado con éxito
                             if (data.status === "approved") {
                                 resolve();
                                 alert("¡Cuenta de Administrador creada y pago aprobado con éxito!");
                                 window.location.href = data.redirect || "/spring/lobbyAdmin";
                             } else {
-                                // 3. Tarjeta rechazada o error en la transacción de Mercado Pago
                                 alert("El pago no fue aprobado: " + (data.status_detail || data.status));
                                 resolve();
                                 window.location.href = "/spring/nuevo-usuario";
                             }
                         })
-                        .catch(err => {
-                            console.error("Error en la petición:", err);
+                        .catch((err) => {
                             alert("Ocurrió un error al comunicarse con el servidor.");
-                            reject();
+                            reject(err);
                             window.location.href = "/spring/nuevo-usuario";
                         });
                 });
             },
             onError: (error) => {
-                console.error("Error devuelto por el Brick:", error);
+                alert("Error al cargar la pasarela de pagos.");
+                window.location.href = "/spring/nuevo-usuario";
             }
         }
     };
 
-    window.paymentBrickController = await bricksBuilder.create(
-        'payment',
-        'paymentBrick_container',
+    window.paymentBrickController = await bricksBuilderInstance.create(
+        "payment",
+        "paymentBrick_container",
         settings
     );
 };

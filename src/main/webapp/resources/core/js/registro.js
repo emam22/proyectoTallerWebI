@@ -1,8 +1,8 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
     const btnComprarAdmin = document.getElementById("btn-comprar-admin");
 
     if (btnComprarAdmin) {
-        btnComprarAdmin.addEventListener("click", function () {
+        btnComprarAdmin.addEventListener("click", () => {
             const emailInput = document.getElementById("email").value.trim();
             const passInput = document.getElementById("password").value.trim();
 
