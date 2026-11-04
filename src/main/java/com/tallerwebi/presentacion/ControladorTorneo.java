@@ -107,7 +107,7 @@ public class ControladorTorneo {
       return new ModelAndView(REDIRECT_FORMULARIO_TORNEO);
     }
 
-    return new ModelAndView(REDIRECT_FORMULARIO_TORNEO);
+    return new ModelAndView("redirect:/creacion-equipo?idTorneo=" + torneo.getId());
   }
 
   @RequestMapping(path = "/creacion-equipo-admin", method = RequestMethod.GET)

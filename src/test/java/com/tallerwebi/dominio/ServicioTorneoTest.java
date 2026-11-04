@@ -8,6 +8,7 @@ import static org.mockito.Mockito.any;
 
 import com.tallerwebi.dominio.excepcion.TorneoExistente;
 import com.tallerwebi.infraestructura.RepositorioEquipoImpl;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -62,6 +63,7 @@ public class ServicioTorneoTest {
     Torneo torneo = new Torneo();
     torneo.setNombre(nombre);
     torneo.setId(1L);
+    torneo.setFechaInicio(LocalDateTime.now().plusDays(1));
     torneo.setCantidadDeEquipos(4);
     torneo.setCantidadMinJugadores(10);
     torneo.setCantidadMaxJugadores(15);
@@ -441,5 +443,52 @@ public class ServicioTorneoTest {
     InOrder inOrder = inOrder(repositorioEquipoTorneoMock, repositorioTorneoMock);
     inOrder.verify(repositorioEquipoTorneoMock, times(1)).eliminarPorTorneo(idTorneo);
     inOrder.verify(repositorioTorneoMock, times(1)).borrar(idTorneo);
+  }
+
+  @Test
+  public void finalizarTorneoConJornadasSinPartidosDeberiaGenerarFixture() throws Exception {
+    // Preparación
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    torneo.setCantidadDeEquipos(2);
+    torneo.setIdaYVuelta(false);
+
+    when(repositorioTorneoMock.buscarTorneoPorId(1L)).thenReturn(torneo);
+
+    Equipo equipo1 = new Equipo();
+    equipo1.setId(10L);
+
+    Equipo equipo2 = new Equipo();
+    equipo2.setId(20L);
+
+    EquipoTorneo inscripcion1 = new EquipoTorneo();
+    inscripcion1.setEquipo(equipo1);
+
+    EquipoTorneo inscripcion2 = new EquipoTorneo();
+    inscripcion2.setEquipo(equipo2);
+
+    when(servicioEquipoTorneoMock.obtenerEquiposPorTorneo(1L))
+      .thenReturn(Arrays.asList(inscripcion1, inscripcion2));
+
+    Jornada jornada1 = mock(Jornada.class);
+    Jornada jornada2 = mock(Jornada.class);
+
+    when(jornada1.getPartidos()).thenReturn(new ArrayList<>());
+    when(jornada2.getPartidos()).thenReturn(new ArrayList<>());
+
+    when(repositorioJornadaMock.obtenerJornadasPorTorneo(1L))
+      .thenReturn(Arrays.asList(jornada1, jornada2));
+
+    when(repositorioEquipoMock.buscarPorId(10L)).thenReturn(equipo1);
+    when(repositorioEquipoMock.buscarPorId(20L)).thenReturn(equipo2);
+
+    // Ejecución
+    servicioTorneo.finalizarTorneo(1L);
+
+    // Validación
+    verify(repositorioJornadaMock, times(1)).guardar(any(Jornada.class));
+
+    verify(repositorioEquipoMock).buscarPorId(10L);
+    verify(repositorioEquipoMock).buscarPorId(20L);
   }
 }

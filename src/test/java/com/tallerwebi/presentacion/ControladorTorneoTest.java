@@ -259,38 +259,20 @@ public class ControladorTorneoTest {
   //metodo verFixture
   @Test
   public void finalizarTorneoConTodosLosEquiposDeberiaGenerarFixture() throws Exception {
-    // preparación
+    // Preparación
     Torneo torneo = new Torneo();
     torneo.setId(1L);
     torneo.setCantidadDeEquipos(2);
 
-    when(servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(torneo);
-    when(servicioEquipoTorneoMock.contarEquiposPorTorneo(1L)).thenReturn(2);
-    when(servicioTorneoMock.obtenerJornadasPorTorneo(1L)).thenReturn(new ArrayList<>());
-
-    Equipo equipo1 = mock(Equipo.class);
-    Equipo equipo2 = mock(Equipo.class);
-
-    when(equipo1.getId()).thenReturn(10L);
-    when(equipo2.getId()).thenReturn(20L);
-
-    EquipoTorneo agregarEquipo1 = mock(EquipoTorneo.class);
-    EquipoTorneo agregarEquipo2 = mock(EquipoTorneo.class);
-
-    when(agregarEquipo1.getEquipo()).thenReturn(equipo1);
-    when(agregarEquipo2.getEquipo()).thenReturn(equipo2);
-
-    when(servicioEquipoTorneoMock.obtenerEquiposPorTorneo(1L))
-      .thenReturn(Arrays.asList(agregarEquipo1, agregarEquipo2));
-
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
-    // ejecución
+    // Ejecución
     ModelAndView mav = controladorTorneo.finalizarTorneo(torneo, redirectAttributes);
 
-    // validación
+    // Validación
+    assertThat(mav.getViewName(), equalTo("redirect:/lobbyAdmin"));
 
-    verify(servicioTorneoMock).crearTorneoConFixture(eq(torneo), eq(Arrays.asList(10L, 20L)));
+    verify(servicioTorneoMock, times(1)).finalizarTorneo(1L);
   }
 
   @Test
@@ -320,13 +302,18 @@ public class ControladorTorneoTest {
   }
 
   //mas test para seguir validando metodos
-
   @Test
   public void siLaCantidadMaximaNoEsValidaDebeVolverAlFormulario() throws Exception {
     // preparación
     when(torneoMock.getCantidadMinJugadores()).thenReturn(11);
     when(torneoMock.getCantidadMaxJugadores()).thenReturn(11);
     when(sessionMock.getAttribute("USUARIO")).thenReturn(usuarioMock);
+
+    doThrow(
+      new IllegalArgumentException("La cantidad máxima de jugadores debe ser mayor que la mínima")
+    )
+      .when(servicioTorneoMock)
+      .registrarTorneo(torneoMock, usuarioMock);
 
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
@@ -509,13 +496,21 @@ public class ControladorTorneoTest {
   }
 
   @Test
-  public void finalizarTorneoConCantidadIncorrectaDeEquiposDeberiaMostrarError() {
+  public void finalizarTorneoConCantidadIncorrectaDeEquiposDeberiaMostrarError() throws Exception {
     // Preparación
     Torneo torneo = new Torneo();
     torneo.setId(1L);
     torneo.setCantidadDeEquipos(4);
 
     when(servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(torneo);
+
+    doThrow(
+      new IllegalArgumentException(
+        "La cantidad de equipos inscriptos no coincide con la configurada."
+      )
+    )
+      .when(servicioTorneoMock)
+      .finalizarTorneo(1L);
 
     Equipo equipo = new Equipo();
     equipo.setId(10L);
@@ -537,6 +532,7 @@ public class ControladorTorneoTest {
       redirectAttributes.getFlashAttributes().get("error"),
       equalTo("La cantidad de equipos inscriptos no coincide con la configurada.")
     );
+    verify(servicioTorneoMock, never()).crearTorneoConFixture(any(), anyList());
   }
 
   @Test
@@ -580,13 +576,14 @@ public class ControladorTorneoTest {
   }
 
   @Test
-  public void finalizarTorneoSiFallaLaConsultaDeInscripcionesDeberiaMostrarError() {
+  public void finalizarTorneoSiFallaLaConsultaDeInscripcionesDeberiaMostrarError()
+    throws Exception {
     // Preparación
     Torneo torneo = new Torneo();
     torneo.setId(1L);
     torneo.setCantidadDeEquipos(2);
 
-    when(servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(torneo);
+    doThrow(new RuntimeException("Error de consulta")).when(servicioTorneoMock).finalizarTorneo(1L);
 
     when(servicioEquipoTorneoMock.obtenerEquiposPorTorneo(1L))
       .thenThrow(new RuntimeException("Error de consulta"));
@@ -632,7 +629,7 @@ public class ControladorTorneoTest {
 
     doThrow(new RuntimeException("Error al crear fixture"))
       .when(servicioTorneoMock)
-      .crearTorneoConFixture(eq(torneo), eq(Arrays.asList(10L, 20L)));
+      .finalizarTorneo(1L);
 
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
@@ -645,50 +642,6 @@ public class ControladorTorneoTest {
       redirectAttributes.getFlashAttributes().get("error"),
       equalTo("No se pudo generar el fixture: Error al crear fixture")
     );
-  }
-
-  @Test
-  public void finalizarTorneoConJornadasSinPartidosDeberiaGenerarFixture() throws Exception {
-    // Preparación
-    Torneo torneo = new Torneo();
-    torneo.setId(1L);
-    torneo.setCantidadDeEquipos(2);
-
-    when(servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(torneo);
-
-    Equipo equipo1 = new Equipo();
-    equipo1.setId(10L);
-
-    Equipo equipo2 = new Equipo();
-    equipo2.setId(20L);
-
-    EquipoTorneo inscripcion1 = new EquipoTorneo();
-    inscripcion1.setEquipo(equipo1);
-
-    EquipoTorneo inscripcion2 = new EquipoTorneo();
-    inscripcion2.setEquipo(equipo2);
-
-    when(servicioEquipoTorneoMock.obtenerEquiposPorTorneo(1L))
-      .thenReturn(Arrays.asList(inscripcion1, inscripcion2));
-
-    Jornada jornada1 = mock(Jornada.class);
-    Jornada jornada2 = mock(Jornada.class);
-
-    when(jornada1.getPartidos()).thenReturn(new ArrayList<>());
-    when(jornada2.getPartidos()).thenReturn(new ArrayList<>());
-
-    when(servicioTorneoMock.obtenerJornadasPorTorneo(1L))
-      .thenReturn(Arrays.asList(jornada1, jornada2));
-
-    RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
-
-    // Ejecución
-    ModelAndView mav = controladorTorneo.finalizarTorneo(torneo, redirectAttributes);
-
-    // Validación
-    assertThat(mav.getViewName(), equalTo("redirect:/lobbyAdmin"));
-
-    verify(servicioTorneoMock).crearTorneoConFixture(eq(torneo), eq(Arrays.asList(10L, 20L)));
   }
 
   @Test

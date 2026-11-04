@@ -10,6 +10,7 @@ import com.tallerwebi.dominio.excepcion.JugadorNoExiste;
 import com.tallerwebi.dominio.excepcion.PlantelIncompletoException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -618,5 +619,280 @@ public class ControladorJugadoresTest {
     // verificacion
     verify(this.servicioJugadorMock, never()).obtenerJugadores(any());
     assertThat(mav.getViewName(), is("redirect:/elegirEquipoSancion?idTorneo=1"));
+  }
+
+  @Test
+  public void deberiaConfirmarElPlantelAlEditarYRedirigir() throws PlantelIncompletoException {
+    // Preparación
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    inscribirEquipoEnTorneo(1L, 10L, torneo);
+
+    // Ejecución
+    ModelAndView mav =
+      this.controlador.confirmarPlantelEditar(torneo, equipo(10L), redirectAttributesMock);
+
+    // Verificación
+    verify(this.servicioEquipoTorneoMock).confirmarPlantel(10L);
+    verify(redirectAttributesMock).addFlashAttribute("ok", "Plantel confirmado correctamente.");
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneoEditar?idTorneo=1&idEquipo=10"));
+  }
+
+  @Test
+  public void noDeberiaConfirmarElPlantelAlEditarSiFaltanPosiciones()
+    throws PlantelIncompletoException {
+    // Preparación
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    inscribirEquipoEnTorneo(1L, 10L, torneo);
+
+    doThrow(new PlantelIncompletoException(List.of("Defensor", "Mediocampista")))
+      .when(this.servicioEquipoTorneoMock)
+      .confirmarPlantel(10L);
+
+    // Ejecución
+    ModelAndView mav =
+      this.controlador.confirmarPlantelEditar(torneo, equipo(10L), redirectAttributesMock);
+
+    // Verificación
+    verify(this.servicioEquipoTorneoMock).confirmarPlantel(10L);
+    verify(redirectAttributesMock)
+      .addFlashAttribute(
+        "error",
+        "No se puede confirmar el plantel. Falta al menos un jugador en las posiciones: " +
+        "Defensor, Mediocampista."
+      );
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneoEditar?idTorneo=1&idEquipo=10"));
+  }
+
+  @Test
+  public void deberiaHabilitarElJugadorAlEditarYRedirigir() {
+    // Preparación
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    inscribirEquipoEnTorneo(1L, 10L, torneo);
+    when(this.servicioJugadorMock.obtenerJugadores(10L)).thenReturn(List.of(jugador(99L)));
+
+    // Ejecución
+    ModelAndView mav =
+      this.controlador.habilitarJugadorEditar(
+          torneo,
+          equipo(10L),
+          jugador(99L),
+          true,
+          redirectAttributesMock
+        );
+
+    // Verificación
+    verify(this.servicioJugadorMock).habilitarJugador(99L, true);
+    verify(redirectAttributesMock).addFlashAttribute(eq("ok"), anyString());
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneoEditar?idTorneo=1&idEquipo=10"));
+  }
+
+  @Test
+  public void deberiaDeshabilitarElJugadorAlEditar() {
+    // Preparación
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    inscribirEquipoEnTorneo(1L, 10L, torneo);
+    when(this.servicioJugadorMock.obtenerJugadores(10L)).thenReturn(List.of(jugador(99L)));
+
+    // Ejecución
+    ModelAndView mav =
+      this.controlador.habilitarJugadorEditar(
+          torneo,
+          equipo(10L),
+          jugador(99L),
+          false,
+          redirectAttributesMock
+        );
+
+    // Verificación
+    verify(this.servicioJugadorMock).habilitarJugador(99L, false);
+    verify(redirectAttributesMock).addFlashAttribute(eq("ok"), anyString());
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneoEditar?idTorneo=1&idEquipo=10"));
+  }
+
+  @Test
+  public void noDeberiaHabilitarAlEditarSiElEquipoNoEstaInscriptoEnElTorneo() {
+    // Preparación
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    when(this.servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(torneo);
+    when(this.servicioEquipoTorneoMock.obtenerEquiposPorTorneo(1L)).thenReturn(new ArrayList<>());
+
+    // Ejecución
+    ModelAndView mav =
+      this.controlador.habilitarJugadorEditar(
+          torneo,
+          equipo(99L),
+          jugador(5L),
+          true,
+          redirectAttributesMock
+        );
+
+    // Verificación
+    verify(this.servicioJugadorMock, never()).habilitarJugador(any(), anyBoolean());
+    verify(redirectAttributesMock).addFlashAttribute(eq("error"), anyString());
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneoEditar?idTorneo=1&idEquipo=99"));
+  }
+
+  @Test
+  public void noDeberiaHabilitarAlEditarSiElJugadorNoPerteneceAlEquipo() {
+    // Preparación
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    inscribirEquipoEnTorneo(1L, 10L, torneo);
+    when(this.servicioJugadorMock.obtenerJugadores(10L)).thenReturn(List.of(jugador(1L)));
+
+    // Ejecución
+    ModelAndView mav =
+      this.controlador.habilitarJugadorEditar(
+          torneo,
+          equipo(10L),
+          jugador(99L),
+          true,
+          redirectAttributesMock
+        );
+
+    // Verificación
+    verify(this.servicioJugadorMock, never()).habilitarJugador(any(), anyBoolean());
+    verify(redirectAttributesMock).addFlashAttribute(eq("error"), anyString());
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneoEditar?idTorneo=1&idEquipo=10"));
+  }
+
+  @Test
+  public void noDeberiaHabilitarAlEditarSiElTorneoNoExiste() {
+    // Preparación
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    when(this.servicioTorneoMock.consultarTorneoPorId(7L)).thenReturn(null);
+
+    // Ejecución
+    ModelAndView mav =
+      this.controlador.habilitarJugadorEditar(
+          null,
+          equipo(10L),
+          jugador(99L),
+          true,
+          redirectAttributesMock
+        );
+
+    // Verificación
+    verify(this.servicioJugadorMock, never()).habilitarJugador(any(), anyBoolean());
+    assertThat(mav.getViewName(), is("redirect:/lobbyAdmin"));
+  }
+
+  @Test
+  public void noDeberiaEliminarElJugadorEditarSiElEquipoNoEstaInscriptoEnElTorneo() {
+    // Preparación
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    when(this.servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(torneo);
+    when(this.servicioEquipoTorneoMock.obtenerEquiposPorTorneo(1L)).thenReturn(new ArrayList<>());
+
+    // Ejecución
+    ModelAndView mav =
+      this.controlador.eliminarJugadorEditar(
+          torneo,
+          equipo(10L),
+          jugador(99L),
+          redirectAttributesMock
+        );
+
+    // Verificación
+    verify(this.servicioJugadorMock, never()).eliminarJugador(any(), any());
+    verify(redirectAttributesMock).addFlashAttribute(eq("error"), anyString());
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneoEditar?idTorneo=1&idEquipo=10"));
+  }
+
+  @Test
+  public void noDeberiaMostrarJugadoresSiElTorneoNoExiste() {
+    // Preparación
+    when(this.servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(null);
+
+    // Ejecución
+    ModelAndView mav = this.controlador.mostrarJugadoresEquipoSancion(1L, 10L);
+
+    // Verificación
+    assertThat(mav.getViewName(), is("redirect:/lobbyAdmin"));
+    verify(this.servicioJugadorMock, never()).obtenerJugadores(any());
+    verify(this.servicioJugadorMock, never()).listarInscripcionesPorEquipoYTorneo(any(), any());
+  }
+
+  @Test
+  public void deberiaCargarLasSancionesPendientesDeCadaJugador() {
+    // Preparación
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+
+    Equipo equipo = equipo(10L);
+    EquipoTorneo equipoTorneo = new EquipoTorneo();
+    equipoTorneo.setEquipo(equipo);
+
+    Jugador jugador1 = jugador(99L);
+    Jugador jugador2 = jugador(100L);
+
+    JugadorEquipoTorneo inscripcion1 = new JugadorEquipoTorneo();
+    inscripcion1.setJugador(jugador1);
+    inscripcion1.setFechasSuspensionPendientes(2);
+
+    JugadorEquipoTorneo inscripcion2 = new JugadorEquipoTorneo();
+    inscripcion2.setJugador(jugador2);
+    inscripcion2.setFechasSuspensionPendientes(1);
+
+    when(this.servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(torneo);
+    when(this.servicioEquipoTorneoMock.obtenerEquiposPorTorneo(1L))
+      .thenReturn(List.of(equipoTorneo));
+    when(this.servicioJugadorMock.obtenerJugadores(10L)).thenReturn(new ArrayList<>());
+    when(this.servicioJugadorMock.listarInscripcionesPorEquipoYTorneo(10L, 1L))
+      .thenReturn(List.of(inscripcion1, inscripcion2));
+
+    // Ejecución
+    ModelAndView mav = this.controlador.mostrarJugadoresEquipoSancion(1L, 10L);
+
+    // Verificación
+    @SuppressWarnings("unchecked")
+    Map<Long, Integer> sanciones = (Map<Long, Integer>) mav.getModel().get("sancionesPorJugador");
+
+    assertThat(sanciones.get(99L), is(2));
+    assertThat(sanciones.get(100L), is(1));
+    assertThat(sanciones.size(), is(2));
+  }
+
+  @Test
+  public void deberiaIgnorarInscripcionesSinJugadorAsociadoAlCargarSanciones() {
+    // Preparación
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+
+    Equipo equipo = equipo(10L);
+    EquipoTorneo equipoTorneo = new EquipoTorneo();
+    equipoTorneo.setEquipo(equipo);
+
+    JugadorEquipoTorneo inscripcionSinJugador = new JugadorEquipoTorneo();
+    inscripcionSinJugador.setFechasSuspensionPendientes(3);
+
+    when(this.servicioTorneoMock.consultarTorneoPorId(1L)).thenReturn(torneo);
+    when(this.servicioEquipoTorneoMock.obtenerEquiposPorTorneo(1L))
+      .thenReturn(List.of(equipoTorneo));
+    when(this.servicioJugadorMock.obtenerJugadores(10L)).thenReturn(new ArrayList<>());
+    when(this.servicioJugadorMock.listarInscripcionesPorEquipoYTorneo(10L, 1L))
+      .thenReturn(List.of(inscripcionSinJugador));
+
+    // Ejecución
+    ModelAndView mav = this.controlador.mostrarJugadoresEquipoSancion(1L, 10L);
+
+    // Verificación
+    @SuppressWarnings("unchecked")
+    Map<Long, Integer> sanciones = (Map<Long, Integer>) mav.getModel().get("sancionesPorJugador");
+
+    assertThat(sanciones.isEmpty(), is(true));
   }
 }
