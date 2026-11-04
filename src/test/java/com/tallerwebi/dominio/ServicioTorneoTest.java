@@ -22,6 +22,7 @@ public class ServicioTorneoTest {
   private RepositorioEquipoImpl repositorioEquipoMock;
   private RepositorioJornada repositorioJornadaMock;
   private RepositorioEquipoTorneo repositorioEquipoTorneoMock;
+  private ServicioEquipoTorneo servicioEquipoTorneoMock;
 
   @BeforeEach
   public void init() {
@@ -30,13 +31,15 @@ public class ServicioTorneoTest {
     this.repositorioEquipoMock = mock(RepositorioEquipoImpl.class);
     this.repositorioJornadaMock = mock(RepositorioJornada.class);
     this.repositorioEquipoTorneoMock = mock(RepositorioEquipoTorneo.class);
+    this.servicioEquipoTorneoMock = mock(ServicioEquipoTorneo.class);
 
     this.servicioTorneo =
       new ServicioTorneoImpl(
         this.repositorioTorneoMock,
         this.repositorioEquipoMock,
         this.repositorioJornadaMock,
-        this.repositorioEquipoTorneoMock
+        this.repositorioEquipoTorneoMock,
+        this.servicioEquipoTorneoMock
       );
   }
 

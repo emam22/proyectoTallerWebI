@@ -47,6 +47,11 @@
         /* ========================================================
            FILA 1 - IZQUIERDA: BANNER AVANZAR FECHA
         ======================================================== */
+        form {
+            width: 100%;
+            height: 100%;
+        }
+
         .banner-avanzar {
             border: 2.5px solid #b6ff00;
             border-radius: 14px;
@@ -379,14 +384,22 @@
 <div class="dashboard-grid">
 
     <!-- 1. BOTÓN AVANZAR FECHA (th:href="@{/resumen}") -->
-    <a th:href="@{/resumen(idTorneo=${idTorneoActual})}">
-        <div class="banner-avanzar">
+    <form th:action="@{/avanzarFecha}" method="post">
+        <input type="hidden"
+               name="idTorneo"
+               th:value="${idTorneoActual}">
+
+        <button type="submit" class="banner-avanzar">
             <div class="avanzar-col-izq">
                 <h1>AVANZAR FECHA</h1>
                 <div class="proxima-fecha-label">PRÓXIMA FECHA</div>
-                <div class="proxima-fecha-valor"  th:text="${proximaFechaNombre}"> Fixture no generado</div>
+                <div class="proxima-fecha-valor"
+                     th:text="${proximaFechaNombre}">
+                    Fixture no generado
+                </div>
             </div>
-
+        </button>
+    </form>
             <!--<div class="avanzar-col-der">
                 <div class="destacado-partido">
                     <div class="destacado-equipos">
@@ -414,9 +427,7 @@
                     </div>
                 </div>-->
 
-            </div>
 
-    </a>
 
 
     <!-- 2. TOTALES -->

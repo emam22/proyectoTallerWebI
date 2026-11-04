@@ -1,339 +1,300 @@
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    * {
-        box-sizing: border-box;
-        margin: 0;
-        padding: 0;
-        font-family: Arial, Helvetica, sans-serif;
-    }
+    <title>Resumen de la fecha</title>
 
-    body {
-        background: #1f1f1f;
-        color: white;
-        min-height: 100vh;
-        padding: 20px;
-    }
+    <link rel="stylesheet" th:href="@{/css/app.css}"/>
+    <link rel="icon" type="image/png" th:href="@{/img/favicon.png?v=2}"/>
 
-    /* CONTENEDOR PRINCIPAL */
-    .contenedor {
-        max-width: 1100px;
-        margin: auto;
-    }
-
-    /* =========================
-       HEADER
-    ========================= */
-
-    .header {
-        display: grid;
-        grid-template-columns: 1.1fr 2fr 1fr;
-        gap: 20px;
-        margin-bottom: 20px;
-    }
-
-    .avanzar-fecha {
-        border: 2px solid #b6ff00;
-        border-radius: 7px;
-        padding: 10px;
-        min-height: 90px;
-    }
-
-    .avanzar-fecha h1 {
-        color: #b6ff00;
-        font-size: 20px;
-        margin-bottom: 15px;
-    }
-
-    .proxima-fecha {
-        font-size: 12px;
-        color: #ddd;
-    }
-
-    .proxima-fecha span {
-        display: block;
-        color: white;
-        font-size: 14px;
-        margin-top: 5px;
-    }
-
-
-    /* PARTIDO DESTACADO */
-
-    .partido-destacado {
-        border: 2px solid #b6ff00;
-        border-radius: 7px;
-        padding: 10px;
-        text-align: center;
-    }
-
-    .partido {
-        margin-bottom: 10px;
-    }
-
-    .equipos {
-        color: #b6ff00;
-        font-weight: bold;
-        font-size: 14px;
-    }
-
-    .fecha-hora {
-        font-size: 10px;
-        color: #ddd;
-        margin-top: 4px;
-    }
-
-
-    /* INFORMACION DEL TORNEO */
-
-    .info-torneo {
-        border: 2px solid #b6ff00;
-        border-radius: 7px;
-        padding: 12px;
-        font-size: 12px;
-        line-height: 2;
-    }
-
-    .info-torneo strong {
-        color: white;
-    }
-
-
-    /* =========================
-       CONTENIDO
-    ========================= */
-
-    .contenido {
-        display: grid;
-        grid-template-columns: 1fr 1.6fr 1fr;
-        gap: 20px;
-    }
-
-
-    /* =========================
-       FECHAS
-    ========================= */
-
-    .fechas {
-        border: 2px solid #b6ff00;
-        border-radius: 7px;
-        padding: 8px;
-    }
-
-    .fecha-card {
-        background: #444;
-        border-radius: 7px;
-        padding: 12px;
-        margin-bottom: 10px;
-        min-height: 95px;
-    }
-
-    .fecha-card:last-child {
-        margin-bottom: 0;
-    }
-
-    .fecha-card h3 {
-        color: #b6ff00;
-        text-align: center;
-        font-size: 11px;
-        margin-bottom: 10px;
-    }
-
-    .fecha-card .partido-mini {
-        text-align: center;
-        font-size: 9px;
-        margin-bottom: 8px;
-    }
-
-    .fecha-card .equipos-mini {
-        color: #b6ff00;
-        font-weight: bold;
-        font-size: 8px;
-    }
-
-    .fecha-card .fecha-mini {
-        color: #ccc;
-        font-size: 7px;
-        margin-top: 3px;
-    }
-
-
-    /* =========================
-       TABLA DE POSICIONES
-    ========================= */
-
-    .tabla-container {
-        border: 2px solid #b6ff00;
-        border-radius: 7px;
-        overflow: hidden;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 11px;
-    }
-
-    thead {
-        background: #b6ff00;
-        color: #222;
-    }
-
-    th {
-        padding: 7px 4px;
-        font-size: 10px;
-    }
-
-    td {
-        padding: 8px 5px;
-        text-align: center;
-        border-bottom: 1px solid #555;
-    }
-
-    tbody tr {
-        background: #444;
-    }
-
-    tbody tr:hover {
-        background: #505050;
-    }
-
-    td.equipo {
-        text-align: left;
-        font-weight: bold;
-    }
-
-    .posicion {
-        width: 30px;
-    }
-
-
-    /* =========================
-       ESTADISTICAS
-    ========================= */
-
-    .estadisticas {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .estadistica-card {
-        border: 2px solid #b6ff00;
-        border-radius: 7px;
-        min-height: 150px;
-        overflow: hidden;
-    }
-
-    .estadistica-titulo {
-        background: #b6ff00;
-        color: #222;
-        padding: 7px;
-        font-size: 11px;
-        text-align: center;
-    }
-
-    .estadistica-contenido {
-        padding: 15px;
-        color: #ccc;
-        font-size: 11px;
-    }
-
-    .estadistica-item {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 12px;
-    }
-
-    .estadistica-item strong {
-        color: white;
-    }
-
-
-    /* =========================
-       RESPONSIVE
-    ========================= */
-
-    @media (max-width: 800px) {
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
 
         body {
-            padding: 10px;
+            background: #1f1f1f;
+            color: white;
+            min-height: 100vh;
+            padding: 30px 20px;
         }
 
-        .header {
-            grid-template-columns: 1fr;
+        .contenedor {
+            max-width: 1000px;
+            margin: auto;
         }
 
-        .contenido {
-            grid-template-columns: 1fr;
+        .encabezado {
+            text-align: center;
+            margin-bottom: 35px;
         }
 
-        .estadisticas {
+        .encabezado h1 {
+            color: #b6ff00;
+            font-size: 30px;
+            margin-bottom: 12px;
+        }
+
+        .encabezado p {
+            color: #ccc;
+            font-size: 16px;
+        }
+
+        .info-jornada {
+            border: 2px solid #b6ff00;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 25px;
+            background: #232323;
+        }
+
+        .info-jornada h2 {
+            color: #b6ff00;
+            font-size: 21px;
+        }
+
+        .partidos-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .partido-card {
+            background: #303030;
+            border: 1px solid #555;
+            border-radius: 10px;
+            padding: 20px;
+            transition: border-color 0.2s ease;
+        }
+
+        .partido-card:hover {
+            border-color: #b6ff00;
+        }
+
+        .partido-etiqueta {
+            color: #b6ff00;
+            font-size: 12px;
+            text-align: center;
+            margin-bottom: 18px;
+            font-weight: bold;
+        }
+
+        .resultado {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-        }
-    }
-
-    @media (max-width: 500px) {
-
-        .estadisticas {
-            grid-template-columns: 1fr;
+            grid-template-columns: 1fr auto 1fr;
+            align-items: center;
+            gap: 15px;
+            text-align: center;
         }
 
-        table {
-            font-size: 9px;
+        .equipo {
+            font-size: 17px;
+            font-weight: bold;
+            overflow-wrap: anywhere;
         }
 
-        th {
-            font-size: 8px;
+        .equipo-local {
+            text-align: right;
         }
 
-        td {
-            padding: 6px 2px;
+        .equipo-visitante {
+            text-align: left;
         }
-    }
 
-</style>
-<link rel="stylesheet" th:href="@{/css/app.css}"/>
-<link rel="icon" type="image/png" th:href="@{/img/favicon.png?v=2}"/>
+        .marcador {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #1f1f1f;
+            border: 1px solid #b6ff00;
+            border-radius: 8px;
+            padding: 10px 16px;
+        }
+
+        .goles {
+            color: #b6ff00;
+            font-size: 27px;
+            font-weight: bold;
+            min-width: 20px;
+        }
+
+        .separador {
+            color: #aaa;
+            font-size: 20px;
+        }
+
+        .mensaje-vacio {
+            background: #303030;
+            border: 1px solid #555;
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            color: #ccc;
+        }
+
+        .mensaje-error {
+            color: #ff7777;
+            background: #3a2222;
+            border: 1px solid #ff7777;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .volver-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 35px;
+        }
+
+        .btn-volver {
+            display: inline-block;
+            text-decoration: none;
+            color: #1f1f1f;
+            background: #b6ff00;
+            font-weight: bold;
+            padding: 13px 25px;
+            border-radius: 7px;
+            transition: background 0.2s ease;
+        }
+
+        .btn-volver:hover {
+            background: #d0ff66;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 20px 12px;
+            }
+
+            .encabezado h1 {
+                font-size: 24px;
+            }
+
+            .resultado {
+                gap: 6px;
+            }
+
+            .equipo {
+                font-size: 12px;
+            }
+
+            .marcador {
+                gap: 7px;
+                padding: 8px;
+            }
+
+            .goles {
+                font-size: 22px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-<div class="contenedor">
-
-    <h1> RESUMEN DE LA FECHA</h1>
-
-</div>
-
-<div class="contenedor">
-
-    <a th:href="@{/lobby(idTorneo=${idTorneoActual})}" class="btn-volver-tab">
-        <div class="avanzar-fecha">
-            Volver al lobby
-        </div>
-    </a>
-
-</div>
-
-<!-- LOGO DE MARCA -->
 <a th:replace="~{fragments/nav :: logoHome(clase='logo-marca')}"></a>
 
-<!-- MENÚ DE USUARIO -->
 <div class="menu-usuario">
-    <button type="button" class="btn-menu-hamburguesa" id="btnMenuUsuario" aria-label="Abrir menú">
+    <button type="button"
+            class="btn-menu-hamburguesa"
+            id="btnMenuUsuario"
+            aria-label="Abrir menú">
         <span></span>
         <span></span>
     </button>
+
     <div class="menu-usuario-opciones" id="menuUsuarioOpciones">
         <a th:href="@{/logout}">Cerrar sesión</a>
     </div>
 </div>
+
+<div class="contenedor">
+
+    <header class="encabezado">
+        <h1>RESUMEN DE LA FECHA</h1>
+        <p>Resultados de los partidos disputados</p>
+    </header>
+
+    <div class="mensaje-error"
+         th:if="${error != null}"
+         th:text="${error}">
+    </div>
+
+    <section class="info-jornada" th:if="${jornada != null}">
+        <h2 th:text="'JORNADA ' + ${jornada.numero}">
+            JORNADA 1
+        </h2>
+    </section>
+
+    <!-- LISTADO DE PARTIDOS -->
+    <section class="partidos-container"
+             th:if="${resumenPartidos != null and !resumenPartidos.isEmpty()}">
+
+        <article class="partido-card"
+                 th:each="resumen, iteracion : ${resumenPartidos}">
+
+            <div class="partido-etiqueta"
+                 th:text="'PARTIDO ' + ${iteracion.count}">
+                PARTIDO 1
+            </div>
+
+            <!-- RESULTADO DEL PARTIDO -->
+            <div class="resultado">
+
+                <div class="equipo equipo-local"
+                     th:text="${resumen.partido.equipoLocal.nombre}">
+                    Equipo local
+                </div>
+
+                <div class="marcador">
+                    <span class="goles"
+                          th:text="${resumen.partido.golesLocal}">
+                        2
+                    </span>
+
+                    <span class="separador">-</span>
+
+                    <span class="goles"
+                          th:text="${resumen.partido.golesVisitante}">
+                        1
+                    </span>
+                </div>
+
+                <div class="equipo equipo-visitante"
+                     th:text="${resumen.partido.equipoVisitante.nombre}">
+                    Equipo visitante
+                </div>
+
+            </div>
+
+        </article>
+
+    </section>
+
+    <div class="mensaje-vacio"
+         th:if="${resumenPartidos == null or resumenPartidos.isEmpty()}">
+        No hay resultados disponibles para esta jornada.
+    </div>
+
+    <div class="volver-container">
+        <a th:href="@{/lobby(idTorneo=${idTorneoActual})}"
+           class="btn-volver">
+            VOLVER AL LOBBY
+        </a>
+    </div>
+
+</div>
+
 <script th:src="@{/js/menu.js}"></script>
 
 </body>

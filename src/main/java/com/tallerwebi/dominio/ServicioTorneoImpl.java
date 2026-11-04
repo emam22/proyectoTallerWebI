@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class ServicioTorneoImpl implements ServicioTorneo {
 
   /*Injectar servicio, no repositorio*/
-
+  private final ServicioEquipoTorneo servicioEquipoTorneo;
   private final RepositorioEquipoImpl repositorioEquipo;
   private RepositorioTorneo repositorioTorneo;
   private RepositorioJornada repositorioJornada;
@@ -28,12 +28,14 @@ public class ServicioTorneoImpl implements ServicioTorneo {
     RepositorioTorneo repositorioTorneo,
     RepositorioEquipoImpl repositorioEquipo,
     RepositorioJornada repositorioJornada,
-    RepositorioEquipoTorneo repositorioEquipoTorneo
+    RepositorioEquipoTorneo repositorioEquipoTorneo,
+    ServicioEquipoTorneo servicioEquipoTorneo
   ) {
     this.repositorioTorneo = repositorioTorneo;
     this.repositorioEquipo = repositorioEquipo;
     this.repositorioJornada = repositorioJornada;
     this.repositorioEquipoTorneo = repositorioEquipoTorneo;
+    this.servicioEquipoTorneo = servicioEquipoTorneo;
   }
 
   @Override
@@ -48,6 +50,8 @@ public class ServicioTorneoImpl implements ServicioTorneo {
 
   @Override
   public void registrarTorneo(Torneo torneo) throws TorneoExistente, Exception {
+    validarDatosTorneo(torneo);
+
     Torneo torneoEncontrado = repositorioTorneo.buscarTorneo(torneo.getNombre());
 
     if (torneoEncontrado != null) {
@@ -55,6 +59,27 @@ public class ServicioTorneoImpl implements ServicioTorneo {
     }
 
     repositorioTorneo.guardar(torneo);
+  }
+
+  private void validarDatosTorneo(Torneo torneo) {
+    if (torneo == null) {
+      throw new IllegalArgumentException("El torneo no puede ser nulo");
+    }
+
+    if (torneo.getCantidadMaxJugadores() <= torneo.getCantidadMinJugadores()) {
+      throw new IllegalArgumentException(
+        "La cantidad máxima de jugadores debe ser mayor que la mínima"
+      );
+    }
+
+    if (
+      torneo.getFechaInicio() == null ||
+      torneo.getFechaInicio().isBefore(java.time.LocalDateTime.now())
+    ) {
+      throw new IllegalArgumentException(
+        "No puedes iniciar un torneo con una fecha anterior a la actual"
+      );
+    }
   }
 
   @Override
@@ -260,6 +285,44 @@ public class ServicioTorneoImpl implements ServicioTorneo {
 
       torneo.agregarJornada(jornada);
       repositorioJornada.guardar(jornada);
+    }
+  }
+
+  @Override
+  public void finalizarTorneo(Long idTorneo) throws TorneoExistente, Exception {
+    // Buscamos el torneo.
+    Torneo torneo = consultarTorneoPorId(idTorneo);
+
+    if (torneo == null) {
+      throw new IllegalArgumentException("No se encontró el torneo.");
+    }
+
+    // Obtenemos los equipos inscriptos.
+    List<EquipoTorneo> inscripciones = servicioEquipoTorneo.obtenerEquiposPorTorneo(idTorneo);
+
+    // Extraemos los IDs de los equipos.
+    List<Long> idsEquipos = inscripciones
+      .stream()
+      .map(inscripcion -> inscripcion.getEquipo().getId())
+      .toList();
+
+    // Verificamos que esté inscripta la cantidad configurada.
+    if (idsEquipos.size() != torneo.getCantidadDeEquipos()) {
+      throw new IllegalArgumentException(
+        "La cantidad de equipos inscriptos no coincide con la configurada."
+      );
+    }
+
+    // Consultamos si ya existe un fixture.
+    List<Jornada> jornadasExistentes = obtenerJornadasPorTorneo(idTorneo);
+
+    // Generamos el fixture solamente si todavía no existe.
+    if (
+      jornadasExistentes == null ||
+      jornadasExistentes.isEmpty() ||
+      jornadasExistentes.stream().allMatch(jornada -> jornada.getPartidos().isEmpty())
+    ) {
+      crearTorneoConFixture(torneo, idsEquipos);
     }
   }
 }

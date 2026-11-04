@@ -4,9 +4,6 @@ import com.tallerwebi.dominio.*;
 import com.tallerwebi.dominio.excepcion.*;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.logging.Logger;
@@ -74,38 +71,22 @@ public class ControladorTorneo {
 
   @RequestMapping(path = "/crearTorneo", method = RequestMethod.POST)
   public ModelAndView crearTorneo(
-    @ModelAttribute("torneo") Torneo torneo,
+    @ModelAttribute(TORNEO) Torneo torneo,
     RedirectAttributes redirectAttributes
   ) {
-    if (torneo.getCantidadMaxJugadores() <= torneo.getCantidadMinJugadores()) {
-      redirectAttributes.addFlashAttribute(
-        ERROR,
-        "La cantidad máxima de jugadores debe ser mayor que la mínima"
-      );
-
-      return new ModelAndView(REDIRECT_FORMULARIO_TORNEO);
-    }
-
-    if (torneo.getFechaInicio() == null || torneo.getFechaInicio().isBefore(LocalDateTime.now())) {
-      redirectAttributes.addFlashAttribute(
-        ERROR,
-        "No puedes iniciar un torneo con una fecha anterior a la actual"
-      );
-      return new ModelAndView(REDIRECT_FORMULARIO_TORNEO);
-    }
-
     try {
       servicioTorneo.registrarTorneo(torneo);
+
+      return new ModelAndView(REDIRECT_CREACION_EQUIPO + torneo.getId());
     } catch (TorneoExistente e) {
       redirectAttributes.addFlashAttribute(ERROR, "Ya existe un torneo con este nombre");
-
-      return new ModelAndView(REDIRECT_FORMULARIO_TORNEO);
+    } catch (IllegalArgumentException e) {
+      redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
     } catch (Exception e) {
       redirectAttributes.addFlashAttribute(ERROR, "Error al crear el torneo");
-      return new ModelAndView(REDIRECT_FORMULARIO_TORNEO);
     }
 
-    return new ModelAndView(REDIRECT_CREACION_EQUIPO + torneo.getId());
+    return new ModelAndView(REDIRECT_FORMULARIO_TORNEO);
   }
 
   @RequestMapping(path = "/creacion-equipo-admin", method = RequestMethod.GET)
@@ -335,43 +316,20 @@ public class ControladorTorneo {
       return new ModelAndView(redireccion);
     }
 
-    Long idTorneo = obtenerIdTorneo(torneo);
-
     try {
-      List<EquipoTorneo> inscripciones = servicioEquipoTorneo.obtenerEquiposPorTorneo(idTorneo);
-
-      List<Long> idsEquipos = inscripciones
-        .stream()
-        .map(inscripcion -> inscripcion.getEquipo().getId())
-        .toList();
-
-      if (idsEquipos.size() != torneo.getCantidadDeEquipos()) {
-        redirectAttributes.addFlashAttribute(
-          ERROR,
-          "La cantidad de equipos inscriptos no coincide con la configurada."
-        );
-        return new ModelAndView(redireccion);
-      }
-
-      List<Jornada> jornadasExistentes = servicioTorneo.obtenerJornadasPorTorneo(idTorneo);
-
-      if (
-        jornadasExistentes == null ||
-        jornadasExistentes.isEmpty() ||
-        jornadasExistentes.stream().allMatch(jornada -> jornada.getPartidos().isEmpty())
-      ) {
-        servicioTorneo.crearTorneoConFixture(torneo, idsEquipos);
-      }
+      servicioTorneo.finalizarTorneo(torneo.getId());
 
       return new ModelAndView(redireccion);
+    } catch (IllegalArgumentException e) {
+      redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
     } catch (Exception e) {
       redirectAttributes.addFlashAttribute(
         ERROR,
         "No se pudo generar el fixture: " + e.getMessage()
       );
-
-      return new ModelAndView(redireccion);
     }
+
+    return new ModelAndView(redireccion);
   }
 
   @RequestMapping(path = "/fixtureTorneo", method = RequestMethod.GET)
@@ -580,7 +538,7 @@ public class ControladorTorneo {
     return new ModelAndView("elegirEquipoSancion", modelo);
   }
 
-  //subir escudo
+  // Sube el escudo de un equipo.
   @ResponseBody
   @PostMapping(value = "/subirEscudo", consumes = "application/octet-stream")
   public ResponseEntity<String> subirEscudo(
@@ -590,6 +548,7 @@ public class ControladorTorneo {
   ) {
     String rutaReal = request.getServletContext().getRealPath("/resources/core/img/escudos");
 
+    // Verificamos que el servidor haya podido resolver el directorio.
     if (rutaReal == null) {
       return ResponseEntity
         .internalServerError()
@@ -597,11 +556,15 @@ public class ControladorTorneo {
     }
 
     try {
+      // Delegamos la validación y el guardado al servicio.
       String ruta = servicioEquipo.subirEscudo(contenido, nombreOriginal, rutaReal);
+
       return ResponseEntity.ok(ruta);
     } catch (IllegalArgumentException e) {
+      // Error de validación: imagen vacía, formato incorrecto, tamaño, etc.
       return ResponseEntity.badRequest().body(e.getMessage());
     } catch (IOException e) {
+      // Error al crear el directorio o guardar el archivo.
       return ResponseEntity.internalServerError().body("No se pudo guardar el escudo.");
     }
   }

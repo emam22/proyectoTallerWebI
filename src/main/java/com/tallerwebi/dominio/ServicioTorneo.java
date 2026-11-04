@@ -18,4 +18,6 @@ public interface ServicioTorneo {
   long contarFechasFinalizadas(Long idTorneo);
   boolean consultarAunEnFechaParaEditar(Long idTorneo);
   void eliminarTorneo(Long id);
+
+  void finalizarTorneo(Long idTorneo) throws TorneoExistente, Exception;
 }
