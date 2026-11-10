@@ -37,5 +37,43 @@
     </a>
 </th:block>
 
+<!--
+  Barra de navegación global.
+  Uso: <div th:replace="~{fragments/nav :: barraNavegacion}"></div>
+  Muestra el logo (link a la home según el rol) y, si hay sesión,
+  el nombre del rol y el menú de usuario con "Cerrar sesión".
+-->
+<th:block th:fragment="barraNavegacion">
+    <header class="barra-nav"
+            th:with="esAdmin=${session.ROL != null and session.ROL.equalsIgnoreCase('admin')},
+                     home=${session.ROL == null ? '/login' : (session.ROL.equalsIgnoreCase('admin') ? '/elegirTorneoAdmin' : '/elegirTorneo')}">
+        <a class="barra-nav-marca" th:href="@{${home}}" title="Ir al inicio">
+            <img th:src="@{/img/isotipo.png?v=2}"
+                 alt="System TOR"
+                 width="32"
+                 height="32"
+                 style="width: auto; height: 32px; max-height: 32px; max-width: 32px; object-fit: contain;"/>
+            <span class="barra-nav-brand">SystemTOR</span>
+        </a>
+
+        <div class="barra-nav-derecha" th:if="${session.ROL != null}">
+            <span class="barra-nav-usuario">
+                Bienvenido <span class="barra-nav-rol" th:text="${esAdmin} ? 'Administrador' : 'Usuario'">Usuario</span>
+            </span>
+
+            <div class="menu-usuario">
+                <button type="button" class="btn-menu-hamburguesa" id="btnMenuUsuario" aria-label="Abrir men&uacute;">
+                    <span></span>
+                    <span></span>
+                </button>
+                <div class="menu-usuario-opciones" id="menuUsuarioOpciones">
+                    <a th:href="@{/logout}">Cerrar sesi&oacute;n</a>
+                </div>
+            </div>
+        </div>
+    </header>
+    <script th:src="@{/js/menu.js}"></script>
+</th:block>
+
 </body>
 </html>

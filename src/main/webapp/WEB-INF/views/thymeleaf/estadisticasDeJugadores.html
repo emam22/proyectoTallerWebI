@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Estadísticas de Jugadores - System TOR</title>
-    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" th:href="@{/css/app.css?v=4}">
     <link rel="stylesheet" th:href="@{/css/main.css}">
     <style>
         /* FONDO PATRÓN Y DEGRADADO */
@@ -204,22 +204,17 @@
 </head>
 <body>
 
+<!-- NAVBAR GLOBAL -->
+<div th:replace="~{fragments/nav :: barraNavegacion}"></div>
+
+
 <!--
  BARRA SUPERIOR
 
 <header class="header-superior">
-    <a th:replace="~{fragments/nav :: logoHome(clase='isotipo-header')}"></a>
-    <h1 class="titulo-pagina">ESTADÍSTICAS DE JUGADORES</h1>
+<h1 class="titulo-pagina">ESTADÍSTICAS DE JUGADORES</h1>
 
-    <div class="menu-usuario">
-        <button type="button" class="btn-menu-hamburguesa" id="btnMenuUsuario" aria-label="Abrir menú">
-            <span></span>
-            <span></span>
-        </button>
-        <div class="menu-usuario-opciones" id="menuUsuarioOpciones">
-            <a th:href="@{/logout}">Cerrar sesión</a>
-        </div>
-    </div>
+    
 </header> -->
 
 <div class="contenedor-encabezado">
@@ -274,8 +269,5 @@
         </table>
     </div>
 </main>
-
-<script th:src="@{/js/menu.js}"></script>
-
 </body>
 </html>

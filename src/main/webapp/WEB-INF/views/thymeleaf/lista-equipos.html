@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
 
-    <link rel="stylesheet" th:href="@{/css/app.css}"/>
+    <link rel="stylesheet" th:href="@{/css/app.css?v=4}"/>
     <link rel="icon" type="image/png" th:href="@{/img/favicon.png?v=2}"/>
 
     <title>Equipos Guardados</title>
@@ -130,6 +130,10 @@
 
 <body>
 
+<!-- NAVBAR GLOBAL -->
+<div th:replace="~{fragments/nav :: barraNavegacion}"></div>
+
+
 <div class="form-card">
 
     <div class="form-header">
@@ -178,22 +182,6 @@
     </div>
 
 </div>
-
-
-<!-- LOGO DE MARCA -->
-<a th:replace="~{fragments/nav :: logoHome(clase='logo-marca')}"></a>
-
-<!-- MENÚ DE USUARIO -->
-<div class="menu-usuario">
-    <button type="button" class="btn-menu-hamburguesa" id="btnMenuUsuario" aria-label="Abrir menú">
-        <span></span>
-        <span></span>
-    </button>
-    <div class="menu-usuario-opciones" id="menuUsuarioOpciones">
-        <a th:href="@{/logout}">Cerrar sesión</a>
-    </div>
-</div>
-<script th:src="@{/js/menu.js}"></script>
 
 
 </body>

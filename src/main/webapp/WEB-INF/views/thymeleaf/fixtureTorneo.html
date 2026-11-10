@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
+  <link rel="stylesheet" th:href="@{/css/app.css?v=4}"/>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -274,6 +275,10 @@
 </head>
 
 <body>
+
+<!-- NAVBAR GLOBAL -->
+<div th:replace="~{fragments/nav :: barraNavegacion}"></div>
+
 
 <div class="contenedor">
 

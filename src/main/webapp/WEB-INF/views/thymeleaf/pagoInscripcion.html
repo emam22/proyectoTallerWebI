@@ -5,29 +5,99 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inscripción al Torneo - Pago</title>
 
+    <link rel="stylesheet" th:href="@{/css/app.css?v=4}">
+    <link rel="icon" type="image/png" th:href="@{/img/favicon.png?v=2}" />
+
     <style>
-        .container {
-            max-width: 600px;
-            margin: 40px auto;
-            font-family: Arial, sans-serif;
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: var(--font-base);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
         }
-        #paymentBrick_container {
-            margin-top: 20px;
+
+        .pago-container {
+            max-width: 640px;
+            margin: 40px auto;
+            padding: 28px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: 0 8px 24px var(--shadow);
+        }
+
+        .pago-titulo {
+            color: var(--accent);
+            font-size: 24px;
+            margin: 0 0 8px;
+            text-align: center;
+        }
+
+        .pago-monto {
+            display: flex;
+            align-items: baseline;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px;
+            margin-bottom: 20px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+        }
+
+        .pago-monto-label {
+            color: var(--text-muted);
+            font-size: 14px;
+        }
+
+        .pago-monto-valor {
+            color: var(--accent);
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        /* El Brick de Mercado Pago es de tema claro: se muestra sobre una
+           tarjeta blanca para conservar su legibilidad. */
+        .pago-brick {
+            background: #ffffff;
+            border-radius: var(--radius-md);
+            padding: 12px;
+        }
+
+        @media (max-width: 800px) {
+            body {
+                padding: 10px;
+            }
+
+            .pago-container {
+                margin: 20px auto;
+                padding: 18px;
+            }
         }
     </style>
-
-    <link rel="stylesheet" th:href="@{/css/estilos-generales.css}">
 
     <!-- 1. El SDK de Mercado Pago DEBE cargarse antes de cualquier script que lo use -->
     <script src="https://sdk.mercadopago.com/js/v2"></script>
 </head>
 <body>
-<div class="container">
-    <h2>Abonar Inscripción al Torneo</h2>
-    <p>Monto a abonar: <strong>$5.000,00</strong></p>
+
+<!-- NAVBAR GLOBAL -->
+<div th:replace="~{fragments/nav :: barraNavegacion}"></div>
+
+<div class="pago-container">
+    <h2 class="pago-titulo">Abonar Inscripción al Torneo</h2>
+
+    <div class="pago-monto">
+        <span class="pago-monto-label">Monto a abonar:</span>
+        <strong class="pago-monto-valor">$5.000,00</strong>
+    </div>
 
     <!-- Contenedor Mercado Pago -->
-    <div id="paymentBrick_container"></div>
+    <div class="pago-brick">
+        <div id="paymentBrick_container"></div>
+    </div>
 </div>
 
 <script th:src="@{/js/pagoBrick.js?v=3}"></script>

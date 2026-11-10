@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
+  <link rel="stylesheet" th:href="@{/css/app.css?v=4}"/>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador - Selección de Torneo</title>
@@ -169,23 +170,9 @@
 </head>
 <body>
 
-<!-- NAVBAR SUPERIOR -->
-<header class="navbar">
-    <div class="navbar-brand-wrapper">
-        <!-- Contenedor blanco con el logo del jugador -->
-        <div class="navbar-logo-box">
-            <a th:replace="~{fragments/nav :: logoHome(clase='')}"></a>
-        </div>
-        <!-- Bloque verde sesgado -->
-        <div class="navbar-title-box">
-            <span class="navbar-title">SIMULADOR</span>
-        </div>
-    </div>
+<!-- NAVBAR GLOBAL -->
+<div th:replace="~{fragments/nav :: barraNavegacion}"></div>
 
-    <div class="navbar-user">
-        <span>Bienvenido</span>
-    </div>
-</header>
 
 <!-- LISTADO DINÁMICO DE TORNEOS -->
 <main class="contenedor">

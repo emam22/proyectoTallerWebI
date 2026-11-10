@@ -48,9 +48,118 @@
 }
 
 /* =========================
+   BASE GLOBAL
+======================= */
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+/* Deja libre la franja de la navbar fija en todas las vistas. */
+body {
+    padding-top: 76px !important;
+}
+
+/* =========================
+   NAVBAR GLOBAL (SUPERIOR)
+======================= */
+
+.barra-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0 22px;
+    background: rgba(17, 17, 17, 0.97);
+    border-bottom: 1px solid var(--border);
+    box-shadow: 0 4px 16px var(--shadow);
+}
+
+.barra-nav-marca {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: auto;
+    height: auto;
+    flex: 0 0 auto;
+    color: var(--text);
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-decoration: none;
+}
+
+.barra-nav-marca:hover {
+    color: var(--accent);
+}
+
+.barra-nav-marca img {
+    height: 32px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 3px 6px var(--shadow));
+}
+
+.barra-nav-brand {
+    font-size: 16px;
+    line-height: 1;
+}
+
+.barra-nav-derecha {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.barra-nav-usuario {
+    color: var(--text-muted);
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.barra-nav-rol {
+    color: var(--accent);
+}
+
+/* El menú vive dentro de la barra: deja de flotar por su cuenta. */
+.barra-nav .menu-usuario {
+    position: relative;
+    top: auto;
+    right: auto;
+}
+
+.barra-nav .menu-usuario-opciones {
+    top: calc(100% + 10px);
+    right: 0;
+}
+
+@media (max-width: 600px) {
+    body {
+        padding-top: 68px !important;
+    }
+
+    .barra-nav {
+        height: 56px;
+        padding: 0 14px;
+    }
+
+    .barra-nav-brand,
+    .barra-nav-usuario {
+        display: none;
+    }
+}
+
+/* =========================
    FONDO DECORATIVO COMPARTIDO
    Transparencias, colores y líneas
-======================== */
+======================= */
 
 body::before {
     content: "";

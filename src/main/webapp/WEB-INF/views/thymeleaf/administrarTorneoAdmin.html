@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Administrar Torneo - System TOR</title>
-    <link rel="stylesheet" th:href="@{/css/app.css}">
+    <link rel="stylesheet" th:href="@{/css/app.css?v=4}">
     <link rel="stylesheet" th:href="@{/css/main.css}">
     <style>
         * {
@@ -229,6 +229,10 @@
 </head>
 <body>
 
+<!-- NAVBAR GLOBAL -->
+<div th:replace="~{fragments/nav :: barraNavegacion}"></div>
+
+
 <div class="admin-dashboard-container">
 
     <div class="fechaLimite"
@@ -378,22 +382,6 @@
     </div>
 
 </div>
-
-
-<!-- LOGO DE MARCA (DEBAJO DEL MENÚ HAMBURGUESA) -->
-<img class="logo-marca-debajo-menu" th:src="@{/img/isotipo.png?v=2}" alt="System TOR"/>
-
-<!-- MENÚ DE USUARIO -->
-<div class="menu-usuario">
-    <button type="button" class="btn-menu-hamburguesa" id="btnMenuUsuario" aria-label="Abrir menú">
-        <span></span>
-        <span></span>
-    </button>
-    <div class="menu-usuario-opciones" id="menuUsuarioOpciones">
-        <a th:href="@{/logout}">Cerrar sesión</a>
-    </div>
-</div>
-<script th:src="@{/js/menu.js}"></script>
 
 
 </body>

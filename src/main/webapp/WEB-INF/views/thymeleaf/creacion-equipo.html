@@ -2,7 +2,7 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" th:href="@{/css/app.css}"/>
+    <link rel="stylesheet" th:href="@{/css/app.css?v=4}"/>
     <link rel="icon" type="image/png" th:href="@{/img/favicon.png?v=2}"/>
     <title>Creación Equipo</title>
 
@@ -239,6 +239,10 @@
 
 <body>
 
+<!-- NAVBAR GLOBAL -->
+<div th:replace="~{fragments/nav :: barraNavegacion}"></div>
+
+
 <div class="form-card">
 
     <!-- ENCABEZADO -->
@@ -424,35 +428,6 @@
 
     </div>
 </div>
-
-<!-- LOGO -->
-<a th:replace="~{fragments/nav :: logoHome(clase='logo-marca')}"></a>
-
-<!-- MENÚ -->
-<div class="menu-usuario">
-
-    <button type="button"
-            class="btn-menu-hamburguesa"
-            id="btnMenuUsuario"
-            aria-label="Abrir menú">
-
-        <span></span>
-        <span></span>
-
-    </button>
-
-    <div class="menu-usuario-opciones"
-         id="menuUsuarioOpciones">
-
-        <a th:href="@{/logout}">
-            Cerrar sesión
-        </a>
-
-    </div>
-
-</div>
-
-<script th:src="@{/js/menu.js}"></script>
 
 <script>
     const selectorEscudo = document.getElementById("escudoEquipo");
