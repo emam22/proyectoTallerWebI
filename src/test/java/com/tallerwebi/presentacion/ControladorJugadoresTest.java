@@ -116,12 +116,7 @@ public class ControladorJugadoresTest {
     // ejecucion
     ModelAndView mav =
       this.controlador.agregarJugador(
-          torneo,
-          equipo(10L),
-          "Lionel",
-          "Messi",
-          10,
-          "Delantero",
+          agregarDto(torneo, equipo(10L), "Lionel", "Messi", 10, "Delantero"),
           redirectAttributesMock
         );
 
@@ -148,12 +143,7 @@ public class ControladorJugadoresTest {
 
     // ejecucion
     this.controlador.agregarJugador(
-        torneo,
-        equipo(20L),
-        "Ana",
-        "Gomez",
-        null,
-        null,
+        agregarDto(torneo, equipo(20L), "Ana", "Gomez", null, null),
         redirectAttributesMock
       );
 
@@ -173,12 +163,7 @@ public class ControladorJugadoresTest {
     // ejecucion
     ModelAndView mav =
       this.controlador.agregarJugador(
-          torneo,
-          equipo(99L),
-          "Juan",
-          "Perez",
-          5,
-          "Arquero",
+          agregarDto(torneo, equipo(99L), "Juan", "Perez", 5, "Arquero"),
           redirectAttributesMock
         );
 
@@ -202,12 +187,7 @@ public class ControladorJugadoresTest {
     // ejecucion
     ModelAndView mav =
       this.controlador.agregarJugador(
-          torneo,
-          equipo(10L),
-          "Juan",
-          "Perez",
-          5,
-          "Arquero",
+          agregarDto(torneo, equipo(10L), "Juan", "Perez", 5, "Arquero"),
           redirectAttributesMock
         );
 
@@ -232,12 +212,7 @@ public class ControladorJugadoresTest {
     // ejecucion
     ModelAndView mav =
       this.controlador.agregarJugador(
-          torneo,
-          equipo(10L),
-          "Juan",
-          "Perez",
-          10,
-          "Arquero",
+          agregarDto(torneo, equipo(10L), "Juan", "Perez", 10, "Arquero"),
           redirectAttributesMock
         );
 
@@ -320,10 +295,7 @@ public class ControladorJugadoresTest {
     // ejecucion
     ModelAndView mav =
       this.controlador.habilitarJugador(
-          torneo,
-          equipo(10L),
-          jugador(99L),
-          true,
+          habilitarDto(torneo, equipo(10L), jugador(99L), true),
           redirectAttributesMock
         );
 
@@ -345,10 +317,7 @@ public class ControladorJugadoresTest {
     // ejecucion
     ModelAndView mav =
       this.controlador.habilitarJugador(
-          torneo,
-          equipo(10L),
-          jugador(99L),
-          false,
+          habilitarDto(torneo, equipo(10L), jugador(99L), false),
           redirectAttributesMock
         );
 
@@ -370,10 +339,7 @@ public class ControladorJugadoresTest {
     // ejecucion
     ModelAndView mav =
       this.controlador.habilitarJugador(
-          torneo,
-          equipo(99L),
-          jugador(5L),
-          true,
+          habilitarDto(torneo, equipo(99L), jugador(5L), true),
           redirectAttributesMock
         );
 
@@ -395,10 +361,7 @@ public class ControladorJugadoresTest {
     // ejecucion
     ModelAndView mav =
       this.controlador.habilitarJugador(
-          torneo,
-          equipo(10L),
-          jugador(99L),
-          true,
+          habilitarDto(torneo, equipo(10L), jugador(99L), true),
           redirectAttributesMock
         );
 
@@ -417,10 +380,7 @@ public class ControladorJugadoresTest {
     // ejecucion
     ModelAndView mav =
       this.controlador.habilitarJugador(
-          null,
-          equipo(10L),
-          jugador(99L),
-          true,
+          habilitarDto(null, equipo(10L), jugador(99L), true),
           redirectAttributesMock
         );
 
@@ -490,6 +450,73 @@ public class ControladorJugadoresTest {
     assertThat(mav.getViewName(), is("redirect:/jugadoresTorneo?idTorneo=1"));
   }
 
+  private AgregarJugadorDto agregarDto(
+    Torneo torneo,
+    Equipo equipo,
+    String nombre,
+    String apellido,
+    Integer dorsal,
+    String puesto
+  ) {
+    if (equipo != null) {
+      when(this.servicioEquipoMock.consultarEquipoPorId(equipo.getId())).thenReturn(equipo);
+    }
+
+    AgregarJugadorDto dto = new AgregarJugadorDto();
+    dto.setIdTorneo(torneo == null ? null : torneo.getId());
+    dto.setIdEquipo(equipo == null ? null : equipo.getId());
+    dto.setNombre(nombre);
+    dto.setApellido(apellido);
+    dto.setDorsal(dorsal);
+    dto.setPuesto(puesto);
+
+    return dto;
+  }
+
+  private HabilitarJugadorDto habilitarDto(
+    Torneo torneo,
+    Equipo equipo,
+    Jugador jugador,
+    Boolean habilitado
+  ) {
+    if (equipo != null) {
+      when(this.servicioEquipoMock.consultarEquipoPorId(equipo.getId())).thenReturn(equipo);
+    }
+    if (jugador != null) {
+      when(this.servicioJugadorMock.consultarJugador(jugador.getId())).thenReturn(jugador);
+    }
+
+    HabilitarJugadorDto dto = new HabilitarJugadorDto();
+    dto.setIdTorneo(torneo == null ? null : torneo.getId());
+    dto.setIdEquipo(equipo == null ? null : equipo.getId());
+    dto.setIdJugador(jugador == null ? null : jugador.getId());
+    dto.setHabilitado(habilitado);
+
+    return dto;
+  }
+
+  private SancionarJugadorDto sancionarDto(
+    Torneo torneo,
+    Equipo equipo,
+    Jugador jugador,
+    Integer fechas
+  ) {
+    if (equipo != null) {
+      when(this.servicioEquipoMock.consultarEquipoPorId(equipo.getId())).thenReturn(equipo);
+    }
+    if (jugador != null) {
+      when(this.servicioJugadorMock.consultarJugador(jugador.getId())).thenReturn(jugador);
+    }
+
+    SancionarJugadorDto dto = new SancionarJugadorDto();
+    dto.setIdTorneo(torneo == null ? null : torneo.getId());
+    dto.setIdEquipo(equipo == null ? null : equipo.getId());
+    dto.setIdJugador(jugador == null ? null : jugador.getId());
+    dto.setFechas(fechas);
+
+    return dto;
+  }
+
   private Equipo equipo(Long id) {
     Equipo equipo = new Equipo();
     equipo.setId(id);
@@ -527,10 +554,7 @@ public class ControladorJugadoresTest {
     //ejecucion
     ModelAndView mav =
       this.controlador.sancionarJugador(
-          torneo,
-          equipo(10L),
-          jugador(99L),
-          1,
+          sancionarDto(torneo, equipo(10L), jugador(99L), 1),
           redirectAttributesMock
         );
 
@@ -551,10 +575,7 @@ public class ControladorJugadoresTest {
 
     ModelAndView mav =
       this.controlador.sancionarJugador(
-          torneo,
-          equipo(10L),
-          jugador(99L),
-          2,
+          sancionarDto(torneo, equipo(10L), jugador(99L), 2),
           redirectAttributesMock
         );
 
@@ -679,10 +700,7 @@ public class ControladorJugadoresTest {
     // Ejecución
     ModelAndView mav =
       this.controlador.habilitarJugadorEditar(
-          torneo,
-          equipo(10L),
-          jugador(99L),
-          true,
+          habilitarDto(torneo, equipo(10L), jugador(99L), true),
           redirectAttributesMock
         );
 
@@ -704,10 +722,7 @@ public class ControladorJugadoresTest {
     // Ejecución
     ModelAndView mav =
       this.controlador.habilitarJugadorEditar(
-          torneo,
-          equipo(10L),
-          jugador(99L),
-          false,
+          habilitarDto(torneo, equipo(10L), jugador(99L), false),
           redirectAttributesMock
         );
 
@@ -729,10 +744,7 @@ public class ControladorJugadoresTest {
     // Ejecución
     ModelAndView mav =
       this.controlador.habilitarJugadorEditar(
-          torneo,
-          equipo(99L),
-          jugador(5L),
-          true,
+          habilitarDto(torneo, equipo(99L), jugador(5L), true),
           redirectAttributesMock
         );
 
@@ -754,10 +766,7 @@ public class ControladorJugadoresTest {
     // Ejecución
     ModelAndView mav =
       this.controlador.habilitarJugadorEditar(
-          torneo,
-          equipo(10L),
-          jugador(99L),
-          true,
+          habilitarDto(torneo, equipo(10L), jugador(99L), true),
           redirectAttributesMock
         );
 
@@ -776,10 +785,7 @@ public class ControladorJugadoresTest {
     // Ejecución
     ModelAndView mav =
       this.controlador.habilitarJugadorEditar(
-          null,
-          equipo(10L),
-          jugador(99L),
-          true,
+          habilitarDto(null, equipo(10L), jugador(99L), true),
           redirectAttributesMock
         );
 

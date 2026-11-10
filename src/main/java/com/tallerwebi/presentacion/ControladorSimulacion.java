@@ -3,8 +3,8 @@ package com.tallerwebi.presentacion;
 import com.tallerwebi.dominio.Jornada;
 import com.tallerwebi.dominio.ServicioSimulacionTorneo;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -12,7 +12,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class ControladorSimulacion {
 
   private static final String ERROR = "error";
-  private static final String ID_TORNEO = "idTorneo";
 
   private final ServicioSimulacionTorneo servicioSimulacionTorneo;
 
@@ -22,9 +21,11 @@ public class ControladorSimulacion {
 
   @PostMapping("/avanzarFecha")
   public ModelAndView avanzarFecha(
-    @RequestParam(ID_TORNEO) Long idTorneo,
+    @ModelAttribute("avanzarFechaDto") AvanzarFechaDto avanzarFechaDto,
     RedirectAttributes redirectAttributes
   ) {
+    Long idTorneo = avanzarFechaDto.getIdTorneo();
+
     try {
       Jornada jornada = servicioSimulacionTorneo.avanzarJornada(idTorneo);
 

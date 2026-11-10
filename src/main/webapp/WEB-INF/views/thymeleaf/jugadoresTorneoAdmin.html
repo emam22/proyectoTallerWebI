@@ -370,8 +370,10 @@
 
                 <!-- ACCIONES -->
                 <td>
-                    <form th:action="@{/jugadoresTorneoAdmin/habilitar(idTorneo=${torneo.id})}"
-                          method="post">
+                    <form th:action="@{/jugadoresTorneoAdmin/habilitar}"
+                          method="post"
+                          th:object="${habilitarJugadorDto}">
+                        <input type="hidden" th:field="*{idTorneo}"/>
                         <input type="hidden" name="idEquipo"
                                th:value="${filaEquipo.equipo.id}"/>
                         <input type="hidden" name="idJugador"
@@ -414,15 +416,17 @@
 
         <!-- AGREGAR JUGADOR -->
         <form class="form-jugador"
-              th:action="@{/jugadoresTorneoAdmin/agregar(idTorneo=${torneo.id})}"
-              method="post">
+              th:action="@{/jugadoresTorneoAdmin/agregar}"
+              method="post"
+              th:object="${agregarJugadorDto}">
+            <input type="hidden" th:field="*{idTorneo}"/>
             <input type="hidden" name="idEquipo"
                    th:value="${filaEquipo.equipo.id}"/>
-            <input type="text" name="nombre" placeholder="Nombre" required/>
-            <input type="text" name="apellido" placeholder="Apellido" required/>
-            <input type="number" name="dorsal" placeholder="Dorsal" min="1"/>
+            <input type="text" th:field="*{nombre}" placeholder="Nombre" required/>
+            <input type="text" th:field="*{apellido}" placeholder="Apellido" required/>
+            <input type="number" th:field="*{dorsal}" placeholder="Dorsal" min="1"/>
 
-            <select name="puesto">
+            <select th:field="*{puesto}">
                 <option value="Arquero">Arquero</option>
                 <option value="Defensor">Defensor</option>
                 <option value="Mediocampista">Mediocampista</option>

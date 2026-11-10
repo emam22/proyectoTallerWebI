@@ -69,6 +69,31 @@ public class ControladorTorneoTest {
     return equipo;
   }
 
+  private ActualizarEquipoDto actualizarDto(
+    Equipo equipo,
+    Torneo torneo,
+    String nombre,
+    String sigla,
+    String colorLocal1,
+    String colorLocal2,
+    String colorVisitante1,
+    String colorVisitante2,
+    String escudoRuta
+  ) {
+    ActualizarEquipoDto dto = new ActualizarEquipoDto();
+    dto.setIdEquipo(equipo == null ? null : equipo.getId());
+    dto.setIdTorneo(torneo == null ? null : torneo.getId());
+    dto.setNombre(nombre);
+    dto.setSigla(sigla);
+    dto.setColorLocal1(colorLocal1);
+    dto.setColorLocal2(colorLocal2);
+    dto.setColorVisitante1(colorVisitante1);
+    dto.setColorVisitante2(colorVisitante2);
+    dto.setEscudoRuta(escudoRuta);
+
+    return dto;
+  }
+
   private EquipoForm equipoForm(String nombre, String sigla) {
     EquipoForm form = new EquipoForm();
     form.setNombreEquipo(nombre);
@@ -432,15 +457,17 @@ public class ControladorTorneoTest {
 
     // Ejecución
     ModelAndView mav = controladorTorneo.actualizarEquipo(
-      equipo,
-      torneoConId(idTorneo),
-      "Equipo Nuevo",
-      "EN",
-      "#ffffff",
-      "#000000",
-      "#ff0000",
-      "#00ff00",
-      null
+      actualizarDto(
+        equipo,
+        torneoConId(idTorneo),
+        "Equipo Nuevo",
+        "EN",
+        "#ffffff",
+        "#000000",
+        "#ff0000",
+        "#00ff00",
+        null
+      )
     );
 
     // Validación
@@ -463,15 +490,17 @@ public class ControladorTorneoTest {
 
     // Ejecución
     ModelAndView mav = controladorTorneo.actualizarEquipo(
-      null,
-      torneoConId(idTorneo),
-      "Nombre",
-      "NOM",
-      "#ffffff",
-      "#000000",
-      "#ff0000",
-      "#00ff00",
-      null
+      actualizarDto(
+        null,
+        torneoConId(idTorneo),
+        "Nombre",
+        "NOM",
+        "#ffffff",
+        "#000000",
+        "#ff0000",
+        "#00ff00",
+        null
+      )
     );
 
     // Validación
@@ -945,12 +974,16 @@ public class ControladorTorneoTest {
     Torneo torneo = new Torneo();
     torneo.setId(idTorneo);
 
+    CrearEquipoDto dto = new CrearEquipoDto();
+    dto.setIdEquipo(idEquipo);
+    dto.setIdTorneo(idTorneo);
+
     when(servicioEquipoMock.consultarEquipoPorId(idEquipo)).thenReturn(equipo);
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
 
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
-    ModelAndView mav = controladorTorneo.cargarEquipoExistente(equipo, torneo, redirectAttributes);
+    ModelAndView mav = controladorTorneo.cargarEquipoExistente(dto, redirectAttributes);
 
     assertEquals("redirect:/creacion-equipo?idTorneo=1", mav.getViewName());
 
@@ -967,6 +1000,10 @@ public class ControladorTorneoTest {
     Torneo torneo = new Torneo();
     torneo.setId(idTorneo);
 
+    CrearEquipoDto dto = new CrearEquipoDto();
+    dto.setIdEquipo(idEquipo);
+    dto.setIdTorneo(idTorneo);
+
     when(servicioEquipoMock.consultarEquipoPorId(idEquipo)).thenReturn(equipo);
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
 
@@ -976,7 +1013,7 @@ public class ControladorTorneoTest {
 
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
 
-    ModelAndView mav = controladorTorneo.cargarEquipoExistente(equipo, torneo, redirectAttributes);
+    ModelAndView mav = controladorTorneo.cargarEquipoExistente(dto, redirectAttributes);
 
     assertEquals("redirect:/creacion-equipo?idTorneo=1", mav.getViewName());
     assertEquals(
@@ -1173,15 +1210,17 @@ public class ControladorTorneoTest {
 
     // Ejecución
     ModelAndView mav = controladorTorneo.actualizarEquipo(
-      equipo,
-      torneoConId(idTorneo),
-      "Equipo Nuevo",
-      "EN",
-      "#ffffff",
-      "#000000",
-      "#ff0000",
-      "#00ff00",
-      "ruta-invalida/escudo.png"
+      actualizarDto(
+        equipo,
+        torneoConId(idTorneo),
+        "Equipo Nuevo",
+        "EN",
+        "#ffffff",
+        "#000000",
+        "#ff0000",
+        "#00ff00",
+        "ruta-invalida/escudo.png"
+      )
     );
 
     // Validación
@@ -1294,15 +1333,17 @@ public class ControladorTorneoTest {
 
     // Ejecución
     ModelAndView mav = controladorTorneo.actualizarEquipo(
-      equipo,
-      torneoConId(idTorneo),
-      "Boca Juniors",
-      "BO",
-      "Azul",
-      "Amarillo",
-      "Blanco",
-      "Negro",
-      null
+      actualizarDto(
+        equipo,
+        torneoConId(idTorneo),
+        "Boca Juniors",
+        "BO",
+        "Azul",
+        "Amarillo",
+        "Blanco",
+        "Negro",
+        null
+      )
     );
 
     // Verificación

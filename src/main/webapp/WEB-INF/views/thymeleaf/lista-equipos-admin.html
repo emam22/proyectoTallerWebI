@@ -154,15 +154,15 @@
                 </div>
 
                 <form th:action="@{/cargar-equipo-existente-admin}"
-                      method="post">
+                      method="post"
+                      th:object="${crearEquipoDto}">
 
                     <input type="hidden"
                            name="idEquipo"
                            th:value="${equipo.id}">
 
                     <input type="hidden"
-                           name="idTorneo"
-                           th:value="${idTorneo}">
+                           th:field="*{idTorneo}">
 
                     <button type="submit"
                             class="btn btn-verde">

@@ -307,13 +307,15 @@
         </form>
 
         <form class="form-jugador"
-              th:action="@{/jugadoresTorneo/agregar(idTorneo=${torneo.id})}"
-              method="post">
+              th:action="@{/jugadoresTorneo/agregar}"
+              method="post"
+              th:object="${agregarJugadorDto}">
+            <input type="hidden" th:field="*{idTorneo}"/>
             <input type="hidden" name="idEquipo" th:value="${filaEquipo.equipo.id}"/>
-            <input type="text" name="nombre" placeholder="Nombre" required/>
-            <input type="text" name="apellido" placeholder="Apellido" required/>
-            <input type="number" name="dorsal" placeholder="Dorsal" min="1"/>
-            <select name="puesto">
+            <input type="text" th:field="*{nombre}" placeholder="Nombre" required/>
+            <input type="text" th:field="*{apellido}" placeholder="Apellido" required/>
+            <input type="number" th:field="*{dorsal}" placeholder="Dorsal" min="1"/>
+            <select th:field="*{puesto}">
                 <option value="Arquero">Arquero</option>
                 <option value="Defensor">Defensor</option>
                 <option value="Mediocampista">Mediocampista</option>

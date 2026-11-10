@@ -387,15 +387,14 @@
                         <td>
                             <form class="form-sancion"
                                   th:action="@{/jugadoresTorneoAdmin/sancionar}"
-                                  method="post">
+                                  method="post"
+                                  th:object="${sancionarJugadorDto}">
 
                                 <input type="hidden"
-                                       name="idTorneo"
-                                       th:value="${idTorneo}"/>
+                                       th:field="*{idTorneo}"/>
 
                                 <input type="hidden"
-                                       name="idEquipo"
-                                       th:value="${equipo.id}"/>
+                                       th:field="*{idEquipo}"/>
 
                                 <input type="hidden"
                                        name="idJugador"

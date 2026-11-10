@@ -384,10 +384,9 @@
 <div class="dashboard-grid">
 
     <!-- 1. BOTÓN AVANZAR FECHA (th:href="@{/resumen}") -->
-    <form th:action="@{/avanzarFecha}" method="post">
+    <form th:action="@{/avanzarFecha}" method="post" th:object="${avanzarFechaDto}">
         <input type="hidden"
-               name="idTorneo"
-               th:value="${idTorneoActual}">
+               th:field="*{idTorneo}">
 
         <button type="submit" class="banner-avanzar">
             <div class="avanzar-col-izq">

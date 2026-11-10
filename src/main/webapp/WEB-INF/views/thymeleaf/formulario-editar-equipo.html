@@ -226,15 +226,13 @@
         </div>
 
         <!-- FORMULARIO DE EDICIÓN -->
-        <form th:action="@{/actualizar-equipo}" method="post">
+        <form th:action="@{/actualizar-equipo}" method="post" th:object="${actualizarEquipoDto}">
 
             <input type="hidden"
-                   name="idEquipo"
-                   th:value="${equipo.id}">
+                   th:field="*{idEquipo}">
 
             <input type="hidden"
-                   name="idTorneo"
-                   th:value="${idTorneo}">
+                   th:field="*{idTorneo}">
 
             <div class="grid-equipo">
 

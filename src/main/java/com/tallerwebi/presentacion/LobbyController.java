@@ -47,8 +47,12 @@ public class LobbyController {
     Long idTorneoABuscar = torneo != null && torneo.getId() != null ? torneo.getId() : 1L;
 
     List<EquipoTorneo> tabla = servicioEquipoTorneo.obtenerEstadisticas(idTorneoABuscar);
+    AvanzarFechaDto avanzarFechaDto = new AvanzarFechaDto();
+    avanzarFechaDto.setIdTorneo(idTorneoABuscar);
+
     model.put("tablaPosiciones", tabla);
     model.put("idTorneoActual", idTorneoABuscar);
+    model.put("avanzarFechaDto", avanzarFechaDto);
 
     List<EstadisticaJugador> estadisticas = servicioEstadisticas.obtenerEstadisticas();
 

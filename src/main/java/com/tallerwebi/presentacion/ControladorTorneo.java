@@ -246,20 +246,24 @@ public class ControladorTorneo {
     Map<String, Object> model = new HashMap<>();
 
     List<Equipo> equipos = servicioEquipo.obtenerEquipos();
+    CrearEquipoDto crearEquipoDto = new CrearEquipoDto();
+    crearEquipoDto.setIdTorneo(idTorneo);
 
     model.put(EQUIPOS, equipos);
     model.put(ID_TORNEO, idTorneo);
+    model.put("crearEquipoDto", crearEquipoDto);
 
     return new ModelAndView(vista, model);
   }
 
   @RequestMapping(path = "/cargar-equipo-existente", method = RequestMethod.POST)
   public ModelAndView cargarEquipoExistente(
-    @ModelAttribute(EQUIPO_CARGADO) Equipo equipo,
-    @ModelAttribute(TORNEO_CARGADO) Torneo torneo,
+    @ModelAttribute("crearEquipoDto") CrearEquipoDto crearEquipoDto,
     RedirectAttributes redirectAttributes
   ) {
-    Long idTorneo = obtenerIdTorneo(torneo);
+    Long idTorneo = crearEquipoDto.getIdTorneo();
+    Equipo equipo = servicioEquipo.consultarEquipoPorId(crearEquipoDto.getIdEquipo());
+    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
 
     return cargarEquipoExistenteComun(
       equipo,
@@ -271,11 +275,12 @@ public class ControladorTorneo {
 
   @RequestMapping(path = "/cargar-equipo-existente-admin", method = RequestMethod.POST)
   public ModelAndView cargarEquipoExistenteAdmin(
-    @ModelAttribute(EQUIPO_CARGADO) Equipo equipo,
-    @ModelAttribute(TORNEO_CARGADO) Torneo torneo,
+    @ModelAttribute("crearEquipoDto") CrearEquipoDto crearEquipoDto,
     RedirectAttributes redirectAttributes
   ) {
-    Long idTorneo = obtenerIdTorneo(torneo);
+    Long idTorneo = crearEquipoDto.getIdTorneo();
+    Equipo equipo = servicioEquipo.consultarEquipoPorId(crearEquipoDto.getIdEquipo());
+    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
 
     return cargarEquipoExistenteComun(
       equipo,
@@ -434,38 +439,38 @@ public class ControladorTorneo {
       return new ModelAndView("redirect:/editarEquipo?idTorneo=" + idTorneo);
     }
 
+    ActualizarEquipoDto actualizarEquipoDto = new ActualizarEquipoDto();
+    actualizarEquipoDto.setIdEquipo(idEquipo);
+    actualizarEquipoDto.setIdTorneo(idTorneo);
+
     ModelAndView mav = new ModelAndView(VISTA_FORMULARIO_EDITAR_EQUIPO);
 
     mav.addObject(ATRIBUTO_EQUIPO, equipo);
     mav.addObject(ID_TORNEO, idTorneo);
+    mav.addObject("actualizarEquipoDto", actualizarEquipoDto);
 
     return mav;
   }
 
   @RequestMapping(path = "/actualizar-equipo", method = RequestMethod.POST)
   public ModelAndView actualizarEquipo(
-    @ModelAttribute(EQUIPO_CARGADO) Equipo equipo,
-    @ModelAttribute(TORNEO_CARGADO) Torneo torneo,
-    @RequestParam("nombre") String nombre,
-    @RequestParam("sigla") String sigla,
-    @RequestParam("colorLocal1") String colorLocal1,
-    @RequestParam("colorLocal2") String colorLocal2,
-    @RequestParam("colorVisitante1") String colorVisitante1,
-    @RequestParam("colorVisitante2") String colorVisitante2,
-    @RequestParam(value = "escudoRuta", required = false) String escudoRuta
+    @ModelAttribute("actualizarEquipoDto") ActualizarEquipoDto actualizarEquipoDto
   ) {
-    Long idTorneo = obtenerIdTorneo(torneo);
+    Long idTorneo = actualizarEquipoDto.getIdTorneo();
+    Equipo equipo = servicioEquipo.consultarEquipoPorId(actualizarEquipoDto.getIdEquipo());
 
     if (equipo == null) {
       return new ModelAndView("redirect:/editar-equipo?idTorneo=" + idTorneo);
     }
 
-    equipo.setNombre(nombre);
-    equipo.setSigla(sigla);
-    equipo.setColorLocal1(colorLocal1);
-    equipo.setColorLocal2(colorLocal2);
-    equipo.setColorVisitante1(colorVisitante1);
-    equipo.setColorVisitante2(colorVisitante2);
+    equipo.setNombre(actualizarEquipoDto.getNombre());
+    equipo.setSigla(actualizarEquipoDto.getSigla());
+    equipo.setColorLocal1(actualizarEquipoDto.getColorLocal1());
+    equipo.setColorLocal2(actualizarEquipoDto.getColorLocal2());
+    equipo.setColorVisitante1(actualizarEquipoDto.getColorVisitante1());
+    equipo.setColorVisitante2(actualizarEquipoDto.getColorVisitante2());
+
+    String escudoRuta = actualizarEquipoDto.getEscudoRuta();
 
     if (escudoRuta != null && !escudoRuta.isBlank()) {
       if (!escudoRuta.startsWith("/img/escudos/")) {
