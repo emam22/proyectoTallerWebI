@@ -29,7 +29,7 @@
   Sin clase propia: <a th:replace="~{fragments/nav :: logoHome(clase='')}"></a>
 -->
 <th:block th:fragment="logoHome(clase)">
-    <a th:with="home=${session.ROL != null and session.ROL.equalsIgnoreCase('admin')} ? '/elegirTorneoAdmin' : '/elegirTorneo'"
+    <a th:with="home=${session.ROL != null and session.ROL.equalsIgnoreCase('admin')} ? '/lobbyAdmin' : '/elegirTorneo'"
        th:href="@{${home}}"
        class="logo-home"
        title="Ir al inicio">
@@ -46,7 +46,7 @@
 <th:block th:fragment="barraNavegacion">
     <header class="barra-nav"
             th:with="esAdmin=${session.ROL != null and session.ROL.equalsIgnoreCase('admin')},
-                     home=${session.ROL == null ? '/login' : (session.ROL.equalsIgnoreCase('admin') ? '/elegirTorneoAdmin' : '/elegirTorneo')}">
+                     home=${session.ROL == null ? '/login' : (session.ROL.equalsIgnoreCase('admin') ? '/lobbyAdmin' : '/elegirTorneo')}">
         <a class="barra-nav-marca" th:href="@{${home}}" title="Ir al inicio">
             <img th:src="@{/img/isotipo.png?v=2}"
                  alt="System TOR"
