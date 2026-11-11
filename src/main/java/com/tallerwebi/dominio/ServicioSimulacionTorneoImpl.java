@@ -1,8 +1,6 @@
 package com.tallerwebi.dominio;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,6 +53,10 @@ public class ServicioSimulacionTorneoImpl implements ServicioSimulacionTorneo {
       return null;
     }
 
+    // Guardamos los jugadores que ya estaban suspendidos
+    // antes de simular esta jornada.
+    Set<Long> jugadoresSuspendidos = obtenerSuspendidosDeLaJornada(jornadaPendiente, idTorneo);
+
     // Simulamos solamente los partidos que todavía no se disputaron.
     for (Partido partido : jornadaPendiente.getPartidos()) {
       if (!Boolean.TRUE.equals(partido.getDisputado())) {
@@ -68,9 +70,11 @@ public class ServicioSimulacionTorneoImpl implements ServicioSimulacionTorneo {
       .stream()
       .allMatch(partido -> Boolean.TRUE.equals(partido.getDisputado()));
 
-    // Si todos terminaron, finalizamos la jornada.
+    // Si todos terminaron, finalizamos la jornada y cumplimos suspensiones.
     if (todosDisputados) {
       jornadaPendiente.setEstado("Finalizada");
+
+      cumplirSuspensionesDeLaJornada(jugadoresSuspendidos, idTorneo);
     }
 
     // Guardamos los cambios realizados.
@@ -445,5 +449,56 @@ public class ServicioSimulacionTorneoImpl implements ServicioSimulacionTorneo {
   // Evita errores cuando una estadística es null.
   private int valorActual(Integer valor) {
     return valor == null ? 0 : valor;
+  }
+
+  private Set<Long> obtenerSuspendidosDeLaJornada(Jornada jornada, Long idTorneo) {
+    Set<Long> jugadoresSuspendidos = new HashSet<>();
+
+    for (Partido partido : jornada.getPartidos()) {
+      if (!Boolean.TRUE.equals(partido.getDisputado())) {
+        agregarSuspendidosDelEquipo(
+          partido.getEquipoLocal().getId(),
+          idTorneo,
+          jugadoresSuspendidos
+        );
+
+        agregarSuspendidosDelEquipo(
+          partido.getEquipoVisitante().getId(),
+          idTorneo,
+          jugadoresSuspendidos
+        );
+      }
+    }
+
+    return jugadoresSuspendidos;
+  }
+
+  private void agregarSuspendidosDelEquipo(
+    Long idEquipo,
+    Long idTorneo,
+    Set<Long> jugadoresSuspendidos
+  ) {
+    List<JugadorEquipoTorneo> inscripciones = repositorioJugadorEquipoTorneo.listarPorEquipoYTorneo(
+      idEquipo,
+      idTorneo
+    );
+
+    for (JugadorEquipoTorneo inscripcion : inscripciones) {
+      if (inscripcion == null || inscripcion.getJugador() == null) {
+        continue;
+      }
+
+      Integer pendientes = inscripcion.getFechasSuspensionPendientes();
+
+      if (pendientes != null && pendientes > 0 && inscripcion.getJugador().getId() != null) {
+        jugadoresSuspendidos.add(inscripcion.getJugador().getId());
+      }
+    }
+  }
+
+  private void cumplirSuspensionesDeLaJornada(Set<Long> jugadoresSuspendidos, Long idTorneo) {
+    for (Long idJugador : jugadoresSuspendidos) {
+      servicioJugador.cumplirFechaSuspensionEnTorneo(idJugador, idTorneo);
+    }
   }
 }
