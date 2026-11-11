@@ -20,6 +20,7 @@ public class ServicioSimulacionTorneoTest {
   private RepositorioEstadisticaJugador repositorioEstadisticaJugadorMock;
   private RepositorioEventoPartido repositorioEventoPartidoMock;
   private ServicioJugador servicioJugadorMock;
+  private ServicioEquipoTorneo servicioEquipoTorneoMock;
 
   @BeforeEach
   public void init() {
@@ -33,6 +34,7 @@ public class ServicioSimulacionTorneoTest {
     servicioSimulacion =
       new ServicioSimulacionTorneoImpl(
         servicioTorneoMock,
+        servicioEquipoTorneoMock,
         repositorioJornadaMock,
         repositorioJugadorEquipoTorneoMock,
         repositorioEstadisticaJugadorMock,

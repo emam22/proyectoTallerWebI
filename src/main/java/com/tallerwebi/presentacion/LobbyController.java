@@ -54,7 +54,9 @@ public class LobbyController {
     model.put("idTorneoActual", idTorneoABuscar);
     model.put("avanzarFechaDto", avanzarFechaDto);
 
-    List<EstadisticaJugador> estadisticas = servicioEstadisticas.obtenerEstadisticas();
+    List<EstadisticaJugador> estadisticas = servicioEstadisticas.obtenerEstadisticasPorTorneo(
+      idTorneoABuscar
+    );
 
     Map<Long, Equipo> equiposPorJugador = obtenerMapaEquiposPorJugador(estadisticas);
 
@@ -89,7 +91,9 @@ public class LobbyController {
 
     Long idTorneoABuscar = torneo != null && torneo.getId() != null ? torneo.getId() : 1L;
 
-    List<EstadisticaJugador> estadisticas = servicioEstadisticas.obtenerEstadisticas();
+    List<EstadisticaJugador> estadisticas = servicioEstadisticas.obtenerEstadisticasPorTorneo(
+      idTorneoABuscar
+    );
 
     model.put("estadisticasDeJugadores", estadisticas);
     model.put("goleador", obtenerGoleador(estadisticas));

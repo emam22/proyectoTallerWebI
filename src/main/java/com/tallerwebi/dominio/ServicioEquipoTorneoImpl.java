@@ -192,30 +192,7 @@ public class ServicioEquipoTorneoImpl implements ServicioEquipoTorneo {
       return;
     }
 
-    estadisticasLocal.setPartidosJugados(estadisticasLocal.getPartidosJugados() + 1);
-    estadisticasVisitante.setPartidosJugados(estadisticasVisitante.getPartidosJugados() + 1);
-
-    estadisticasLocal.setGolesAFavor(estadisticasLocal.getGolesAFavor() + golesLocal);
-    estadisticasLocal.setGolesEnContra(estadisticasLocal.getGolesEnContra() + golesVisitante);
-
-    estadisticasVisitante.setGolesAFavor(estadisticasVisitante.getGolesAFavor() + golesVisitante);
-    estadisticasVisitante.setGolesEnContra(estadisticasVisitante.getGolesEnContra() + golesLocal);
-
-    //puntos
-    if (golesLocal > golesVisitante) {
-      estadisticasLocal.setPuntos(estadisticasLocal.getPuntos() + 3);
-      estadisticasLocal.setPartidosGanados(estadisticasLocal.getPartidosGanados() + 1);
-      estadisticasVisitante.setPartidoPerdidos(estadisticasVisitante.getPartidoPerdidos() + 1);
-    } else if (golesVisitante > golesLocal) {
-      estadisticasVisitante.setPuntos(estadisticasVisitante.getPuntos() + 3);
-      estadisticasVisitante.setPartidosGanados(estadisticasVisitante.getPartidosGanados() + 1);
-      estadisticasLocal.setPartidoPerdidos(estadisticasLocal.getPartidoPerdidos() + 1);
-    } else if (golesLocal == golesVisitante) {
-      estadisticasLocal.setPuntos(estadisticasLocal.getPuntos() + 1);
-      estadisticasLocal.setPartidosEmpatados(estadisticasLocal.getPartidosEmpatados() + 1);
-
-      estadisticasVisitante.setPuntos(estadisticasVisitante.getPuntos() + 1);
-      estadisticasVisitante.setPartidosEmpatados(estadisticasVisitante.getPartidosEmpatados() + 1);
-    }
+    estadisticasLocal.registrarPartido(golesLocal, golesVisitante);
+    estadisticasVisitante.registrarPartido(golesVisitante, golesLocal);
   }
 }

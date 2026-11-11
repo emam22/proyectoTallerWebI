@@ -19,6 +19,9 @@ public class EstadisticaJugador {
   @ManyToOne
   private Jugador jugador;
 
+  @ManyToOne
+  private Torneo torneo;
+
   public Long getId() {
     return id;
   }
@@ -77,5 +80,13 @@ public class EstadisticaJugador {
 
   public void setJugador(Jugador jugador) {
     this.jugador = jugador;
+  }
+
+  public Torneo getTorneo() {
+    return torneo;
+  }
+
+  public void setTorneo(Torneo torneo) {
+    this.torneo = torneo;
   }
 }

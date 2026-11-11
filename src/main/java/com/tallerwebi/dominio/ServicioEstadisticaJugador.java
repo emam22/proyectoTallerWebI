@@ -12,4 +12,5 @@ public interface ServicioEstadisticaJugador {
   void sumarPartidoJugado(Long idJugador);
   void registrarGol(Long idJugador);
   void registrarAsistencia(long idJugador);
+  List<EstadisticaJugador> obtenerEstadisticasPorTorneo(Long idTorneo);
 }

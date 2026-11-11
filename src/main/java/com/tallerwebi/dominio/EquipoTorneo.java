@@ -102,4 +102,24 @@ public class EquipoTorneo {
   public void setTorneo(Torneo torneo) {
     this.torneo = torneo;
   }
+
+  public void registrarPartido(int golesFavor, int golesContra) {
+    this.partidosJugados = valorOZero(this.partidosJugados) + 1;
+    this.golesAFavor = valorOZero(this.golesAFavor) + golesFavor;
+    this.golesEnContra = valorOZero(this.golesEnContra) + golesContra;
+
+    if (golesFavor > golesContra) {
+      this.puntos = valorOZero(this.puntos) + 3;
+      this.partidosGanados = valorOZero(this.partidosGanados) + 1;
+    } else if (golesFavor == golesContra) {
+      this.puntos = valorOZero(this.puntos) + 1;
+      this.partidosEmpatados = valorOZero(this.partidosEmpatados) + 1;
+    } else {
+      this.partidoPerdidos = valorOZero(this.partidoPerdidos) + 1;
+    }
+  }
+
+  private int valorOZero(Integer valor) {
+    return valor == null ? 0 : valor;
+  }
 }

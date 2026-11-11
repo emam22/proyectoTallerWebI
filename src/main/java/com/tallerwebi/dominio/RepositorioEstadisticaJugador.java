@@ -8,4 +8,6 @@ public interface RepositorioEstadisticaJugador {
   void eliminarFilaEstadistica(Long idJugador);
   EstadisticaJugador buscarEstadisticasPorIdJugador(Long idJugador);
   void actualizarEstadisticasJugador(EstadisticaJugador estadisticas);
+  List<EstadisticaJugador> obtenerEstadisticasPorTorneo(Long idTorneo);
+  EstadisticaJugador buscarEstadisticasPorJugadorYTorneo(Long idJugador, Long idTorneo);
 }

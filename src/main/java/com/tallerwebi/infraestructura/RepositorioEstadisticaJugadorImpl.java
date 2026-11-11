@@ -53,4 +53,31 @@ public class RepositorioEstadisticaJugadorImpl implements RepositorioEstadistica
   public void actualizarEstadisticasJugador(EstadisticaJugador estadisticas) {
     sf.getCurrentSession().merge(estadisticas);
   }
+
+  @Override
+  public List<EstadisticaJugador> obtenerEstadisticasPorTorneo(Long idTorneo) {
+    return sf
+      .getCurrentSession()
+      .createQuery(
+        "SELECT e FROM EstadisticaJugador e WHERE e.torneo.id = :idTorneo ORDER BY e.goles DESC, e.asistencias DESC",
+        EstadisticaJugador.class
+      )
+      .setParameter("idTorneo", idTorneo)
+      .getResultList();
+  }
+
+  @Override
+  public EstadisticaJugador buscarEstadisticasPorJugadorYTorneo(Long idJugador, Long idTorneo) {
+    List<EstadisticaJugador> resultados = sf
+      .getCurrentSession()
+      .createQuery(
+        "SELECT e FROM EstadisticaJugador e WHERE e.jugador.id = :idJugador AND e.torneo.id = :idTorneo",
+        EstadisticaJugador.class
+      )
+      .setParameter("idJugador", idJugador)
+      .setParameter("idTorneo", idTorneo)
+      .getResultList();
+
+    return resultados.isEmpty() ? null : resultados.get(0);
+  }
 }

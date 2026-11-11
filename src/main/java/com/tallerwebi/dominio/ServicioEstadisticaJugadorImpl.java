@@ -95,21 +95,6 @@ public class ServicioEstadisticaJugadorImpl implements ServicioEstadisticaJugado
     servicioJugador.agregarFechasSuspensionEnTorneo(idJugador, idTorneo, 1);
   }
 
-  private EstadisticaJugador obtenerEstadisticasValidadas(Long idJugador, Long idTorneo) {
-    Jugador jugador = servicioJugador.consultarJugador(idJugador);
-    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
-
-    EstadisticaJugador estadisticas = repoEstadisticas.buscarEstadisticasPorIdJugador(idJugador);
-
-    if (jugador == null || torneo == null || estadisticas == null) {
-      throw new IllegalArgumentException(
-        "No se encontró el jugador, el torneo o sus estadísticas."
-      );
-    }
-
-    return estadisticas;
-  }
-
   @Override
   public void sumarPartidoJugado(Long idJugador) {
     EstadisticaJugador estadisticas = repoEstadisticas.buscarEstadisticasPorIdJugador(idJugador);
@@ -141,5 +126,28 @@ public class ServicioEstadisticaJugadorImpl implements ServicioEstadisticaJugado
       estadisticas.setParticipacionesGol(estadisticas.getGoles() + asistencias);
       repoEstadisticas.actualizarEstadisticasJugador(estadisticas);
     }
+  }
+
+  @Override
+  public List<EstadisticaJugador> obtenerEstadisticasPorTorneo(Long idTorneo) {
+    return repoEstadisticas.obtenerEstadisticasPorTorneo(idTorneo);
+  }
+
+  private EstadisticaJugador obtenerEstadisticasValidadas(Long idJugador, Long idTorneo) {
+    Jugador jugador = servicioJugador.consultarJugador(idJugador);
+    Torneo torneo = servicioTorneo.consultarTorneoPorId(idTorneo);
+
+    EstadisticaJugador estadisticas = repoEstadisticas.buscarEstadisticasPorJugadorYTorneo(
+      idJugador,
+      idTorneo
+    );
+
+    if (jugador == null || torneo == null || estadisticas == null) {
+      throw new IllegalArgumentException(
+        "No se encontró el jugador, el torneo o sus estadísticas."
+      );
+    }
+
+    return estadisticas;
   }
 }
