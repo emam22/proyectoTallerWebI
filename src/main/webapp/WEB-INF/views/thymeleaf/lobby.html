@@ -379,6 +379,8 @@
         }
     </style>
 </head>
+
+
 <body>
 
 <!-- NAVBAR GLOBAL -->
@@ -402,6 +404,10 @@
                 </div>
             </div>
         </button>
+        <div th:if="${error != null}"
+             th:text="${error}"
+             style="color: red; font-weight: bold; margin-bottom: 15px;">
+        </div>
     </form>
             <!--<div class="avanzar-col-der">
                 <div class="destacado-partido">

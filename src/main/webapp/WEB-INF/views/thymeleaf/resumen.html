@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
@@ -131,6 +130,69 @@
             font-size: 20px;
         }
 
+        /* EVENTOS DEL PARTIDO */
+        .eventos-partido {
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid #555;
+        }
+
+        .eventos-partido h3 {
+            color: #b6ff00;
+            font-size: 15px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .lista-eventos {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-width: 600px;
+            margin: auto;
+        }
+
+        .evento {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 7px;
+            background: #232323;
+            border-radius: 6px;
+            padding: 11px 14px;
+            font-size: 14px;
+        }
+
+        .evento-minuto {
+            color: #aaa;
+            font-weight: bold;
+            min-width: 35px;
+        }
+
+        .evento-gol strong {
+            color: #b6ff00;
+        }
+
+        .evento-amarilla strong {
+            color: #ffd43b;
+        }
+
+        .evento-roja strong {
+            color: #ff5555;
+        }
+
+        .evento-asistencia {
+            color: #aaa;
+            font-size: 12px;
+        }
+
+        .sin-eventos {
+            color: #aaa;
+            text-align: center;
+            font-size: 13px;
+            padding: 10px;
+        }
+
         .mensaje-vacio {
             background: #303030;
             border: 1px solid #555;
@@ -196,6 +258,10 @@
             .goles {
                 font-size: 22px;
             }
+
+            .evento {
+                font-size: 12px;
+            }
         }
     </style>
 </head>
@@ -204,8 +270,6 @@
 
 <!-- NAVBAR GLOBAL -->
 <div th:replace="~{fragments/nav :: barraNavegacion}"></div>
-
-
 
 <div class="contenedor">
 
@@ -263,6 +327,58 @@
                      th:text="${resumen.partido.equipoVisitante.nombre}">
                     Equipo visitante
                 </div>
+
+            </div>
+
+            <!-- EVENTOS DEL PARTIDO -->
+            <div class="eventos-partido">
+
+                <h3>EVENTOS DEL PARTIDO</h3>
+
+                <div class="lista-eventos"
+                     th:if="${resumen.eventos != null and !resumen.eventos.isEmpty()}">
+
+                    <div th:each="evento : ${resumen.eventos}"
+                         class="evento"
+                         th:classappend="${
+                            evento.tipo.name() == 'GOL' ? ' evento-gol' :
+                            (evento.tipo.name() == 'AMARILLA' ? ' evento-amarilla' : ' evento-roja')
+                         }">
+
+                        <span class="evento-minuto"
+                              th:text="${evento.minuto} + '\''">
+                            25'
+                        </span>
+
+                        <strong th:text="${
+                            evento.tipo.name() == 'GOL' ? ' GOL - ' :
+                            (evento.tipo.name() == 'AMARILLA' ? ' AMARILLA - ' : ' ROJA - ')
+                        }">
+                            GOL -
+                        </strong>
+
+                        <span th:text="${evento.nombreJugador}">
+                            Nombre del jugador
+                        </span>
+
+                        <span class="evento-asistencia"
+                              th:if="${evento.tipo.name() == 'GOL' and evento.nombreAsistidor != null}"
+                              th:text="'(Asistencia: ' + ${evento.nombreAsistidor} + ')'">
+                            (Asistencia: Nombre)
+                        </span>
+
+                        <span th:if="${evento.nombreEquipo != null}"
+                              th:text="' - ' + ${evento.nombreEquipo}">
+</span>
+
+                    </div>
+
+                </div>
+
+                <p class="sin-eventos"
+                   th:if="${resumen.eventos == null or resumen.eventos.isEmpty()}">
+                    No se registraron eventos en este partido.
+                </p>
 
             </div>
 

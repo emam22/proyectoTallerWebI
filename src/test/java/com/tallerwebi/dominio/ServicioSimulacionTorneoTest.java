@@ -18,6 +18,7 @@ public class ServicioSimulacionTorneoTest {
   private RepositorioJornada repositorioJornadaMock;
   private RepositorioJugadorEquipoTorneo repositorioJugadorEquipoTorneoMock;
   private RepositorioEstadisticaJugador repositorioEstadisticaJugadorMock;
+  private RepositorioEventoPartido repositorioEventoPartidoMock;
 
   @BeforeEach
   public void init() {
@@ -25,13 +26,15 @@ public class ServicioSimulacionTorneoTest {
     repositorioJornadaMock = mock(RepositorioJornada.class);
     repositorioJugadorEquipoTorneoMock = mock(RepositorioJugadorEquipoTorneo.class);
     repositorioEstadisticaJugadorMock = mock(RepositorioEstadisticaJugador.class);
+    repositorioEventoPartidoMock = mock(RepositorioEventoPartido.class);
 
     servicioSimulacion =
       new ServicioSimulacionTorneoImpl(
         servicioTorneoMock,
         repositorioJornadaMock,
         repositorioJugadorEquipoTorneoMock,
-        repositorioEstadisticaJugadorMock
+        repositorioEstadisticaJugadorMock,
+        repositorioEventoPartidoMock
       );
   }
 

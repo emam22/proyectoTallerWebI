@@ -75,7 +75,7 @@ public class ServicioEquipoTorneoImpl implements ServicioEquipoTorneo {
     return repositorioEquipoTorneo.contarEquiposPorTorneo(idTorneo);
   }
 
-  @Override
+  /*@Override
   public void inscribirEquipoExistente(Equipo equipo, Torneo torneo) throws EquipoYaInscripto {
     boolean yaInscripto =
       this.repositorioEquipoTorneo.existeEquipoEnTorneo(equipo.getId(), torneo.getId());
@@ -98,6 +98,37 @@ public class ServicioEquipoTorneoImpl implements ServicioEquipoTorneo {
     equipoTorneo.setGolesEnContra(0);
 
     this.repositorioEquipoTorneo.guardar(equipoTorneo);
+  }*/
+
+  @Override
+  public void inscribirEquipoExistente(Equipo equipo, Torneo torneo) throws EquipoYaInscripto {
+    boolean yaInscripto =
+      this.repositorioEquipoTorneo.existeEquipoEnTorneo(equipo.getId(), torneo.getId());
+
+    if (yaInscripto) {
+      throw new EquipoYaInscripto();
+    }
+
+    EquipoTorneo equipoTorneo = new EquipoTorneo();
+
+    equipoTorneo.setEquipo(equipo);
+    equipoTorneo.setTorneo(torneo);
+
+    equipoTorneo.setPuntos(0);
+    equipoTorneo.setPartidosJugados(0);
+    equipoTorneo.setPartidosGanados(0);
+    equipoTorneo.setPartidoPerdidos(0);
+    equipoTorneo.setPartidosEmpatados(0);
+    equipoTorneo.setGolesAFavor(0);
+    equipoTorneo.setGolesEnContra(0);
+
+    repositorioEquipoTorneo.guardar(equipoTorneo);
+
+    List<Jugador> jugadores = servicioJugador.obtenerJugadores(equipo.getId());
+
+    for (Jugador jugador : jugadores) {
+      servicioJugador.inscribirJugadorEnTorneo(jugador.getId(), equipo.getId(), torneo.getId());
+    }
   }
 
   @Override

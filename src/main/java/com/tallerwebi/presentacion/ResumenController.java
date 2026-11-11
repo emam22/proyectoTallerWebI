@@ -1,13 +1,6 @@
 package com.tallerwebi.presentacion;
 
-import com.tallerwebi.dominio.EstadisticaJugador;
-import com.tallerwebi.dominio.Jornada;
-import com.tallerwebi.dominio.JugadorEquipoTorneo;
-import com.tallerwebi.dominio.Partido;
-import com.tallerwebi.dominio.RepositorioEstadisticaJugador;
-import com.tallerwebi.dominio.RepositorioJugadorEquipoTorneo;
-import com.tallerwebi.dominio.ServicioTorneo;
-import com.tallerwebi.dominio.Torneo;
+import com.tallerwebi.dominio.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,15 +18,18 @@ public class ResumenController {
   private final ServicioTorneo servicioTorneo;
   private final RepositorioEstadisticaJugador repositorioEstadisticaJugador;
   private final RepositorioJugadorEquipoTorneo repositorioJugadorEquipoTorneo;
+  private final RepositorioEventoPartido repositorioEventoPartido;
 
   public ResumenController(
     ServicioTorneo servicioTorneo,
     RepositorioEstadisticaJugador repositorioEstadisticaJugador,
-    RepositorioJugadorEquipoTorneo repositorioJugadorEquipoTorneo
+    RepositorioJugadorEquipoTorneo repositorioJugadorEquipoTorneo,
+    RepositorioEventoPartido repositorioEventoPartido
   ) {
     this.servicioTorneo = servicioTorneo;
     this.repositorioEstadisticaJugador = repositorioEstadisticaJugador;
     this.repositorioJugadorEquipoTorneo = repositorioJugadorEquipoTorneo;
+    this.repositorioEventoPartido = repositorioEventoPartido;
   }
 
   // Carga el torneo correspondiente al ID recibido en la URL.
@@ -46,12 +42,17 @@ public class ResumenController {
   @Transactional(readOnly = true)
   @RequestMapping("/resumen")
   public ModelAndView irAResumen(
-    @ModelAttribute("torneo") Torneo torneo,
-    @RequestParam(value = "idJornada", required = false) Long idJornada
+    @ModelAttribute("buscarResumenDTO") BuscarResumenDTO buscarResumenDTO
   ) {
     Map<String, Object> model = new HashMap<>();
 
-    Long idTorneoActual = torneo == null ? null : torneo.getId();
+    Long idTorneoActual = buscarResumenDTO.getIdTorneo();
+    Long idJornada = buscarResumenDTO.getIdJornada();
+
+    Torneo torneo = idTorneoActual == null
+      ? null
+      : servicioTorneo.consultarTorneoPorId(idTorneoActual);
+
     model.put("idTorneoActual", idTorneoActual);
 
     if (torneo == null || idJornada == null) {
@@ -61,14 +62,7 @@ public class ResumenController {
 
     List<Jornada> jornadas = servicioTorneo.obtenerJornadasPorTorneo(idTorneoActual);
 
-    Jornada jornadaSeleccionada = null;
-
-    for (Jornada jornada : jornadas) {
-      if (jornada.getId().equals(idJornada)) {
-        jornadaSeleccionada = jornada;
-        break;
-      }
-    }
+    Jornada jornadaSeleccionada = buscarJornada(jornadas, idJornada);
 
     if (jornadaSeleccionada == null) {
       model.put("error", "No se encontró la jornada solicitada.");
@@ -85,26 +79,79 @@ public class ResumenController {
     List<ResumenPartidoDTO> resumenPartidos = new ArrayList<>();
 
     for (Partido partido : jornadaSeleccionada.getPartidos()) {
-      // Obtenemos las estadísticas de los jugadores del equipo local.
-      List<EstadisticaJugador> estadisticasLocal = obtenerEstadisticasDelEquipo(
-        partido.getEquipoLocal().getId(),
-        idTorneoActual,
-        estadisticasPorJugador
-      );
-
-      // Obtenemos las estadísticas de los jugadores del equipo visitante.
-      List<EstadisticaJugador> estadisticasVisitante = obtenerEstadisticasDelEquipo(
-        partido.getEquipoVisitante().getId(),
-        idTorneoActual,
-        estadisticasPorJugador
-      );
-
-      resumenPartidos.add(new ResumenPartidoDTO(partido, estadisticasLocal, estadisticasVisitante));
+      resumenPartidos.add(crearResumenPartido(partido, idTorneoActual, estadisticasPorJugador));
     }
 
     model.put("resumenPartidos", resumenPartidos);
 
     return new ModelAndView("resumen", model);
+  }
+
+  // Busca la jornada solicitada dentro de las jornadas del torneo.
+  private Jornada buscarJornada(List<Jornada> jornadas, Long idJornada) {
+    for (Jornada jornada : jornadas) {
+      if (jornada.getId().equals(idJornada)) {
+        return jornada;
+      }
+    }
+
+    return null;
+  }
+
+  // Prepara las estadísticas y los eventos correspondientes a un partido.
+  private ResumenPartidoDTO crearResumenPartido(
+    Partido partido,
+    Long idTorneo,
+    Map<Long, EstadisticaJugador> estadisticasPorJugador
+  ) {
+    List<EstadisticaJugador> estadisticasLocal = obtenerEstadisticasDelEquipo(
+      partido.getEquipoLocal().getId(),
+      idTorneo,
+      estadisticasPorJugador
+    );
+
+    List<EstadisticaJugador> estadisticasVisitante = obtenerEstadisticasDelEquipo(
+      partido.getEquipoVisitante().getId(),
+      idTorneo,
+      estadisticasPorJugador
+    );
+
+    List<EventoPartidoDto> eventos = obtenerEventosDelPartido(partido, idTorneo);
+
+    return new ResumenPartidoDTO(partido, estadisticasLocal, estadisticasVisitante, eventos);
+  }
+
+  // Obtiene los eventos del partido y el equipo al que pertenece cada jugador.
+  private List<EventoPartidoDto> obtenerEventosDelPartido(Partido partido, Long idTorneo) {
+    List<EventoPartidoDto> eventos = new ArrayList<>();
+
+    for (EventoPartido evento : repositorioEventoPartido.obtenerEventosPorPartido(
+      partido.getId()
+    )) {
+      String nombreEquipo = obtenerNombreEquipoDelJugador(evento, idTorneo);
+
+      eventos.add(new EventoPartidoDto(evento, nombreEquipo));
+    }
+
+    return eventos;
+  }
+
+  // Obtiene el nombre del equipo al que pertenece el jugador en el torneo.
+  private String obtenerNombreEquipoDelJugador(EventoPartido evento, Long idTorneo) {
+    if (evento.getJugador() == null || evento.getJugador().getId() == null) {
+      return null;
+    }
+
+    JugadorEquipoTorneo inscripcion = repositorioJugadorEquipoTorneo.buscarPorJugadorYTorneo(
+      evento.getJugador().getId(),
+      idTorneo
+    );
+
+    if (inscripcion == null || inscripcion.getEquipo() == null) {
+      return null;
+    }
+
+    return inscripcion.getEquipo().getNombre();
   }
 
   // Crea un mapa para encontrar rápidamente las estadísticas de cada jugador.

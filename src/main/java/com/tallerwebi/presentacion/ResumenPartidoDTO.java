@@ -11,15 +11,18 @@ public class ResumenPartidoDTO {
   private final Partido partido;
   private final List<EstadisticaJugador> estadisticasLocal;
   private final List<EstadisticaJugador> estadisticasVisitante;
+  private final List<EventoPartidoDto> eventos;
 
   public ResumenPartidoDTO(
     Partido partido,
     List<EstadisticaJugador> estadisticasLocal,
-    List<EstadisticaJugador> estadisticasVisitante
+    List<EstadisticaJugador> estadisticasVisitante,
+    List<EventoPartidoDto> eventos
   ) {
     this.partido = partido;
     this.estadisticasLocal = estadisticasLocal;
     this.estadisticasVisitante = estadisticasVisitante;
+    this.eventos = eventos;
   }
 
   public Partido getPartido() {
@@ -32,5 +35,9 @@ public class ResumenPartidoDTO {
 
   public List<EstadisticaJugador> getEstadisticasVisitante() {
     return estadisticasVisitante;
+  }
+
+  public List<EventoPartidoDto> getEventos() {
+    return eventos;
   }
 }

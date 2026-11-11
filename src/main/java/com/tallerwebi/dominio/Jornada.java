@@ -18,7 +18,9 @@ public class Jornada {
   @ManyToOne
   private Torneo torneo;
 
-  @OneToMany(mappedBy = "jornada", cascade = CascadeType.PERSIST)
+  /* @OneToMany(mappedBy = "jornada", cascade = CascadeType.PERSIST)
+  private List<Partido> partidos = new ArrayList<>();*/
+  @OneToMany(mappedBy = "jornada", cascade = { CascadeType.PERSIST, CascadeType.MERGE })
   private List<Partido> partidos = new ArrayList<>();
 
   @ManyToOne

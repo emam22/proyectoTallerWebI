@@ -1,5 +1,6 @@
 package com.tallerwebi.dominio;
 
+import com.tallerwebi.dominio.excepcion.EquipoYaInscripto;
 import jakarta.transaction.Transactional;
 import java.util.ArrayList;
 import java.util.List;
@@ -139,6 +140,7 @@ public class ServicioJugadorImpl implements ServicioJugador {
     repositorioJugador.actualizar(jugador);
   }
 
+  /*
   @Override
   public void inscribirJugadorEnTorneo(Long idJugador, Long idEquipo, Long idTorneo) {
     if (idJugador == null || idEquipo == null || idTorneo == null) {
@@ -155,6 +157,38 @@ public class ServicioJugadorImpl implements ServicioJugador {
 
     if (jugador == null || equipo == null || torneo == null) {
       return;
+    }
+
+    JugadorEquipoTorneo inscripcion = new JugadorEquipoTorneo();
+    inscripcion.setJugador(jugador);
+    inscripcion.setEquipo(equipo);
+    inscripcion.setTorneo(torneo);
+
+    repositorioJugadorEquipoTorneo.guardar(inscripcion);
+  }*/
+  @Override
+  public void inscribirJugadorEnTorneo(Long idJugador, Long idEquipo, Long idTorneo) {
+    if (idJugador == null || idEquipo == null || idTorneo == null) {
+      return;
+    }
+
+    Jugador jugador = repositorioJugador.obtenerJugador(idJugador);
+    Equipo equipo = repositorioEquipo.buscarPorId(idEquipo);
+    Torneo torneo = repositorioTorneo.buscarTorneoPorId(idTorneo);
+
+    if (jugador == null || equipo == null || torneo == null) {
+      return;
+    }
+
+    List<JugadorEquipoTorneo> inscripciones = repositorioJugadorEquipoTorneo.listarPorEquipoYTorneo(
+      idEquipo,
+      idTorneo
+    );
+
+    for (JugadorEquipoTorneo inscripcion : inscripciones) {
+      if (inscripcion.getJugador().getId().equals(idJugador)) {
+        return;
+      }
     }
 
     JugadorEquipoTorneo inscripcion = new JugadorEquipoTorneo();

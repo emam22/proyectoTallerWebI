@@ -15,17 +15,23 @@ public class ServicioSimulacionTorneoImpl implements ServicioSimulacionTorneo {
   private final RepositorioJornada repositorioJornada;
   private final RepositorioJugadorEquipoTorneo repositorioJugadorEquipoTorneo;
   private final RepositorioEstadisticaJugador repositorioEstadisticaJugador;
+  private final RepositorioEventoPartido repositorioEventoPartido;
+  private final ServicioJugador servicioJugador;
 
   public ServicioSimulacionTorneoImpl(
     ServicioTorneo servicioTorneo,
     RepositorioJornada repositorioJornada,
     RepositorioJugadorEquipoTorneo repositorioJugadorEquipoTorneo,
-    RepositorioEstadisticaJugador repositorioEstadisticaJugador
+    RepositorioEstadisticaJugador repositorioEstadisticaJugador,
+    RepositorioEventoPartido repositorioEventoPartido,
+    ServicioJugador servicioJugador
   ) {
     this.servicioTorneo = servicioTorneo;
     this.repositorioJornada = repositorioJornada;
     this.repositorioJugadorEquipoTorneo = repositorioJugadorEquipoTorneo;
     this.repositorioEstadisticaJugador = repositorioEstadisticaJugador;
+    this.repositorioEventoPartido = repositorioEventoPartido;
+    this.servicioJugador = servicioJugador;
   }
 
   // Busca la próxima jornada pendiente y simula sus partidos.
@@ -110,7 +116,14 @@ public class ServicioSimulacionTorneoImpl implements ServicioSimulacionTorneo {
     int golesVisitante = generarGoles(probabilidadVisitante);
 
     // NUEVO: actualizamos las estadísticas individuales de ambos equipos.
-    actualizarEstadisticasPartido(jugadoresLocal, jugadoresVisitante, golesLocal, golesVisitante);
+    actualizarEstadisticasPartido(
+      partido,
+      jugadoresLocal,
+      jugadoresVisitante,
+      golesLocal,
+      golesVisitante,
+      idTorneo
+    );
 
     // Actualizamos el resultado y marcamos el partido como disputado.
     partido.setGolesLocal(golesLocal);
@@ -247,10 +260,12 @@ public class ServicioSimulacionTorneoImpl implements ServicioSimulacionTorneo {
 
   // Actualiza las estadísticas de los jugadores de ambos equipos.
   private void actualizarEstadisticasPartido(
+    Partido partido,
     List<JugadorEquipoTorneo> jugadoresLocal,
     List<JugadorEquipoTorneo> jugadoresVisitante,
     int golesLocal,
-    int golesVisitante
+    int golesVisitante,
+    Long idTorneo
   ) {
     List<EstadisticaJugador> estadisticasLocal = obtenerEstadisticasJugadores(jugadoresLocal);
 
@@ -261,11 +276,11 @@ public class ServicioSimulacionTorneoImpl implements ServicioSimulacionTorneo {
     incrementarPartidosJugados(estadisticasLocal);
     incrementarPartidosJugados(estadisticasVisitante);
 
-    asignarGolesYAsistencias(estadisticasLocal, golesLocal);
-    asignarGolesYAsistencias(estadisticasVisitante, golesVisitante);
+    asignarGolesYAsistencias(partido, estadisticasLocal, golesLocal);
+    asignarGolesYAsistencias(partido, estadisticasVisitante, golesVisitante);
 
-    asignarTarjetas(estadisticasLocal);
-    asignarTarjetas(estadisticasVisitante);
+    asignarTarjetas(partido, estadisticasLocal, idTorneo);
+    asignarTarjetas(partido, estadisticasVisitante, idTorneo);
   }
 
   // Recupera las estadísticas o crea un registro en cero.
@@ -314,7 +329,11 @@ public class ServicioSimulacionTorneoImpl implements ServicioSimulacionTorneo {
   }
 
   // Asigna goles y asistencias aleatoriamente.
-  private void asignarGolesYAsistencias(List<EstadisticaJugador> estadisticas, int cantidadGoles) {
+  private void asignarGolesYAsistencias(
+    Partido partido,
+    List<EstadisticaJugador> estadisticas,
+    int cantidadGoles
+  ) {
     if (estadisticas.isEmpty()) {
       return;
     }
@@ -325,10 +344,11 @@ public class ServicioSimulacionTorneoImpl implements ServicioSimulacionTorneo {
       EstadisticaJugador goleador = estadisticas.get(indiceGoleador);
 
       goleador.setGoles(valorActual(goleador.getGoles()) + 1);
-
       goleador.setParticipacionesGol(valorActual(goleador.getParticipacionesGol()) + 1);
 
       repositorioEstadisticaJugador.actualizarEstadisticasJugador(goleador);
+
+      Jugador asistidor = null;
 
       boolean tieneAsistencia =
         estadisticas.size() > 1 && ThreadLocalRandom.current().nextDouble() < 0.70;
@@ -343,28 +363,62 @@ public class ServicioSimulacionTorneoImpl implements ServicioSimulacionTorneo {
         EstadisticaJugador asistente = estadisticas.get(indiceAsistente);
 
         asistente.setAsistencias(valorActual(asistente.getAsistencias()) + 1);
-
         asistente.setParticipacionesGol(valorActual(asistente.getParticipacionesGol()) + 1);
 
         repositorioEstadisticaJugador.actualizarEstadisticasJugador(asistente);
+
+        asistidor = asistente.getJugador();
       }
+
+      registrarEvento(partido, TipoEventoPartido.GOL, goleador.getJugador(), asistidor);
     }
   }
 
+  // Registra un evento del partido y lo guarda en la base de datos.
+  private void registrarEvento(
+    Partido partido,
+    TipoEventoPartido tipo,
+    Jugador jugador,
+    Jugador asistidor
+  ) {
+    EventoPartido evento = new EventoPartido();
+
+    evento.setTipo(tipo);
+    evento.setMinuto(ThreadLocalRandom.current().nextInt(1, 91));
+    evento.setPartido(partido);
+    evento.setJugador(jugador);
+    evento.setAsistidor(asistidor);
+
+    repositorioEventoPartido.guardar(evento);
+  }
+
   // Asigna tarjetas aleatorias.
-  private void asignarTarjetas(List<EstadisticaJugador> estadisticas) {
+  private void asignarTarjetas(
+    Partido partido,
+    List<EstadisticaJugador> estadisticas,
+    Long idTorneo
+  ) {
     if (estadisticas.isEmpty()) {
       return;
     }
+
+    List<EstadisticaJugador> jugadoresConAmarilla = new ArrayList<>();
 
     int cantidadAmarillas = ThreadLocalRandom.current().nextInt(3);
 
     for (int i = 0; i < cantidadAmarillas; i++) {
       EstadisticaJugador jugador = elegirJugador(estadisticas);
 
-      jugador.setAmarillas(valorActual(jugador.getAmarillas()) + 1);
+      if (jugadoresConAmarilla.contains(jugador)) {
+        continue;
+      }
 
+      jugador.setAmarillas(valorActual(jugador.getAmarillas()) + 1);
       repositorioEstadisticaJugador.actualizarEstadisticasJugador(jugador);
+
+      registrarEvento(partido, TipoEventoPartido.AMARILLA, jugador.getJugador(), null);
+
+      jugadoresConAmarilla.add(jugador);
     }
 
     boolean recibeRoja = ThreadLocalRandom.current().nextInt(100) < 8;
@@ -373,8 +427,11 @@ public class ServicioSimulacionTorneoImpl implements ServicioSimulacionTorneo {
       EstadisticaJugador jugador = elegirJugador(estadisticas);
 
       jugador.setRojas(valorActual(jugador.getRojas()) + 1);
-
       repositorioEstadisticaJugador.actualizarEstadisticasJugador(jugador);
+
+      registrarEvento(partido, TipoEventoPartido.ROJA, jugador.getJugador(), null);
+
+      servicioJugador.sancionarJugadorEnTorneo(jugador.getJugador().getId(), idTorneo, 1);
     }
   }
 
