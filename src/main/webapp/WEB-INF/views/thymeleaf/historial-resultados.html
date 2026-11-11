@@ -1,0 +1,392 @@
+
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" th:href="@{/css/app.css?v=4}"/>
+    <link rel="icon" type="image/png" th:href="@{/img/favicon.png?v=2}"/>
+
+    <title>Historial de resultados</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        body {
+            background: #1f1f1f;
+            color: white;
+            min-height: 100vh;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* CONTENEDOR PRINCIPAL */
+        .form-card {
+            display: block;
+            width: 100%;
+            max-width: 850px;
+            min-width: 0;
+            background: #444444;
+            border: 2px solid #b6ff00;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        /* ENCABEZADO */
+        .form-header {
+            width: 100%;
+            background: #b6ff00;
+            color: #111;
+            padding: 12px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* CUERPO */
+        .form-body {
+            display: block;
+            width: 100%;
+            min-width: 0;
+            padding: 25px;
+        }
+
+        .descripcion {
+            color: #efefef;
+            font-size: 14px;
+            text-align: center;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        /* MENSAJES */
+        .mensaje {
+            text-align: center;
+            font-weight: bold;
+            font-size: 14px;
+            line-height: 1.5;
+            overflow-wrap: anywhere;
+            margin-bottom: 18px;
+        }
+
+        .mensaje.ok {
+            color: #b6ff00;
+        }
+
+        .mensaje.error {
+            color: #ff6b6b;
+        }
+
+        /* JORNADAS */
+        .jornada-item {
+            width: 100%;
+            min-width: 0;
+            background: #333333;
+            border: 1px solid #666666;
+            border-radius: 8px;
+            padding: 18px;
+            margin-bottom: 18px;
+        }
+
+        .jornada-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .jornada-header {
+            color: #b6ff00;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #666666;
+            margin-bottom: 14px;
+        }
+
+        /* PARTIDOS */
+        .partido-item {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            min-width: 0;
+            background: #444444;
+            border: 1px solid #666666;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+
+        .partido-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .equipo-local,
+        .equipo-visitante {
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+        }
+
+        .equipo-local {
+            text-align: right;
+        }
+
+        .equipo-visitante {
+            text-align: left;
+        }
+
+        /* RESULTADO */
+        .resultado {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #b6ff00;
+            font-size: 20px;
+            font-weight: 900;
+            white-space: nowrap;
+        }
+
+        .resultado .separador {
+            color: white;
+            font-size: 15px;
+        }
+
+        /* PARTIDO SIN RESULTADO */
+        .sin-jugar {
+            color: #aaaaaa;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* SIN RESULTADOS */
+        .sin-resultados {
+            display: block;
+            width: 100%;
+            text-align: center;
+            color: #efefef;
+            font-size: 14px;
+            line-height: 1.5;
+            padding: 20px;
+            background: #333333;
+            border-radius: 8px;
+            overflow-wrap: anywhere;
+        }
+
+        /* CONTENEDOR VOLVER */
+        .acciones-volver {
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        /* BOTÓN VOLVER */
+        a.volver-lobby,
+        a.volver-lobby:link,
+        a.volver-lobby:visited {
+            display: block;
+            width: 100%;
+            padding: 12px 10px;
+            box-sizing: border-box;
+            background: #1f1f1f;
+            color: #b6ff00;
+            border: 2px solid #b6ff00;
+            border-radius: 8px;
+            text-align: center;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: bold;
+            line-height: 1.4;
+            overflow-wrap: anywhere;
+            transition: background 0.2s, color 0.2s,
+            transform 0.1s;
+        }
+
+        a.volver-lobby:hover {
+            background: #b6ff00;
+            color: #111111;
+            transform: translateY(-1px);
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 700px) {
+            body {
+                padding: 20px 12px;
+                align-items: flex-start;
+            }
+
+            .form-card {
+                width: 100%;
+                max-width: 100%;
+            }
+
+            .form-body {
+                padding: 18px;
+            }
+
+            .jornada-item {
+                padding: 12px;
+            }
+
+            .partido-item {
+                gap: 6px;
+                padding: 12px 8px;
+            }
+
+            .equipo-local,
+            .equipo-visitante {
+                font-size: 12px;
+            }
+
+            .resultado {
+                font-size: 17px;
+                gap: 5px;
+            }
+        }
+
+        @media (max-width: 350px) {
+            body {
+                padding: 15px 8px;
+            }
+
+            .form-body {
+                padding: 12px;
+            }
+
+            .form-header {
+                font-size: 14px;
+            }
+
+            .partido-item {
+                grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+                gap: 4px;
+                padding: 10px 5px;
+            }
+
+            .resultado {
+                font-size: 15px;
+                gap: 3px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR GLOBAL -->
+<div th:replace="~{fragments/nav :: barraNavegacion}"></div>
+
+<div class="form-card">
+
+    <div class="form-header">
+        HISTORIAL DE RESULTADOS
+    </div>
+
+    <div class="form-body">
+
+        <p class="descripcion">
+            Consultá los resultados de los partidos disputados en el torneo.
+        </p>
+
+        <p class="mensaje ok"
+           th:if="${mensaje}"
+           th:text="${mensaje}">
+        </p>
+
+        <p class="mensaje error"
+           th:if="${error}"
+           th:text="${error}">
+        </p>
+
+        <!-- CUANDO NO HAY RESULTADOS -->
+        <div class="sin-resultados"
+             th:if="${#lists.isEmpty(jornadas)}">
+
+            <p>Todavía no hay resultados registrados.</p>
+
+        </div>
+
+        <!-- LISTADO DE JORNADAS -->
+        <div th:each="jornada : ${jornadas}">
+
+            <div class="jornada-item">
+
+                <div class="jornada-header"
+                     th:text="|Jornada ${jornada.numero}|">
+                    Jornada 1
+                </div>
+
+                <!-- PARTIDOS -->
+                <div th:each="partido : ${jornada.partidos}">
+
+                    <div class="partido-item">
+
+                        <!-- EQUIPO LOCAL -->
+                        <div class="equipo-local"
+                             th:text="${partido.equipoLocal.nombre}">
+                            Equipo local
+                        </div>
+
+                        <!-- RESULTADO -->
+                        <div th:if="${partido.disputado}" class="resultado">
+
+                            <span th:text="${partido.golesLocal}">0</span>
+
+                            <span class="separador">-</span>
+
+                            <span th:text="${partido.golesVisitante}">0</span>
+
+                        </div>
+
+
+                        <!-- PARTIDO SIN RESULTADO -->
+                        <div th:unless="${partido.disputado}" class="sin-jugar">
+                            PENDIENTE
+                        </div>
+
+                        <!-- EQUIPO VISITANTE -->
+                        <div class="equipo-visitante"
+                             th:text="${partido.equipoVisitante.nombre}">
+                            Equipo visitante
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- VOLVER AL LOBBY -->
+        <div class="acciones-volver">
+
+            <a th:href="@{/lobby(idTorneo=${idTorneoActual})}"
+               class="volver-lobby">
+                Volver al lobby
+            </a>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>

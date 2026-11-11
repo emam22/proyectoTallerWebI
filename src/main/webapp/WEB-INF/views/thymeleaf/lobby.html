@@ -360,6 +360,47 @@
             min-height: 80px;
         }
 
+
+        .columna-superior-izquierda {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 0;
+        }
+
+        .columna-superior-izquierda form {
+            flex: 1;
+            min-height: 0;
+        }
+
+        .banner-avanzar {
+            width: 100%;
+        }
+
+        .banner-resultados {
+            border: 2.5px solid #b6ff00;
+            border-radius: 14px;
+            padding: 12px 20px;
+            background: #232323;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex: 0 0 65px;
+            width: 100%;
+            height: auto;
+            color: #b6ff00;
+            font-size: clamp(16px, 1.4vw, 21px);
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: background 0.15s ease, transform 0.15s ease;
+        }
+
+        .banner-resultados:hover {
+            background: #2b2b2b;
+            transform: translateY(-2px);
+        }
+
         /* RESPONSIVE */
         @media (max-width: 950px) {
             body {
@@ -389,73 +430,65 @@
 
 <div class="dashboard-grid">
 
-    <!-- 1. BOTÓN AVANZAR FECHA (th:href="@{/resumen}") -->
-    <form th:action="@{/avanzarFecha}" method="post" th:object="${avanzarFechaDto}">
-        <input type="hidden"
-               th:field="*{idTorneo}">
+    <!-- 1. COLUMNA SUPERIOR IZQUIERDA -->
+    <div class="columna-superior-izquierda">
 
-        <button type="submit" class="banner-avanzar">
-            <div class="avanzar-col-izq">
-                <h1>AVANZAR FECHA</h1>
-                <div class="proxima-fecha-label">PRÓXIMA FECHA</div>
-                <div class="proxima-fecha-valor"
-                     th:text="${proximaFechaNombre}">
-                    Fixture no generado
+        <!-- AVANZAR FECHA -->
+        <form th:action="@{/avanzarFecha}"
+              method="post"
+              th:object="${avanzarFechaDto}">
+
+            <input type="hidden" th:field="*{idTorneo}">
+
+            <button type="submit" class="banner-avanzar">
+
+                <div class="avanzar-col-izq">
+                    <h1>AVANZAR FECHA</h1>
+
+                    <div class="proxima-fecha-label">
+                        PRÓXIMA FECHA
+                    </div>
+
+                    <div class="proxima-fecha-valor"
+                         th:text="${proximaFechaNombre}">
+                        Fixture no generado
+                    </div>
                 </div>
+
+            </button>
+
+            <div th:if="${error != null}"
+                 th:text="${error}"
+                 style="color: red; font-weight: bold; margin-bottom: 15px;">
             </div>
-        </button>
-        <div th:if="${error != null}"
-             th:text="${error}"
-             style="color: red; font-weight: bold; margin-bottom: 15px;">
-        </div>
-    </form>
-            <!--<div class="avanzar-col-der">
-                <div class="destacado-partido">
-                    <div class="destacado-equipos">
-                        <span th:text="${partido1Local} ?: 'BARRACAS CENTRAL'">BARRACAS CENTRAL</span>
-                        <span class="vs">vs.</span>
-                        <span th:text="${partido1Visitante} ?: 'BOCA JUNIORS'">BOCA JUNIORS</span>
-                    </div>
-                    <div class="destacado-horario">
-                        <span th:text="${partido1Dia} ?: 'Jue, 10 de Sept'">Jue, 10 de Sept</span>
-                        <span th:text="${partido1Hora} ?: '20hs'">20hs</span>
-                    </div>
-                </div>-->
 
+        </form>
 
+        <!-- HISTORIAL DE RESULTADOS -->
+        <a th:href="@{/historialResultados(idTorneo=${idTorneoActual})}"
+           class="banner-resultados">
 
-               <!-- <div class="destacado-partido">
-                    <div class="destacado-equipos">
-                        <span th:text="${partido2Local} ?: 'DEFENSA Y JUSTICIA'">DEFENSA Y JUSTICIA</span>
-                        <span class="vs">vs.</span>
-                        <span th:text="${partido2Visitante} ?: 'LANÚS'">LANÚS</span>
-                    </div>
-                    <div class="destacado-horario">
-                        <span th:text="${partido2Dia} ?: 'Jue, 10 de Sept'">Jue, 10 de Sept</span>
-                        <span th:text="${partido2Hora} ?: '21hs'">21hs</span>
-                    </div>
-                </div>-->
+            RESUMEN DE RESULTADOS
 
+        </a>
 
+    </div>
 
 
     <!-- 2. TOTALES -->
+    <div class="card-totales">
 
-<div class="card-totales">
         <div class="total-item">
             <span>TOTAL EQUIPOS:</span>
             <strong th:text="${totalEquipos}">0</strong>
         </div>
-       <!-- <div class="total-item">
-            <span>TOTAL JUGADORES:</span>
-            <strong th:text="${totalJugadores} ?: '660'">660</strong>
-        </div>-->
+
         <div class="total-item">
-            <span>FECHAS JUGADAS :</span>
+            <span>FECHAS JUGADAS:</span>
             <strong th:text="${fechasJugadas}">0</strong>
         </div>
-    </div>
 
+    </div>
 
 
     <!-- 3. FIXTURE + TABLA -->
@@ -469,7 +502,6 @@
                 FIXTURE
             </a>
 
-            <!-- Mostrar las próximas dos jornadas pendientes -->
             <div class="card-fecha-box"
                  th:each="jornada : ${proximasJornadas}"
                  th:if="${jornada != null}">
@@ -478,26 +510,26 @@
                     Jornada 1
                 </h3>
 
-                <!-- Mostrar como máximo dos partidos por jornada -->
                 <div class="partido-fila"
                      th:each="partido, iter : ${jornada.partidos}"
                      th:if="${iter.count le 2 and partido != null}">
 
                     <div class="mini-equipos">
-                <span th:text="${partido.equipoLocal.nombre}">
-                    Equipo local
-                </span>
+
+                        <span th:text="${partido.equipoLocal.nombre}">
+                            Equipo local
+                        </span>
 
                         <span class="mini-vs">VS</span>
 
                         <span th:text="${partido.equipoVisitante.nombre}">
-                    Equipo visitante
-                </span>
+                            Equipo visitante
+                        </span>
+
                     </div>
 
                 </div>
 
-                <!-- Si la jornada todavía no tiene partidos -->
                 <p th:if="${#lists.isEmpty(jornada.partidos)}"
                    style="color: white; font-size: 13px;">
                     Sin partidos cargados
@@ -505,7 +537,6 @@
 
             </div>
 
-            <!-- Mensaje si no hay jornadas pendientes -->
             <p th:if="${#lists.isEmpty(proximasJornadas)}"
                style="color: white; text-align: center; font-size: 13px;">
                 No hay fechas pendientes
@@ -513,9 +544,12 @@
 
         </div>
 
-        <!-- TABLA (th:href="@{/tablaEquipos}") -->
+
+        <!-- TABLA DE POSICIONES -->
         <a th:href="@{/tablaEquipos(idTorneo=${idTorneoActual})}">
+
             <div class="panel-tabla">
+
                 <table>
                     <thead>
                     <tr>
@@ -530,9 +564,12 @@
                         <th>PTS</th>
                     </tr>
                     </thead>
+
                     <tbody>
-                    <!-- Iteración dinámica Thymeleaf -->
-                    <tr th:each="fila, iter : ${tablaPosiciones}" th:if="${iter.count le 8}">
+
+                    <tr th:each="fila, iter : ${tablaPosiciones}"
+                        th:if="${iter.count le 8}">
+
                         <td class="posicion" th:text="${iter.count}">1</td>
                         <td class="equipo" th:text="${fila.equipo.nombre}">Defensa y Justicia</td>
                         <td th:text="${fila.partidosJugados}">10</td>
@@ -542,24 +579,33 @@
                         <td th:text="${fila.golesAFavor}">13</td>
                         <td th:text="${fila.golesEnContra}">7</td>
                         <td class="pts" th:text="${fila.puntos}">17</td>
+
                     </tr>
 
                     </tbody>
                 </table>
+
             </div>
+
         </a>
 
     </div>
 
 
-    <!-- 4. ESTADÍSTICAS LATERALES (th:href="@{/estadisticasDeJugadores}") -->
+    <!-- 4. ESTADÍSTICAS LATERALES -->
     <div class="columna-derecha-stats">
-        <a th:href="@{/estadisticasDeJugadores(idTorneo=${idTorneoActual})}" class="link-stat">
+
+        <a th:href="@{/estadisticasDeJugadores(idTorneo=${idTorneoActual})}"
+           class="link-stat">
+
             <div class="stat-card-box">
 
-                <!-- CABECERA VERDE UNIFICADA (TÍTULO + COLUMNAS) -->
                 <div class="stat-header-bar">
-                    <span class="stat-titulo">Estadísticas de Jugadores</span>
+
+                    <span class="stat-titulo">
+                        Estadísticas de Jugadores
+                    </span>
+
                     <div class="stat-columnas-header">
                         <span class="col-jugador">Nombre</span>
                         <span class="col-apellido">Apellido</span>
@@ -569,44 +615,67 @@
                         <span class="col-stat">TA</span>
                         <span class="col-stat">TR</span>
                     </div>
+
                 </div>
 
-                <!-- CUERPO OSCURO CON LOS DATOS -->
                 <div class="stat-body-content">
+
                     <table class="tabla-stats-lateral">
+
                         <tbody>
+
                         <tr th:if="${#lists.isEmpty(estadisticasJugadores)}">
-                            <td colspan="7" class="sin-stats">Sin estadísticas registradas</td>
+                            <td colspan="7" class="sin-stats">
+                                Sin estadísticas registradas
+                            </td>
                         </tr>
 
-                        <tr th:each="stat, iter : ${estadisticasJugadores}" th:if="${iter.count le 8}">
-                            <!-- Escudo y Nombre dentro de la misma celda -->
+                        <tr th:each="stat, iter : ${estadisticasJugadores}"
+                            th:if="${iter.count le 8}">
+
                             <td class="col-jugador">
-                    <span th:if="${equiposPorJugador != null and stat.jugador != null and equiposPorJugador.get(stat.jugador.id) != null}">
-                        <img th:src="@{${equiposPorJugador.get(stat.jugador.id).escudo}}"
-                             alt="Escudo"
-                             width="20"
-                             height="20"
-                             style="vertical-align: middle; margin-right: 5px; object-fit: contain;" />
-                    </span>
-                                <span th:text="${stat.jugador != null ? stat.jugador.nombre : 'Sin nombre'}">Juan</span>
+
+                                <span th:if="${equiposPorJugador != null and stat.jugador != null and equiposPorJugador.get(stat.jugador.id) != null}">
+
+                                    <img th:src="@{${equiposPorJugador.get(stat.jugador.id).escudo}}"
+                                         alt="Escudo"
+                                         width="20"
+                                         height="20"
+                                         style="vertical-align: middle; margin-right: 5px; object-fit: contain;" />
+
+                                </span>
+
+                                <span th:text="${stat.jugador != null ? stat.jugador.nombre : 'Sin nombre'}">
+                                    Juan
+                                </span>
+
                             </td>
 
-                            <td class="col-apellido" th:text="${stat.jugador != null ? stat.jugador.apellido : ''}">perez</td>
+                            <td class="col-apellido"
+                                th:text="${stat.jugador != null ? stat.jugador.apellido : ''}">
+                                Perez
+                            </td>
+
                             <td class="col-stat" th:text="${stat.goles}">0</td>
                             <td class="col-stat" th:text="${stat.asistencias}">0</td>
                             <td class="col-stat" th:text="${stat.participacionesGol}">0</td>
                             <td class="col-stat" th:text="${stat.amarillas}">0</td>
                             <td class="col-stat" th:text="${stat.rojas}">0</td>
+
                         </tr>
+
                         </tbody>
+
                     </table>
+
                 </div>
+
             </div>
+
         </a>
+
     </div>
 
 </div>
-
 </body>
 </html>

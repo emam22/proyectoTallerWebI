@@ -107,7 +107,9 @@ public class ServicioTorneoImpl implements ServicioTorneo {
 
   @Override
   public List<Jornada> obtenerJornadasPorTorneo(Long torneoId) {
-    return repositorioJornada.obtenerJornadasPorTorneo(torneoId);
+    List<Jornada> jornadas = repositorioJornada.obtenerJornadasPorTorneo(torneoId);
+
+    return jornadas != null ? jornadas : new ArrayList<>();
   }
 
   @Override

@@ -353,4 +353,86 @@ public class RepositorioEquipoTorneoTest {
 
     return usuario;
   }
+
+  @Test
+  @Transactional
+  @Rollback
+  public void deberiaBuscarEquipoPorId() {
+    // Preparación
+    Torneo torneo = new Torneo();
+    torneo.setNombre("Torneo de prueba");
+    torneo.setUsuario(crearUsuario());
+
+    sessionFactory.getCurrentSession().persist(torneo);
+
+    Equipo equipo = new Equipo();
+    equipo.setNombre("Los Pumas");
+    sessionFactory.getCurrentSession().persist(equipo);
+
+    EquipoTorneo equipoTorneo = new EquipoTorneo();
+    equipoTorneo.setEquipo(equipo);
+    equipoTorneo.setTorneo(torneo);
+
+    sessionFactory.getCurrentSession().persist(equipoTorneo);
+    sessionFactory.getCurrentSession().flush();
+
+    // Ejecución
+    Equipo resultado = repositorioEquipoTorneo.buscarEquipoPorId(
+            equipo.getId()
+    );
+
+    // Verificación
+    assertThat(resultado, is(notNullValue()));
+    assertThat(resultado.getId(), is(equalTo(equipo.getId())));
+    assertThat(resultado.getNombre(), is(equalTo("Los Pumas")));
+  }
+  @Test
+  @Transactional
+  @Rollback
+  public void deberiaObtenerEquiposPorTorneo() {
+    // Preparación
+    Torneo torneo = new Torneo();
+    torneo.setNombre("Torneo de prueba");
+    torneo.setUsuario(crearUsuario());
+
+    sessionFactory.getCurrentSession().persist(torneo);
+
+    Equipo equipo1 = new Equipo();
+    equipo1.setNombre("Los Pumas");
+
+    Equipo equipo2 = new Equipo();
+    equipo2.setNombre("Los Leones");
+
+    sessionFactory.getCurrentSession().persist(equipo1);
+    sessionFactory.getCurrentSession().persist(equipo2);
+
+    EquipoTorneo equipoTorneo1 = new EquipoTorneo();
+    equipoTorneo1.setEquipo(equipo1);
+    equipoTorneo1.setTorneo(torneo);
+
+    EquipoTorneo equipoTorneo2 = new EquipoTorneo();
+    equipoTorneo2.setEquipo(equipo2);
+    equipoTorneo2.setTorneo(torneo);
+
+    sessionFactory.getCurrentSession().persist(equipoTorneo1);
+    sessionFactory.getCurrentSession().persist(equipoTorneo2);
+    sessionFactory.getCurrentSession().flush();
+
+    // Ejecución
+    List<EquipoTorneo> resultado =
+            repositorioEquipoTorneo.obtenerEquiposPorTorneo(torneo.getId());
+
+    // Verificación
+    assertThat(resultado.size(), is(equalTo(2)));
+    assertThat(
+            resultado.stream().anyMatch(et ->
+                    "Los Pumas".equals(et.getEquipo().getNombre())),
+            is(true)
+    );
+    assertThat(
+            resultado.stream().anyMatch(et ->
+                    "Los Leones".equals(et.getEquipo().getNombre())),
+            is(true)
+    );
+  }
 }
