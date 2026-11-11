@@ -27,3 +27,7 @@ hs_err_pid*
 
 # Configuracion local de base de datos (no compartir)
 src/main/resources/db-local.properties
+
+.env
+application-local.properties
+application-dev.properties

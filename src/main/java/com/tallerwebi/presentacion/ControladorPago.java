@@ -1,5 +1,7 @@
 package com.tallerwebi.presentacion;
 
+import com.mercadopago.exceptions.MPApiException;
+import com.mercadopago.exceptions.MPException;
 import com.mercadopago.resources.payment.Payment;
 import com.tallerwebi.dominio.ServicioLogin;
 import com.tallerwebi.dominio.ServicioMercadoPago;
@@ -13,7 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
@@ -27,12 +33,13 @@ public class ControladorPago {
   private static final String CLAVE_STATUS = "status";
   private static final String CLAVE_MENSAJE = "mensaje";
   private static final String ESTADO_ERROR = "error";
+
   private final ServicioMercadoPago mpService;
   private final ServicioLogin loginService;
 
   @Autowired
-  public ControladorPago(ServicioMercadoPago mpservice, ServicioLogin loginService) {
-    this.mpService = mpservice;
+  public ControladorPago(ServicioMercadoPago mpService, ServicioLogin loginService) {
+    this.mpService = mpService;
     this.loginService = loginService;
   }
 
@@ -43,42 +50,104 @@ public class ControladorPago {
     return modelAndView;
   }
 
+  @GetMapping("/api/validar-password")
+  @ResponseBody
+  public ResponseEntity<?> validarPasswordPrevia(@RequestParam("password") String password) {
+    Map<String, Object> resp = new HashMap<>();
+    String error = obtenerErrorPassword(password);
+    if (error != null) {
+      resp.put("valido", false);
+      resp.put(CLAVE_MENSAJE, error);
+      return ResponseEntity.ok(resp);
+    }
+    resp.put("valido", true);
+    return ResponseEntity.ok(resp);
+  }
+
   @PostMapping("/api/pagos/procesar")
   @ResponseBody
   public ResponseEntity<?> procesarPago(@RequestBody ProcesoPagoDTO dto, HttpSession session) {
     Map<String, Object> respuesta = new HashMap<>();
 
-    try {
-      // 1. Validar contraseña antes de invocar pasarela
-      String errorValidacion = obtenerErrorPassword(dto.getPassword());
-      if (errorValidacion != null) {
-        respuesta.put(CLAVE_STATUS, ESTADO_ERROR);
-        respuesta.put(CLAVE_MENSAJE, errorValidacion);
-        return ResponseEntity.badRequest().body(respuesta);
-      }
-
-      // 2. Transacción Mercado Pago
-      Payment pago = mpService.crearPago(dto);
-
-      // 3. Resultado de pago
-      if (ESTADO_APROBADO.equalsIgnoreCase(pago.getStatus())) {
-        registrarAdminSiAplica(dto, session);
-
-        respuesta.put(CLAVE_STATUS, ESTADO_APROBADO);
-        respuesta.put("id", pago.getId());
-        respuesta.put("redirect", "/spring/lobbyAdmin");
-        return ResponseEntity.ok(respuesta);
-      }
-
-      respuesta.put(CLAVE_STATUS, pago.getStatus());
-      respuesta.put("status_detail", pago.getStatusDetail());
-      return ResponseEntity.ok(respuesta);
-    } catch (Exception e) {
-      LOGGER.error("Error al procesar el pago o registrar el admin", e);
+    String errorValidacion = obtenerErrorPassword(dto.getPassword());
+    if (errorValidacion != null) {
       respuesta.put(CLAVE_STATUS, ESTADO_ERROR);
-      respuesta.put(CLAVE_MENSAJE, e.getMessage());
-      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(respuesta);
+      respuesta.put(CLAVE_MENSAJE, errorValidacion);
+      return ResponseEntity.badRequest().body(respuesta);
     }
+
+    try {
+      Payment pago = mpService.crearPago(dto);
+      return armarRespuestaExito(pago, dto, session);
+    } catch (MPApiException apiException) {
+      return manejarErrorApi(apiException);
+    } catch (MPException mpException) {
+      return manejarErrorSdk(mpException);
+    } catch (Exception e) {
+      return manejarErrorGeneral(e);
+    }
+  }
+
+  private ResponseEntity<?> armarRespuestaExito(
+    Payment pago,
+    ProcesoPagoDTO dto,
+    HttpSession session
+  ) throws Exception {
+    Map<String, Object> respuesta = new HashMap<>();
+
+    if (ESTADO_APROBADO.equalsIgnoreCase(pago.getStatus())) {
+      registrarAdminSiAplica(dto, session);
+      respuesta.put(CLAVE_STATUS, ESTADO_APROBADO);
+      respuesta.put("id", pago.getId());
+      respuesta.put("redirect", "/spring/lobbyAdmin");
+      return ResponseEntity.ok(respuesta);
+    }
+
+    respuesta.put(CLAVE_STATUS, pago.getStatus());
+    respuesta.put("status_detail", pago.getStatusDetail());
+    return ResponseEntity.ok(respuesta);
+  }
+
+  private ResponseEntity<?> manejarErrorApi(MPApiException apiException) {
+    String contenidoError = apiException.getMessage();
+    if (
+      apiException.getApiResponse() != null && apiException.getApiResponse().getContent() != null
+    ) {
+      contenidoError = apiException.getApiResponse().getContent();
+    }
+
+    if (LOGGER.isErrorEnabled()) {
+      LOGGER.error(
+        "Error API Mercado Pago (HTTP {}): {}",
+        apiException.getStatusCode(),
+        contenidoError
+      );
+    }
+
+    Map<String, Object> respuesta = new HashMap<>();
+    respuesta.put(CLAVE_STATUS, ESTADO_ERROR);
+    respuesta.put(CLAVE_MENSAJE, contenidoError);
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(respuesta);
+  }
+
+  private ResponseEntity<?> manejarErrorSdk(MPException mpException) {
+    if (LOGGER.isErrorEnabled()) {
+      LOGGER.error("Error SDK Mercado Pago: ", mpException);
+    }
+    Map<String, Object> respuesta = new HashMap<>();
+    respuesta.put(CLAVE_STATUS, ESTADO_ERROR);
+    respuesta.put(CLAVE_MENSAJE, mpException.getMessage());
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(respuesta);
+  }
+
+  private ResponseEntity<?> manejarErrorGeneral(Exception excepcion) {
+    if (LOGGER.isErrorEnabled()) {
+      LOGGER.error("Error inesperado al procesar el pago: ", excepcion);
+    }
+    Map<String, Object> respuesta = new HashMap<>();
+    respuesta.put(CLAVE_STATUS, ESTADO_ERROR);
+    respuesta.put(CLAVE_MENSAJE, excepcion.getMessage());
+    return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(respuesta);
   }
 
   private String obtenerErrorPassword(String password) {

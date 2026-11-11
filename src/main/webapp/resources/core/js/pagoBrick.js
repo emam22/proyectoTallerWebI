@@ -3,7 +3,9 @@ const urlParams = new URLSearchParams(window.location.search);
 const adminEmail = urlParams.get("email");
 const adminPassword = urlParams.get("password");
 
-const mp = new MercadoPago("TEST-8198ecc1-8632-48e8-b2ca-5939a2d9bb40", {
+const emailTestComprador = "TESTUSER1664296236612020723@testuser.com";
+
+const mp = new MercadoPago("TEST-e2192b44-67af-42b5-81e8-8379b2da8959", {
   locale: "es-AR"
 });
 
@@ -15,7 +17,7 @@ const renderPaymentBrick = async (bricksBuilderInstance) => {
       amount: 5000.0,
       preferenceId: null,
       payer: {
-        email: adminEmail || "alumno_unlam_pago@gmail.com"
+        email: emailTestComprador
       }
     },
     customization: {
@@ -24,13 +26,11 @@ const renderPaymentBrick = async (bricksBuilderInstance) => {
         bankTransfer: "all",
         creditCard: "all",
         debitCard: "all",
-        mercadoPago: "all"
+        mercadoPago: "none"
       }
     },
     callbacks: {
-      onReady: () => {
-        // Brick listo
-      },
+      onReady: () => {},
       onSubmit: ({ formData }) => {
         return new Promise((resolve, reject) => {
           fetch("/spring/api/pagos/procesar", {
@@ -46,35 +46,35 @@ const renderPaymentBrick = async (bricksBuilderInstance) => {
               installments: formData.installments,
               identificationType: formData.payer.identification ? formData.payer.identification.type : "DNI",
               identificationNumber: formData.payer.identification ? formData.payer.identification.number : "12345678",
-              email: adminEmail,
+              email: adminEmail, // El email real que se guardará en la BD para el admin
               password: adminPassword
             })
           })
-            .then(async (response) => {
-              const data = await response.json();
+              .then(async (response) => {
+                const data = await response.json();
 
-              if (!response.ok || data.status === "error") {
-                alert("No se pudo completar el registro: " + (data.mensaje || "Datos inválidos"));
-                reject();
-                window.location.href = "/spring/nuevo-usuario";
-                return;
-              }
+                if (!response.ok || data.status === "error") {
+                  alert("No se pudo completar el registro: " + (data.mensaje || "Datos inválidos"));
+                  reject();
+                  window.location.href = "/spring/nuevo-usuario";
+                  return;
+                }
 
-              if (data.status === "approved") {
-                resolve();
-                alert("¡Cuenta de Administrador creada y pago aprobado con éxito!");
-                window.location.href = data.redirect || "/spring/lobbyAdmin";
-              } else {
-                alert("El pago no fue aprobado: " + (data.status_detail || data.status));
-                resolve();
+                if (data.status === "approved") {
+                  resolve();
+                  alert("¡Cuenta de Administrador creada y pago aprobado con éxito!");
+                  window.location.href = data.redirect || "/spring/lobbyAdmin";
+                } else {
+                  alert("El pago no fue aprobado: " + (data.status_detail || data.status));
+                  resolve();
+                  window.location.href = "/spring/nuevo-usuario";
+                }
+              })
+              .catch((err) => {
+                alert("Ocurrió un error al comunicarse con el servidor.");
+                reject(err);
                 window.location.href = "/spring/nuevo-usuario";
-              }
-            })
-            .catch((err) => {
-              alert("Ocurrió un error al comunicarse con el servidor.");
-              reject(err);
-              window.location.href = "/spring/nuevo-usuario";
-            });
+              });
         });
       },
       onError: () => {
@@ -85,9 +85,9 @@ const renderPaymentBrick = async (bricksBuilderInstance) => {
   };
 
   window.paymentBrickController = await bricksBuilderInstance.create(
-    "payment",
-    "paymentBrick_container",
-    settings
+      "payment",
+      "paymentBrick_container",
+      settings
   );
 };
 
