@@ -377,15 +377,14 @@ public class RepositorioEquipoTorneoTest {
     sessionFactory.getCurrentSession().flush();
 
     // Ejecución
-    Equipo resultado = repositorioEquipoTorneo.buscarEquipoPorId(
-            equipo.getId()
-    );
+    Equipo resultado = repositorioEquipoTorneo.buscarEquipoPorId(equipo.getId());
 
     // Verificación
     assertThat(resultado, is(notNullValue()));
     assertThat(resultado.getId(), is(equalTo(equipo.getId())));
     assertThat(resultado.getNombre(), is(equalTo("Los Pumas")));
   }
+
   @Test
   @Transactional
   @Rollback
@@ -419,20 +418,17 @@ public class RepositorioEquipoTorneoTest {
     sessionFactory.getCurrentSession().flush();
 
     // Ejecución
-    List<EquipoTorneo> resultado =
-            repositorioEquipoTorneo.obtenerEquiposPorTorneo(torneo.getId());
+    List<EquipoTorneo> resultado = repositorioEquipoTorneo.obtenerEquiposPorTorneo(torneo.getId());
 
     // Verificación
     assertThat(resultado.size(), is(equalTo(2)));
     assertThat(
-            resultado.stream().anyMatch(et ->
-                    "Los Pumas".equals(et.getEquipo().getNombre())),
-            is(true)
+      resultado.stream().anyMatch(et -> "Los Pumas".equals(et.getEquipo().getNombre())),
+      is(true)
     );
     assertThat(
-            resultado.stream().anyMatch(et ->
-                    "Los Leones".equals(et.getEquipo().getNombre())),
-            is(true)
+      resultado.stream().anyMatch(et -> "Los Leones".equals(et.getEquipo().getNombre())),
+      is(true)
     );
   }
 }
