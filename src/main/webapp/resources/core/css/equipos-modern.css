@@ -305,6 +305,32 @@ td.td-escudo .escudo-chip {
     box-shadow: inset 3px 0 0 var(--accent, #b6ff00);
 }
 
+/* Escudo como ultima columna, alineado a la derecha de la fila */
+.stat-columnas-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+    font-size: clamp(9px, 0.75vw, 11px);
+    white-space: nowrap;
+}
+
+.stat-columnas-header span {
+    white-space: nowrap;
+}
+
+.stat-columnas-header .col-escudo,
+.tabla-stats-lateral td.col-escudo {
+    text-align: left;
+    width: 28px;
+    padding-left: 2px;
+}
+
+.tabla-stats-lateral td.col-escudo .escudo-chip--xxs {
+    margin-right: 0;
+}
+
 .jornada {
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.28);
     transition:

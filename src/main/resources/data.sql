@@ -10,8 +10,8 @@ INSERT INTO Usuario (id, email, password, rol, activo) VALUES
 (3, 'usuario@gmail.com', '1234', 'USUARIO', true);
 
 INSERT INTO Torneo (id, nombre, fechaInicio, cantidadDeEquipos, cantidadMinJugadores, cantidadMaxJugadores, cantidadAmaSusp, idaYVuelta, usuario_id) VALUES
-(1, 'Torneo Apertura 2011', '2011-08-05 00:00:00', 20, 11, 23, 5, false, 2),
-(2, 'Promocion 2011 - River desciende', '2011-06-22 21:00:00', 2, 11, 23, 5, true, 2);
+(1, 'Torneo Apertura 2011', '2011-08-05 00:00:00', 20, 11, 23, 5, false, 1),
+(2, 'Promocion 2011', '2011-06-22 21:00:00', 2, 11, 23, 5, true, 1);
 
 INSERT INTO Equipo (id, codigo, nombre, escudo, colorLocal1, colorLocal2, colorVisitante1, colorVisitante2, sigla) VALUES
 (1, 'ALL', 'All Boys', '/img/escudos/all-boys.png', '#ffffff', '#000000', '#000000', '#ffffff', 'ALL'),

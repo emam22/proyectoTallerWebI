@@ -508,6 +508,59 @@ tbody tr:hover {
 }
 
 /* =========================
+   TRANSICION DE ENTRADA A LAS VISTAS
+======================== */
+
+@keyframes logo-entrada {
+    0% {
+        opacity: 0;
+        transform: translateX(-30px) rotate(-8deg) scale(0.8);
+    }
+    60% {
+        opacity: 1;
+        transform: translateX(4px) rotate(2deg) scale(1.04);
+    }
+    100% {
+        opacity: 1;
+        transform: translateX(0) rotate(0) scale(1);
+    }
+}
+
+@keyframes texto-entrada {
+    from {
+        opacity: 0;
+        transform: translateX(-12px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes vista-entrada {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.barra-nav-marca img {
+    animation: logo-entrada 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.barra-nav-brand {
+    animation: texto-entrada 0.5s ease-out 0.12s both;
+}
+
+body > :not(.barra-nav):not(script) {
+    animation: vista-entrada 0.55s ease-out 0.16s both;
+}
+
+/* =========================
    ACCESIBILIDAD: reducir movimiento
 ======================== */
 

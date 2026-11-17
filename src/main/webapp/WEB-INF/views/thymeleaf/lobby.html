@@ -2,7 +2,7 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" th:href="@{/css/app.css?v=4}"/>
+    <link rel="stylesheet" th:href="@{/css/app.css?v=5}"/>
     <link rel="icon" type="image/png" th:href="@{/img/favicon.png?v=2}"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador de Torneo</title>
@@ -551,7 +551,7 @@
             }
         }
     </style>
-    <link rel="stylesheet" th:href="@{/css/equipos-modern.css?v=1}"/>
+    <link rel="stylesheet" th:href="@{/css/equipos-modern.css?v=4}"/>
 </head>
 
 
@@ -764,6 +764,7 @@
                     </span>
 
                     <div class="stat-columnas-header">
+                        <span class="col-escudo">Esc.</span>
                         <span class="col-jugador">Nombre</span>
                         <span class="col-apellido">Apellido</span>
                         <span class="col-stat">Goles</span>
@@ -782,7 +783,7 @@
                         <tbody>
 
                         <tr th:if="${#lists.isEmpty(estadisticasJugadores)}">
-                            <td colspan="7" class="sin-stats">
+                            <td colspan="8" class="sin-stats">
                                 Sin estadísticas registradas
                             </td>
                         </tr>
@@ -790,21 +791,20 @@
                         <tr th:each="stat, iter : ${estadisticasJugadores}"
                             th:if="${iter.count le 12}">
 
-                            <td class="col-jugador">
-
+                            <td class="col-escudo">
                                 <span class="escudo-chip escudo-chip--xxs"
                                       th:if="${equiposPorJugador != null and stat.jugador != null and equiposPorJugador.get(stat.jugador.id) != null}">
 
                                     <img th:src="@{${equiposPorJugador.get(stat.jugador.id).escudo}}"
-                                         alt="Escudo"
+                                         th:alt="${equiposPorJugador.get(stat.jugador.id).nombre}"
                                          loading="lazy"/>
 
                                 </span>
+                            </td>
 
-                                <span th:text="${stat.jugador != null ? stat.jugador.nombre : 'Sin nombre'}">
-                                    Juan
-                                </span>
-
+                            <td class="col-jugador"
+                                th:text="${stat.jugador != null ? stat.jugador.nombre : 'Sin nombre'}">
+                                Juan
                             </td>
 
                             <td class="col-apellido"
