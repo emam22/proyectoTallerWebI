@@ -1,7 +1,7 @@
 -- ============================================================
 -- Seed de demo: Torneo Apertura 2011 + Promocion 2011
 -- Apertura 2011 completo (19 fechas, 190 partidos, 376 goles).
--- Promocion: Belgrano 2-0 River y River 1-1 Belgrano (global 3-1).
+-- Promocion: Belgrano 2-0 River (jugado) y River vs Belgrano (pendiente).
 -- ============================================================
 
 INSERT INTO Usuario (id, email, password, rol, activo) VALUES
@@ -14,27 +14,27 @@ INSERT INTO Torneo (id, nombre, fechaInicio, cantidadDeEquipos, cantidadMinJugad
 (2, 'Promocion 2011 - River desciende', '2011-06-22 21:00:00', 2, 11, 23, 5, true, 2);
 
 INSERT INTO Equipo (id, codigo, nombre, escudo, colorLocal1, colorLocal2, colorVisitante1, colorVisitante2, sigla) VALUES
-(1, 'ALL', 'All Boys', '/img/escudos/0cedcd34-683d-400f-ad97-57a543687d9d.jpg', '#ffffff', '#000000', '#000000', '#ffffff', 'ALL'),
-(2, 'AAAJ', 'Argentinos Juniors', '/img/escudos/13825ab4-a005-4bec-bf07-7ed2dd64ade2.png', '#ff0000', '#ffffff', '#ffffff', '#ff0000', 'AAAJ'),
-(3, 'ARS', 'Arsenal', '/img/escudos/195940d7-8ff1-4571-8de9-259edd444c11.png', '#75aadb', '#d00000', '#ffffff', '#000000', 'ARS'),
-(4, 'ATR', 'Atlético de Rafaela', '/img/escudos/23155250-3e47-403f-9cf9-125aca12f770.jpg', '#75aadb', '#ffffff', '#ffffff', '#75aadb', 'ATR'),
-(5, 'BAN', 'Banfield', '/img/escudos/2de84508-ec3c-4c37-b284-5b81698bb263.jpg', '#008000', '#ffffff', '#ffffff', '#008000', 'BAN'),
-(6, 'BEL', 'Belgrano', '/img/escudos/34f32a96-db30-4511-9f1f-45ab0c22aa0f.jpg', '#75aadb', '#ffffff', '#ffffff', '#75aadb', 'BEL'),
-(7, 'CABJ', 'Boca Juniors', '/img/escudos/3562b610-195a-44ca-9b05-2aaa3821924c.jpg', '#0033a0', '#ffd700', '#ffffff', '#0033a0', 'CABJ'),
-(8, 'COL', 'Colón', '/img/escudos/372bc0e3-b76a-4ceb-abf8-74c6fcb8f6f7.png', '#d00000', '#000000', '#ffffff', '#d00000', 'COL'),
-(9, 'EDLP', 'Estudiantes (LP)', '/img/escudos/4388c476-4461-4602-82c8-f1b6c5124804.png', '#d00000', '#ffffff', '#ffffff', '#d00000', 'EDLP'),
-(10, 'GOD', 'Godoy Cruz', '/img/escudos/4cb3c734-05d1-41a4-bb72-96396d366058.jpg', '#0033a0', '#ffffff', '#ffffff', '#0033a0', 'GOD'),
-(11, 'CAI', 'Independiente', '/img/escudos/4f9f7490-f742-49b7-93c4-c94b0028c9f8.png', '#d00000', '#ffffff', '#ffffff', '#d00000', 'CAI'),
-(12, 'LAN', 'Lanús', '/img/escudos/55c04eec-a323-4800-a465-41ca9a4457f9.png', '#800000', '#ffffff', '#ffffff', '#800000', 'LAN'),
-(13, 'NOB', 'Newell''s Old Boys', '/img/escudos/61a1c956-1030-485f-b7eb-af8aa3fca4c4.png', '#d00000', '#000000', '#ffffff', '#d00000', 'NOB'),
-(14, 'OLI', 'Olimpo', '/img/escudos/6fd0eb94-63dd-4e18-8c21-657b4fe6140b.png', '#ffd700', '#000000', '#ffffff', '#ffd700', 'OLI'),
-(15, 'RAC', 'Racing Club', '/img/escudos/75de4fc4-e1f9-420a-8c68-87f53ab6a37b.png', '#75aadb', '#ffffff', '#ffffff', '#75aadb', 'RAC'),
-(16, 'CARP', 'River Plate', '/img/escudos/780e3aa0-9f25-4d26-aa72-a94ff97b0661.jpg', '#ffffff', '#d00000', '#000000', '#ffffff', 'CARP'),
-(17, 'CASL', 'San Lorenzo', '/img/escudos/9800150a-7fb1-4d23-978a-521547a6770e.png', '#0033a0', '#d00000', '#ffffff', '#0033a0', 'CASL'),
-(18, 'SMSJ', 'San Martín (SJ)', '/img/escudos/99162a4c-258d-4bac-8913-46a399da6274.jpg', '#008000', '#ffffff', '#ffffff', '#008000', 'SMSJ'),
-(19, 'TIG', 'Tigre', '/img/escudos/a0f62d72-e399-447a-a36c-703eb489471b.jpg', '#d00000', '#0033a0', '#ffffff', '#d00000', 'TIG'),
-(20, 'UNI', 'Unión', '/img/escudos/a3a0665a-866b-465f-85d1-a40e7157ce08.jpg', '#d00000', '#ffffff', '#ffffff', '#d00000', 'UNI'),
-(21, 'VSL', 'Vélez Sarsfield', '/img/escudos/b5021561-c02a-4a17-84f3-cfeb74403da2.png', '#ffffff', '#0033a0', '#0033a0', '#ffffff', 'VSL');
+(1, 'ALL', 'All Boys', '/img/escudos/all-boys.png', '#ffffff', '#000000', '#000000', '#ffffff', 'ALL'),
+(2, 'AAAJ', 'Argentinos Juniors', '/img/escudos/argentinos-juniors.png', '#ff0000', '#ffffff', '#ffffff', '#ff0000', 'AAAJ'),
+(3, 'ARS', 'Arsenal', '/img/escudos/arsenal.png', '#75aadb', '#d00000', '#ffffff', '#000000', 'ARS'),
+(4, 'ATR', 'Atlético de Rafaela', '/img/escudos/atletico-rafaela.png', '#75aadb', '#ffffff', '#ffffff', '#75aadb', 'ATR'),
+(5, 'BAN', 'Banfield', '/img/escudos/banfield.png', '#008000', '#ffffff', '#ffffff', '#008000', 'BAN'),
+(6, 'BEL', 'Belgrano', '/img/escudos/belgrano.png', '#75aadb', '#ffffff', '#ffffff', '#75aadb', 'BEL'),
+(7, 'CABJ', 'Boca Juniors', '/img/escudos/boca-juniors.png', '#0033a0', '#ffd700', '#ffffff', '#0033a0', 'CABJ'),
+(8, 'COL', 'Colón', '/img/escudos/colon.png', '#d00000', '#000000', '#ffffff', '#d00000', 'COL'),
+(9, 'EDLP', 'Estudiantes (LP)', '/img/escudos/estudiantes-lp.png', '#d00000', '#ffffff', '#ffffff', '#d00000', 'EDLP'),
+(10, 'GOD', 'Godoy Cruz', '/img/escudos/godoy-cruz.png', '#0033a0', '#ffffff', '#ffffff', '#0033a0', 'GOD'),
+(11, 'CAI', 'Independiente', '/img/escudos/independiente.png', '#d00000', '#ffffff', '#ffffff', '#d00000', 'CAI'),
+(12, 'LAN', 'Lanús', '/img/escudos/lanus.png', '#800000', '#ffffff', '#ffffff', '#800000', 'LAN'),
+(13, 'NOB', 'Newell''s Old Boys', '/img/escudos/newells-old-boys.png', '#d00000', '#000000', '#ffffff', '#d00000', 'NOB'),
+(14, 'OLI', 'Olimpo', '/img/escudos/olimpo.png', '#ffd700', '#000000', '#ffffff', '#ffd700', 'OLI'),
+(15, 'RAC', 'Racing Club', '/img/escudos/racing-club.png', '#75aadb', '#ffffff', '#ffffff', '#75aadb', 'RAC'),
+(16, 'CARP', 'River Plate', '/img/escudos/river-plate.png', '#ffffff', '#d00000', '#000000', '#ffffff', 'CARP'),
+(17, 'CASL', 'San Lorenzo', '/img/escudos/san-lorenzo.png', '#0033a0', '#d00000', '#ffffff', '#0033a0', 'CASL'),
+(18, 'SMSJ', 'San Martín (SJ)', '/img/escudos/san-martin-sj.png', '#008000', '#ffffff', '#ffffff', '#008000', 'SMSJ'),
+(19, 'TIG', 'Tigre', '/img/escudos/tigre.png', '#d00000', '#0033a0', '#ffffff', '#d00000', 'TIG'),
+(20, 'UNI', 'Unión', '/img/escudos/union.png', '#d00000', '#ffffff', '#ffffff', '#d00000', 'UNI'),
+(21, 'VSL', 'Vélez Sarsfield', '/img/escudos/velez-sarsfield.png', '#ffffff', '#0033a0', '#0033a0', '#ffffff', 'VSL');
 
 INSERT INTO EquipoTorneo (id, puntos, partidosJugados, partidosGanados, partidoPerdidos, partidosEmpatados, golesAFavor, golesEnContra, equipo_id, torneo_id) VALUES
 (1, 21, 19, 4, 6, 9, 15, 23, 1, 1),
@@ -57,8 +57,8 @@ INSERT INTO EquipoTorneo (id, puntos, partidosJugados, partidosGanados, partidoP
 (18, 27, 19, 7, 6, 6, 22, 19, 19, 1),
 (19, 25, 19, 6, 6, 7, 14, 18, 20, 1),
 (20, 31, 19, 9, 6, 4, 22, 17, 21, 1),
-(21, 4, 2, 1, 0, 1, 3, 1, 6, 2),
-(22, 1, 2, 0, 1, 1, 1, 3, 16, 2);
+(21, 3, 1, 1, 0, 0, 2, 0, 6, 2),
+(22, 0, 1, 0, 1, 0, 0, 2, 16, 2);
 
 INSERT INTO Jugador (id, dorsal, puesto, nombre, apellido, categoria, habilitado, fechasSuspensionPendientes, estadoSancion) VALUES
 (1, 1, 'Arquero', 'Nicolás', 'Cambiasso', 1, true, 0, 'SIN_SANCION'),
@@ -555,7 +555,7 @@ INSERT INTO Jornada (id, numero, estado, torneo_id, equipoFechaLibre_id) VALUES
 (18, 18, 'Finalizada', 1, NULL),
 (19, 19, 'Finalizada', 1, NULL),
 (20, 1, 'Finalizada', 2, NULL),
-(21, 2, 'Finalizada', 2, NULL);
+(21, 2, 'Pendiente', 2, NULL);
 
 INSERT INTO Partido (id, fechaId, equipoLocal_id, equipoVisitante_id, jornada_id, golesLocal, golesVisitante, disputado, fecha, hora) VALUES
 (1, NULL, 5, 4, 1, 0, 2, true, '2011-08-05', '19:10:00'),
@@ -753,7 +753,7 @@ INSERT INTO Partido (id, fechaId, equipoLocal_id, equipoVisitante_id, jornada_id
 (189, NULL, 4, 10, 19, 0, 2, true, '2011-12-12', NULL),
 (190, NULL, 18, 17, 19, 1, 0, true, '2011-12-12', '22:10:00'),
 (191, NULL, 6, 16, 20, 2, 0, true, '2011-06-22', '21:00:00'),
-(192, NULL, 16, 6, 21, 1, 1, true, '2011-06-26', '15:00:00');
+(192, NULL, 16, 6, 21, NULL, NULL, false, '2011-06-26', '15:00:00');
 
 INSERT INTO EstadisticaJugador (id, partidosJugados, goles, asistencias, participacionesGol, amarillas, rojas, jugador_id, torneo_id) VALUES
 (1, 19, 0, 0, 0, 0, 0, 1, 1),
@@ -980,30 +980,30 @@ INSERT INTO EstadisticaJugador (id, partidosJugados, goles, asistencias, partici
 (218, 19, 3, 1, 4, 5, 0, 229, 1),
 (219, 19, 1, 1, 2, 2, 0, 230, 1),
 (220, 19, 5, 1, 6, 2, 0, 231, 1),
-(221, 2, 0, 0, 0, 0, 0, 56, 2),
-(222, 2, 0, 0, 0, 0, 0, 57, 2),
-(223, 2, 0, 0, 0, 0, 0, 58, 2),
-(224, 2, 0, 0, 0, 0, 0, 59, 2),
-(225, 2, 0, 0, 0, 0, 0, 60, 2),
-(226, 2, 0, 0, 0, 0, 0, 61, 2),
-(227, 2, 0, 0, 0, 0, 0, 62, 2),
-(228, 2, 0, 0, 0, 1, 0, 63, 2),
-(229, 2, 0, 0, 0, 0, 0, 64, 2),
-(230, 2, 2, 0, 2, 0, 0, 65, 2),
-(231, 2, 1, 1, 2, 0, 0, 66, 2),
-(232, 2, 0, 0, 0, 0, 0, 166, 2),
-(233, 2, 0, 0, 0, 1, 0, 167, 2),
-(234, 2, 0, 0, 0, 0, 1, 168, 2),
-(235, 2, 0, 0, 0, 0, 0, 169, 2),
-(236, 2, 0, 0, 0, 0, 0, 170, 2),
-(237, 2, 0, 0, 0, 1, 0, 171, 2),
-(238, 2, 0, 0, 0, 0, 0, 172, 2),
-(239, 2, 0, 1, 1, 0, 0, 173, 2),
-(240, 2, 0, 0, 0, 0, 0, 174, 2);
+(221, 1, 0, 0, 0, 0, 0, 56, 2),
+(222, 1, 0, 0, 0, 0, 0, 57, 2),
+(223, 1, 0, 0, 0, 0, 0, 58, 2),
+(224, 1, 0, 0, 0, 0, 0, 59, 2),
+(225, 1, 0, 0, 0, 0, 0, 60, 2),
+(226, 1, 0, 0, 0, 0, 0, 61, 2),
+(227, 1, 0, 0, 0, 0, 0, 62, 2),
+(228, 1, 0, 0, 0, 1, 0, 63, 2),
+(229, 1, 0, 0, 0, 0, 0, 64, 2),
+(230, 1, 1, 0, 1, 0, 0, 65, 2),
+(231, 1, 1, 1, 2, 0, 0, 66, 2),
+(232, 1, 0, 0, 0, 0, 0, 166, 2),
+(233, 1, 0, 0, 0, 1, 0, 167, 2),
+(234, 1, 0, 0, 0, 0, 0, 168, 2),
+(235, 1, 0, 0, 0, 0, 0, 169, 2),
+(236, 1, 0, 0, 0, 0, 0, 170, 2),
+(237, 1, 0, 0, 0, 0, 0, 171, 2),
+(238, 1, 0, 0, 0, 0, 0, 172, 2),
+(239, 1, 0, 0, 0, 0, 0, 173, 2),
+(240, 1, 0, 0, 0, 0, 0, 174, 2);
 
 INSERT INTO EstadisticaJugador (id, partidosJugados, goles, asistencias, participacionesGol, amarillas, rojas, jugador_id, torneo_id) VALUES
-(241, 2, 0, 0, 0, 0, 0, 175, 2),
-(242, 2, 1, 0, 1, 0, 0, 176, 2);
+(241, 1, 0, 0, 0, 0, 0, 175, 2),
+(242, 1, 0, 0, 0, 0, 0, 176, 2);
 
 INSERT INTO JugadorEquipoTorneo (id, fechasSuspensionPendientes, equipo_id, jugador_id, torneo_id, estadoSancion) VALUES
 (1, 0, 1, 1, 1, 'SIN_SANCION'),
@@ -2366,9 +2366,5 @@ INSERT INTO EventoPartido (id, tipo, minuto, partido_id, jugador_id, asistidor_i
 (1082, 'GOL', 12, 191, 65, 66),
 (1083, 'GOL', 67, 191, 66, NULL),
 (1084, 'AMARILLA', 38, 191, 63, NULL),
-(1085, 'AMARILLA', 55, 191, 167, NULL),
-(1086, 'GOL', 30, 192, 176, 173),
-(1087, 'GOL', 75, 192, 65, NULL),
-(1088, 'AMARILLA', 62, 192, 171, NULL),
-(1089, 'ROJA', 88, 192, 168, NULL);
+(1085, 'AMARILLA', 55, 191, 167, NULL);
 

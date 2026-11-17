@@ -285,6 +285,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" th:href="@{/css/equipos-modern.css?v=1}"/>
 </head>
 
 <body>
@@ -338,9 +339,19 @@
                     <div class="partido-item">
 
                         <!-- EQUIPO LOCAL -->
-                        <div class="equipo-local"
-                             th:text="${partido.equipoLocal.nombre}">
-                            Equipo local
+                        <div class="equipo-local equipo-con-escudo local">
+
+                            <span class="nombre-equipo"
+                                  th:text="${partido.equipoLocal.nombre}">
+                                Equipo local
+                            </span>
+
+                            <span class="escudo-chip escudo-chip--xs">
+                                <img th:src="@{${partido.equipoLocal.escudo}}"
+                                     th:alt="${partido.equipoLocal.nombre}"
+                                     loading="lazy"/>
+                            </span>
+
                         </div>
 
                         <!-- RESULTADO -->
@@ -361,9 +372,19 @@
                         </div>
 
                         <!-- EQUIPO VISITANTE -->
-                        <div class="equipo-visitante"
-                             th:text="${partido.equipoVisitante.nombre}">
-                            Equipo visitante
+                        <div class="equipo-visitante equipo-con-escudo visitante">
+
+                            <span class="escudo-chip escudo-chip--xs">
+                                <img th:src="@{${partido.equipoVisitante.escudo}}"
+                                     th:alt="${partido.equipoVisitante.nombre}"
+                                     loading="lazy"/>
+                            </span>
+
+                            <span class="nombre-equipo"
+                                  th:text="${partido.equipoVisitante.nombre}">
+                                Equipo visitante
+                            </span>
+
                         </div>
 
                     </div>

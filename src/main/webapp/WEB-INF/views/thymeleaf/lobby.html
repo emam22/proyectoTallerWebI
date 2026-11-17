@@ -17,12 +17,14 @@
         body {
             background: #232323;
             color: white;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            min-height: 100vh;
+            height: auto;
             padding: 24px 30px;
-            overflow: hidden;
+            overflow-x: hidden;
+            overflow-y: auto;
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             justify-content: center;
         }
 
@@ -37,7 +39,8 @@
         /* GRID PRINCIPAL: 2 FILAS Y ALINEACIÓN DE COLUMNA DERECHA */
         .dashboard-grid {
             width: 100%;
-            height: 100%;
+            min-height: calc(100vh - 100px);
+            height: auto;
             display: grid;
             grid-template-columns: 3.5fr 1.15fr;
             grid-template-rows: auto 1fr;
@@ -53,41 +56,126 @@
         }
 
         .banner-avanzar {
-            border: 2.5px solid #b6ff00;
-            border-radius: 14px;
-            padding: 20px 32px;
-            background: #232323;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #b6ff00;
+            border-radius: 12px;
+            padding: 11px 46px 11px 20px;
+            background: linear-gradient(135deg, rgba(182, 255, 0, 0.12), #232323 62%);
             display: flex;
             justify-content: space-between;
             align-items: center;
             height: 100%;
-            transition: background 0.15s ease, transform 0.15s ease;
+            min-height: 64px;
+            box-shadow:
+                0 10px 26px rgba(0, 0, 0, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            cursor: pointer;
+            text-align: left;
+            transition:
+                background 0.2s ease,
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
         }
 
-        .banner-avanzar:hover {
-            background: #2b2b2b;
-            transform: translateY(-2px);
+        /* Destello que recorre el botón al pasar el mouse */
+        .banner-avanzar::after,
+        .banner-resultados::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                115deg,
+                transparent 32%,
+                rgba(182, 255, 0, 0.2) 50%,
+                transparent 68%
+            );
+            transform: translateX(-130%);
+            transition: transform 0.65s ease;
+            pointer-events: none;
+        }
+
+        .banner-avanzar:hover::after,
+        .banner-resultados:hover::after {
+            transform: translateX(130%);
+        }
+
+        /* Flecha de avance */
+        .banner-avanzar::before {
+            content: "\2192";
+            position: absolute;
+            right: 18px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #b6ff00;
+            font-size: 22px;
+            font-weight: 900;
+            opacity: 0.85;
+            transition: transform 0.2s ease;
+        }
+
+        .banner-avanzar:hover::before {
+            transform: translate(3px, -50%);
+        }
+
+        .avanzar-col-izq {
+            position: relative;
+            z-index: 1;
         }
 
         .avanzar-col-izq h1 {
             color: #b6ff00;
-            font-size: clamp(22px, 2.2vw, 32px);
+            font-size: clamp(16px, 1.35vw, 20px);
             font-weight: 900;
             letter-spacing: 0.5px;
-            margin-bottom: 16px;
+            line-height: 1.15;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+        }
+
+        .proxima-fecha {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        /* Punto pulsante de "en vivo" */
+        .avanzar-col-izq h1::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            flex: 0 0 auto;
+            border-radius: 50%;
+            background: #b6ff00;
+            animation: pulso-verde 2.2s infinite;
+        }
+
+        @keyframes pulso-verde {
+            0% {
+                box-shadow: 0 0 0 0 rgba(182, 255, 0, 0.5);
+            }
+            70% {
+                box-shadow: 0 0 0 9px rgba(182, 255, 0, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(182, 255, 0, 0);
+            }
         }
 
         .proxima-fecha-label {
-            font-size: clamp(12px, 1vw, 15px);
+            font-size: 10px;
             font-weight: 800;
-            color: #ffffff;
-            letter-spacing: 0.5px;
+            color: #d7ddc8;
+            letter-spacing: 0.08em;
         }
 
         .proxima-fecha-valor {
             color: #f0f0f0;
-            font-size: clamp(13px, 1.05vw, 16px);
-            margin-top: 5px;
+            font-size: clamp(11px, 0.95vw, 13px);
+            margin-top: 0;
         }
 
         .avanzar-col-der {
@@ -161,7 +249,7 @@
         ======================================================== */
         .subgrid-inferior-izq {
             display: grid;
-            grid-template-columns: 1.15fr 1.6fr;
+            grid-template-columns: 1fr 1.95fr;
             gap: 24px;
             height: 100%;
             min-height: 0;
@@ -363,42 +451,72 @@
 
         .columna-superior-izquierda {
             display: flex;
-            flex-direction: column;
-            gap: 12px;
+            flex-direction: row;
+            gap: 14px;
             min-height: 0;
         }
 
         .columna-superior-izquierda form {
-            flex: 1;
+            flex: 1.5 1 0;
+            height: auto;
             min-height: 0;
         }
 
         .banner-avanzar {
             width: 100%;
+            height: 100%;
         }
 
         .banner-resultados {
-            border: 2.5px solid #b6ff00;
-            border-radius: 14px;
-            padding: 12px 20px;
-            background: #232323;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #b6ff00;
+            border-radius: 12px;
+            padding: 11px 18px;
+            background: linear-gradient(135deg, rgba(182, 255, 0, 0.12), #232323 62%);
             display: flex;
             justify-content: center;
             align-items: center;
-            flex: 0 0 65px;
-            width: 100%;
+            gap: 8px;
+            flex: 1 1 0;
+            width: auto;
             height: auto;
+            min-height: 64px;
             color: #b6ff00;
-            font-size: clamp(16px, 1.4vw, 21px);
+            font-size: clamp(12px, 1vw, 15px);
             font-weight: 900;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.04em;
+            text-align: center;
             cursor: pointer;
-            transition: background 0.15s ease, transform 0.15s ease;
+            box-shadow:
+                0 10px 26px rgba(0, 0, 0, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            transition:
+                background 0.2s ease,
+                transform 0.2s ease,
+                box-shadow 0.2s ease;
         }
 
+        .banner-resultados::before {
+            content: "\2192";
+            font-size: 16px;
+            font-weight: 900;
+            color: #b6ff00;
+        }
+
+        .banner-avanzar:hover,
         .banner-resultados:hover {
-            background: #2b2b2b;
+            background: linear-gradient(135deg, rgba(182, 255, 0, 0.18), #2b2b2b 62%);
             transform: translateY(-2px);
+            box-shadow:
+                0 16px 34px rgba(0, 0, 0, 0.45),
+                0 0 0 1px rgba(182, 255, 0, 0.35);
+        }
+
+        .banner-avanzar:focus-visible,
+        .banner-resultados:focus-visible {
+            outline: 2px solid #ffffff;
+            outline-offset: 3px;
         }
 
         /* RESPONSIVE */
@@ -412,6 +530,20 @@
                 grid-template-columns: 1fr;
                 grid-template-rows: auto;
                 height: auto;
+                min-height: 0;
+            }
+            .columna-superior-izquierda {
+                flex-direction: column;
+            }
+            .columna-superior-izquierda form {
+                flex: 0 0 auto;
+                height: auto;
+            }
+            .banner-avanzar {
+                height: auto;
+            }
+            .banner-resultados {
+                flex: 0 0 auto;
             }
             .subgrid-inferior-izq {
                 grid-template-columns: 1fr;
@@ -419,6 +551,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" th:href="@{/css/equipos-modern.css?v=1}"/>
 </head>
 
 
@@ -445,13 +578,15 @@
                 <div class="avanzar-col-izq">
                     <h1>AVANZAR FECHA</h1>
 
-                    <div class="proxima-fecha-label">
-                        PRÓXIMA FECHA
-                    </div>
+                    <div class="proxima-fecha">
+                        <span class="proxima-fecha-label">
+                            PRÓXIMA FECHA
+                        </span>
 
-                    <div class="proxima-fecha-valor"
-                         th:text="${proximaFechaNombre}">
-                        Fixture no generado
+                        <span class="proxima-fecha-valor"
+                              th:text="${proximaFechaNombre}">
+                            Fixture no generado
+                        </span>
                     </div>
                 </div>
 
@@ -516,14 +651,28 @@
 
                     <div class="mini-equipos">
 
-                        <span th:text="${partido.equipoLocal.nombre}">
-                            Equipo local
+                        <span class="mini-equipo">
+                            <span th:text="${partido.equipoLocal.nombre}">
+                                Equipo local
+                            </span>
+                            <span class="escudo-chip">
+                                <img th:src="@{${partido.equipoLocal.escudo}}"
+                                     th:alt="${partido.equipoLocal.nombre}"
+                                     loading="lazy"/>
+                            </span>
                         </span>
 
                         <span class="mini-vs">VS</span>
 
-                        <span th:text="${partido.equipoVisitante.nombre}">
-                            Equipo visitante
+                        <span class="mini-equipo">
+                            <span class="escudo-chip">
+                                <img th:src="@{${partido.equipoVisitante.escudo}}"
+                                     th:alt="${partido.equipoVisitante.nombre}"
+                                     loading="lazy"/>
+                            </span>
+                            <span th:text="${partido.equipoVisitante.nombre}">
+                                Equipo visitante
+                            </span>
                         </span>
 
                     </div>
@@ -550,10 +699,12 @@
 
             <div class="panel-tabla">
 
-                <table>
+                <table class="tabla-moderna tabla-compacta"
+                       th:classappend="${tablaPosiciones != null and tablaPosiciones.size() > 12} ? 'tabla-llena' : ''">
                     <thead>
                     <tr>
                         <th>Pos</th>
+                        <th class="th-escudo">Esc.</th>
                         <th class="th-equipo">Equipo</th>
                         <th>PJ</th>
                         <th>PG</th>
@@ -567,10 +718,16 @@
 
                     <tbody>
 
-                    <tr th:each="fila, iter : ${tablaPosiciones}"
-                        th:if="${iter.count le 8}">
+                    <tr th:each="fila, iter : ${tablaPosiciones}">
 
                         <td class="posicion" th:text="${iter.count}">1</td>
+                        <td class="td-escudo">
+                            <span class="escudo-chip">
+                                <img th:src="@{${fila.equipo.escudo}}"
+                                     th:alt="${fila.equipo.nombre}"
+                                     loading="lazy"/>
+                            </span>
+                        </td>
                         <td class="equipo" th:text="${fila.equipo.nombre}">Defensa y Justicia</td>
                         <td th:text="${fila.partidosJugados}">10</td>
                         <td th:text="${fila.partidosGanados}">5</td>
@@ -631,17 +788,16 @@
                         </tr>
 
                         <tr th:each="stat, iter : ${estadisticasJugadores}"
-                            th:if="${iter.count le 8}">
+                            th:if="${iter.count le 12}">
 
                             <td class="col-jugador">
 
-                                <span th:if="${equiposPorJugador != null and stat.jugador != null and equiposPorJugador.get(stat.jugador.id) != null}">
+                                <span class="escudo-chip escudo-chip--xxs"
+                                      th:if="${equiposPorJugador != null and stat.jugador != null and equiposPorJugador.get(stat.jugador.id) != null}">
 
                                     <img th:src="@{${equiposPorJugador.get(stat.jugador.id).escudo}}"
                                          alt="Escudo"
-                                         width="20"
-                                         height="20"
-                                         style="vertical-align: middle; margin-right: 5px; object-fit: contain;" />
+                                         loading="lazy"/>
 
                                 </span>
 

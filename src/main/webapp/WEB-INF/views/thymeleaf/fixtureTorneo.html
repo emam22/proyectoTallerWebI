@@ -272,6 +272,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" th:href="@{/css/equipos-modern.css?v=1}"/>
 </head>
 
 <body>
@@ -348,17 +349,37 @@
                 <div th:each="partido : ${jornada.partidos}"
                      class="partido">
 
-                    <span class="equipo local"
-                          th:text="${partido.equipoLocal.nombre}">
-                        Equipo local
-                    </span>
+                    <div class="partido-equipo local">
+
+                        <span class="equipo local"
+                              th:text="${partido.equipoLocal.nombre}">
+                            Equipo local
+                        </span>
+
+                        <span class="escudo-chip escudo-chip--sm">
+                            <img th:src="@{${partido.equipoLocal.escudo}}"
+                                 th:alt="${partido.equipoLocal.nombre}"
+                                 loading="lazy"/>
+                        </span>
+
+                    </div>
 
                     <span class="versus">VS</span>
 
-                    <span class="equipo visitante"
-                          th:text="${partido.equipoVisitante.nombre}">
-                        Equipo visitante
-                    </span>
+                    <div class="partido-equipo visitante">
+
+                        <span class="escudo-chip escudo-chip--sm">
+                            <img th:src="@{${partido.equipoVisitante.escudo}}"
+                                 th:alt="${partido.equipoVisitante.nombre}"
+                                 loading="lazy"/>
+                        </span>
+
+                        <span class="equipo visitante"
+                              th:text="${partido.equipoVisitante.nombre}">
+                            Equipo visitante
+                        </span>
+
+                    </div>
 
                 </div>
 

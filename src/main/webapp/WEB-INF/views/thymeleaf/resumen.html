@@ -264,6 +264,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" th:href="@{/css/equipos-modern.css?v=1}"/>
 </head>
 
 <body>
@@ -304,9 +305,19 @@
             <!-- RESULTADO DEL PARTIDO -->
             <div class="resultado">
 
-                <div class="equipo equipo-local"
-                     th:text="${resumen.partido.equipoLocal.nombre}">
-                    Equipo local
+                <div class="equipo equipo-local equipo-con-escudo local">
+
+                    <span class="nombre-equipo"
+                          th:text="${resumen.partido.equipoLocal.nombre}">
+                        Equipo local
+                    </span>
+
+                    <span class="escudo-chip escudo-chip--sm">
+                        <img th:src="@{${resumen.partido.equipoLocal.escudo}}"
+                             th:alt="${resumen.partido.equipoLocal.nombre}"
+                             loading="lazy"/>
+                    </span>
+
                 </div>
 
                 <div class="marcador">
@@ -323,9 +334,19 @@
                     </span>
                 </div>
 
-                <div class="equipo equipo-visitante"
-                     th:text="${resumen.partido.equipoVisitante.nombre}">
-                    Equipo visitante
+                <div class="equipo equipo-visitante equipo-con-escudo visitante">
+
+                    <span class="escudo-chip escudo-chip--sm">
+                        <img th:src="@{${resumen.partido.equipoVisitante.escudo}}"
+                             th:alt="${resumen.partido.equipoVisitante.nombre}"
+                             loading="lazy"/>
+                    </span>
+
+                    <span class="nombre-equipo"
+                          th:text="${resumen.partido.equipoVisitante.nombre}">
+                        Equipo visitante
+                    </span>
+
                 </div>
 
             </div>

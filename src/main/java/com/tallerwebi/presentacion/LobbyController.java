@@ -96,6 +96,7 @@ public class LobbyController {
     );
 
     model.put("estadisticasDeJugadores", estadisticas);
+    model.put("equiposPorJugador", obtenerMapaEquiposPorJugador(estadisticas));
     model.put("goleador", obtenerGoleador(estadisticas));
     model.put("idTorneoActual", idTorneoABuscar);
 

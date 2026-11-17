@@ -156,6 +156,7 @@
             border-radius: 0 12px 12px 12px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            scroll-margin-top: 90px;
         }
 
         .tabla-datos {
@@ -199,8 +200,63 @@
             padding: 30px;
             color: #aaa;
             font-weight: normal;
-        }f
+        }
+
+        /* VER MÁS: solo se muestran las primeras 15 filas */
+        .tabla-datos tr.fila-extra {
+            display: none;
+        }
+
+        .tabla-datos.tabla-expandida tr.fila-extra {
+            display: table-row;
+        }
+
+        .pie-tabla {
+            display: flex;
+            justify-content: center;
+            padding: 18px 12px;
+            background: rgba(0, 0, 0, 0.15);
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .btn-ver-mas {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 26px;
+            border: none;
+            border-radius: 999px;
+            background: #b6ff00;
+            color: #1a1a1a;
+            font-size: 13px;
+            font-weight: 900;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.35);
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease,
+                background 0.2s ease;
+        }
+
+        .btn-ver-mas:hover {
+            background: #d0ff66;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 26px rgba(0, 0, 0, 0.45);
+        }
+
+        .btn-ver-mas:active {
+            transform: translateY(0);
+        }
+
+        .btn-ver-mas .contador-ver-mas {
+            font-size: 11px;
+            font-weight: 700;
+            color: rgba(0, 0, 0, 0.65);
+        }
     </style>
+    <link rel="stylesheet" th:href="@{/css/equipos-modern.css?v=1}"/>
 </head>
 <body>
 
@@ -233,10 +289,11 @@
 
 
     <div class="panel-tabla">
-        <table class="tabla-datos">
+        <table class="tabla-datos tabla-moderna" id="tabla-estadisticas">
             <thead>
             <tr>
                 <th style="width: 50px;">#</th>
+                <th class="th-escudo">Esc.</th>
                 <th class="th-jugador">Nombre</th>
                 <th class="th-jugador">Apellido</th>
                 <th>PJ</th>
@@ -250,12 +307,21 @@
             <tbody>
             <!-- Si no hay registros -->
             <tr th:if="${#lists.isEmpty(estadisticasDeJugadores)}">
-                <td colspan="9" class="sin-datos">No hay estadísticas cargadas actualmente.</td>
+                <td colspan="10" class="sin-datos">No hay estadísticas cargadas actualmente.</td>
             </tr>
 
-            <!-- Iteración dinámica -->
-            <tr th:each="stat, iter : ${estadisticasDeJugadores}">
+            <!-- Iteración dinámica: las primeras 15 filas quedan visibles -->
+            <tr th:each="stat, iter : ${estadisticasDeJugadores}"
+                th:classappend="${iter.count > 15} ? 'fila-extra' : ''">
                 <td th:text="${iter.count}">1</td>
+                <td class="td-escudo">
+                    <span class="escudo-chip escudo-chip--sm"
+                          th:if="${equiposPorJugador != null and stat.jugador != null and equiposPorJugador.get(stat.jugador.id) != null}">
+                        <img th:src="@{${equiposPorJugador.get(stat.jugador.id).escudo}}"
+                             th:alt="${equiposPorJugador.get(stat.jugador.id).nombre}"
+                             loading="lazy"/>
+                    </span>
+                </td>
                 <td class="td-jugador" th:text="${stat.jugador?.nombre}">Juan</td>
                 <td class="td-jugador" th:text="${stat.jugador?.apellido}">Perez</td>
                 <td th:text="${stat.partidosJugados} ?: 0">0</td>
@@ -267,7 +333,60 @@
             </tr>
             </tbody>
         </table>
+
+        <div class="pie-tabla"
+             th:if="${estadisticasDeJugadores != null and estadisticasDeJugadores.size() > 15}">
+
+            <button type="button"
+                    id="btn-ver-mas"
+                    class="btn-ver-mas"
+                    aria-controls="tabla-estadisticas"
+                    aria-expanded="false"
+                    th:attr="data-restantes=${estadisticasDeJugadores.size() - 15}">
+
+                <span class="texto-ver-mas">Ver más</span>
+
+                <span class="contador-ver-mas"
+                      th:text="'(' + (${estadisticasDeJugadores.size()} - 15) + ')'">
+                    (10)
+                </span>
+
+            </button>
+
+        </div>
     </div>
 </main>
+
+<script>
+    (function () {
+        var boton = document.getElementById('btn-ver-mas');
+        var tabla = document.getElementById('tabla-estadisticas');
+
+        if (!boton || !tabla) {
+            return;
+        }
+
+        var texto = boton.querySelector('.texto-ver-mas');
+        var contador = boton.querySelector('.contador-ver-mas');
+        var restantes = boton.dataset.restantes;
+
+        boton.addEventListener('click', function () {
+            var expandida = tabla.classList.toggle('tabla-expandida');
+
+            boton.setAttribute('aria-expanded', expandida ? 'true' : 'false');
+            texto.textContent = expandida ? 'Ver menos' : 'Ver más';
+            contador.textContent = '(' + restantes + ')';
+            contador.style.display = expandida ? 'none' : 'inline';
+
+            if (!expandida) {
+                document.querySelector('.panel-tabla').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    })();
+</script>
+
 </body>
 </html>

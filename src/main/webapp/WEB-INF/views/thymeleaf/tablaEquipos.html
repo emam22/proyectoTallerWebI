@@ -407,6 +407,7 @@
     }
 
 </style>
+<link rel="stylesheet" th:href="@{/css/equipos-modern.css?v=1}"/>
 </head>
 
 <body>
@@ -435,10 +436,11 @@
 
 
     <div class="panel-tabla">
-        <table>
+        <table class="tabla-moderna">
             <thead>
             <tr>
                 <th>Pos</th>
+                <th class="th-escudo">Escudo</th>
                 <th class="th-equipo">Equipo</th>
                 <th>PJ</th>
                 <th>PG</th>
@@ -453,6 +455,13 @@
             <!-- Iteración dinámica Thymeleaf -->
             <tr th:each="fila, iter : ${tablaPosiciones}">
                 <td class="posicion" th:text="${iter.count}">1</td>
+                <td class="td-escudo">
+                    <span class="escudo-chip escudo-chip--sm">
+                        <img th:src="@{${fila.equipo.escudo}}"
+                             th:alt="${fila.equipo.nombre}"
+                             loading="lazy"/>
+                    </span>
+                </td>
                 <td class="equipo" th:text="${fila.equipo.nombre}">Defensa y Justicia</td>
                 <td th:text="${fila.partidosJugados}">10</td>
                 <td th:text="${fila.partidosGanados}">5</td>
