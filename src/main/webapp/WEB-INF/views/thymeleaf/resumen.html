@@ -7,7 +7,7 @@
 
     <title>Resumen de la fecha</title>
 
-    <link rel="stylesheet" th:href="@{/css/app.css?v=5}"/>
+    <link rel="stylesheet" th:href="@{/css/app.css?v=7}"/>
     <link rel="icon" type="image/png" th:href="@{/img/favicon.png?v=2}"/>
 
     <style>
@@ -218,21 +218,6 @@
             margin-top: 35px;
         }
 
-        .btn-volver {
-            display: inline-block;
-            text-decoration: none;
-            color: #1f1f1f;
-            background: #b6ff00;
-            font-weight: bold;
-            padding: 13px 25px;
-            border-radius: 7px;
-            transition: background 0.2s ease;
-        }
-
-        .btn-volver:hover {
-            background: #d0ff66;
-        }
-
         @media (max-width: 600px) {
             body {
                 padding: 20px 12px;
@@ -264,7 +249,7 @@
             }
         }
     </style>
-    <link rel="stylesheet" th:href="@{/css/equipos-modern.css?v=1}"/>
+    <link rel="stylesheet" th:href="@{/css/equipos-modern.css?v=5}"/>
 </head>
 
 <body>
@@ -414,7 +399,7 @@
 
     <div class="volver-container">
         <a th:href="@{/lobby(idTorneo=${idTorneoActual})}"
-           class="btn-volver">
+           class="btn-volver--inline">
             VOLVER AL LOBBY
         </a>
     </div>

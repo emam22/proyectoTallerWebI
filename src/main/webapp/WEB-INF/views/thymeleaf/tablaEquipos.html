@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" th:href="@{/css/app.css?v=5}"/>
+    <link rel="stylesheet" th:href="@{/css/app.css?v=7}"/>
     <link rel="icon" type="image/png" th:href="@{/img/favicon.png?v=2}"/>
-    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Tabla de posiciones</title>
 </head>
 <style>
 
@@ -87,213 +88,9 @@
     }
 
     .boton-volver:hover {
-        background: #d0ff66;
-        transform: translateY(-2px);
+        background: var(--accent-hover);
     }
 
-
-    /* PARTIDO DESTACADO */
-
-    .partido-destacado {
-        border: 2px solid #b6ff00;
-        border-radius: 7px;
-        padding: 10px;
-        text-align: center;
-    }
-
-    .partido {
-        margin-bottom: 10px;
-    }
-
-    .equipos {
-        color: #b6ff00;
-        font-weight: bold;
-        font-size: 14px;
-    }
-
-    .fecha-hora {
-        font-size: 10px;
-        color: #ddd;
-        margin-top: 4px;
-    }
-
-
-    /* INFORMACION DEL TORNEO */
-
-    .info-torneo {
-        border: 2px solid #b6ff00;
-        border-radius: 7px;
-        padding: 12px;
-        font-size: 12px;
-        line-height: 2;
-    }
-
-    .info-torneo strong {
-        color: white;
-    }
-
-
-    /* =========================
-       CONTENIDO
-    ========================= */
-
-    .contenido {
-        display: grid;
-        grid-template-columns: 1fr 1.6fr 1fr;
-        gap: 20px;
-    }
-
-
-    /* =========================
-       FECHAS
-    ========================= */
-
-    .fechas {
-        border: 2px solid #b6ff00;
-        border-radius: 7px;
-        padding: 8px;
-    }
-
-    .fecha-card {
-        background: #444;
-        border-radius: 7px;
-        padding: 12px;
-        margin-bottom: 10px;
-        min-height: 95px;
-    }
-
-    .fecha-card:last-child {
-        margin-bottom: 0;
-    }
-
-    .fecha-card h3 {
-        color: #b6ff00;
-        text-align: center;
-        font-size: 11px;
-        margin-bottom: 10px;
-    }
-
-    .fecha-card .partido-mini {
-        text-align: center;
-        font-size: 9px;
-        margin-bottom: 8px;
-    }
-
-    .fecha-card .equipos-mini {
-        color: #b6ff00;
-        font-weight: bold;
-        font-size: 8px;
-    }
-
-    .fecha-card .fecha-mini {
-        color: #ccc;
-        font-size: 7px;
-        margin-top: 3px;
-    }
-
-
-    /* =========================
-       TABLA DE POSICIONES
-    ========================= */
-
-    .tabla-container {
-        border: 2px solid #b6ff00;
-        border-radius: 7px;
-        overflow: hidden;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 11px;
-    }
-
-    thead {
-        background: #b6ff00;
-        color: #222;
-    }
-
-    th {
-        padding: 7px 4px;
-        font-size: 10px;
-    }
-
-    td {
-        padding: 8px 5px;
-        text-align: center;
-        border-bottom: 1px solid #555;
-    }
-
-    tbody tr {
-        background: #444;
-    }
-
-    tbody tr:hover {
-        background: #505050;
-    }
-
-    td.equipo {
-        text-align: left;
-        font-weight: bold;
-    }
-
-    .posicion {
-        width: 30px;
-    }
-
-
-    .boton-volver {
-        display: inline-block;
-        padding: 12px 20px;
-        background: #b6ff00;
-        color: #232323;
-        text-decoration: none;
-        font-weight: 900;
-        border-radius: 10px;
-        transition: 0.2s ease;
-    }
-
-
-    /* =========================
-       ESTADISTICAS
-    ========================= */
-
-    .estadisticas {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .estadistica-card {
-        border: 2px solid #b6ff00;
-        border-radius: 7px;
-        min-height: 150px;
-        overflow: hidden;
-    }
-
-    .estadistica-titulo {
-        background: #b6ff00;
-        color: #222;
-        padding: 7px;
-        font-size: 11px;
-        text-align: center;
-    }
-
-    .estadistica-contenido {
-        padding: 15px;
-        color: #ccc;
-        font-size: 11px;
-    }
-
-    .estadistica-item {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 12px;
-    }
-
-    .estadistica-item strong {
-        color: white;
-    }
 
     .panel-tabla {
         border: 2.5px solid #b6ff00;
@@ -407,7 +204,7 @@
     }
 
 </style>
-<link rel="stylesheet" th:href="@{/css/equipos-modern.css?v=1}"/>
+<link rel="stylesheet" th:href="@{/css/equipos-modern.css?v=5}"/>
 </head>
 
 <body>
@@ -436,6 +233,7 @@
 
 
     <div class="panel-tabla">
+      <div class="tabla-scroll">
         <table class="tabla-moderna">
             <thead>
             <tr>
@@ -474,6 +272,7 @@
 
             </tbody>
         </table>
+      </div>
     </div>
 </main>
 </body>

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Estadísticas de Jugadores - System TOR</title>
-    <link rel="stylesheet" th:href="@{/css/app.css?v=5}">
+    <link rel="stylesheet" th:href="@{/css/app.css?v=7}">
     <link rel="stylesheet" th:href="@{/css/main.css}">
     <style>
         /* FONDO PATRÓN Y DEGRADADO */
@@ -55,23 +55,6 @@
             color: #b6ff00;
             text-align: center;
             white-space: nowrap;
-        }
-
-        .boton-volver {
-            display: inline-block;
-            padding: 12px 20px;
-            background: #b6ff00;
-            color: #232323;
-            text-decoration: none;
-            font-weight: 900;
-            border-radius: 10px;
-            transition: 0.2s ease;
-            white-space: nowrap;
-        }
-
-        .boton-volver:hover {
-            background: #d0ff66;
-            transform: translateY(-2px);
         }
 
         .contenedor-encabezado {
@@ -130,30 +113,11 @@
             margin-top: 10px;
         }
 
-        /* BOTÓN VOLVER PEGADO ARRIBA */
-        .btn-volver-tab {
-            display: inline-block;
-            background-color: #b6ff00;
-            color: #000;
-            font-weight: 900;
-            font-size: 13px;
-            text-decoration: none;
-            padding: 8px 24px;
-            border-top-left-radius: 10px;
-            border-top-right-radius: 10px;
-            margin-bottom: 0;
-            transition: opacity 0.2s;
-        }
-
-        .btn-volver-tab:hover {
-            opacity: 0.9;
-        }
-
         /* CAJA DE LA TABLA */
         .panel-tabla {
             background-color: #3e3e3e;
             border: 2px solid #b6ff00;
-            border-radius: 0 12px 12px 12px;
+            border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
             scroll-margin-top: 90px;
@@ -241,7 +205,7 @@
         }
 
         .btn-ver-mas:hover {
-            background: #d0ff66;
+            background: var(--accent-hover);
             transform: translateY(-2px);
             box-shadow: 0 12px 26px rgba(0, 0, 0, 0.45);
         }
@@ -256,7 +220,7 @@
             color: rgba(0, 0, 0, 0.65);
         }
     </style>
-    <link rel="stylesheet" th:href="@{/css/equipos-modern.css?v=1}"/>
+    <link rel="stylesheet" th:href="@{/css/equipos-modern.css?v=5}"/>
 </head>
 <body>
 
@@ -289,6 +253,7 @@
 
 
     <div class="panel-tabla">
+      <div class="tabla-scroll">
         <table class="tabla-datos tabla-moderna" id="tabla-estadisticas">
             <thead>
             <tr>
@@ -333,6 +298,7 @@
             </tr>
             </tbody>
         </table>
+      </div>
 
         <div class="pie-tabla"
              th:if="${estadisticasDeJugadores != null and estadisticasDeJugadores.size() > 15}">

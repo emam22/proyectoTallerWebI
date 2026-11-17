@@ -416,6 +416,38 @@ tbody tr:hover {
     background: var(--surface-3);
 }
 
+/* Estados de jornada en el fixture */
+.estado.estado--pendiente {
+    background: rgba(255, 215, 0, 0.12);
+    color: var(--gold);
+    border-color: rgba(255, 215, 0, 0.45);
+}
+
+.estado.estado--jugada {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-color: rgba(182, 255, 0, 0.5);
+}
+
+/* Estado vacio compartido por las tablas */
+.sin-datos {
+    padding: 26px 18px;
+    color: var(--text-muted);
+    font-weight: normal;
+    text-align: center;
+}
+
+/* Tablas anchas: scroll horizontal en pantallas chicas */
+.tabla-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tabla-scroll table {
+    min-width: 760px;
+}
+
 /* =========================
    FLECHA DE VOLVER (fragmento fragments/nav.html)
 ======================== */
@@ -447,6 +479,49 @@ tbody tr:hover {
     background: var(--accent);
     color: var(--bg);
     transform: translateY(-2px);
+}
+
+/* Boton Volver dentro del flujo de la pagina (no flotante) */
+.btn-volver--inline,
+.boton-volver {
+    position: static;
+    display: inline-flex;
+    width: auto;
+    height: auto;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--accent);
+    color: var(--bg);
+    border: 2px solid var(--accent);
+    border-radius: var(--radius-lg);
+    padding: 12px 20px;
+    font-family: var(--font-base);
+    font-size: 14px;
+    font-weight: 900;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: 0 6px 16px var(--shadow);
+    transition:
+        background var(--dur-fast) var(--ease),
+        border-color var(--dur-fast) var(--ease),
+        transform var(--dur-fast) var(--ease),
+        box-shadow var(--dur-fast) var(--ease);
+}
+
+.btn-volver--inline:hover,
+.boton-volver:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 22px var(--shadow);
+}
+
+.btn-volver--inline:focus-visible,
+.boton-volver:focus-visible {
+    outline: 2px solid var(--text);
+    outline-offset: 3px;
 }
 
 /* =========================

@@ -305,26 +305,44 @@ td.td-escudo .escudo-chip {
     box-shadow: inset 3px 0 0 var(--accent, #b6ff00);
 }
 
-/* Escudo como ultima columna, alineado a la derecha de la fila */
-.stat-columnas-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 4px;
-    margin-top: 6px;
-    font-size: clamp(9px, 0.75vw, 11px);
+/* Tabla lateral de estadisticas: una sola cabecera alineada con el cuerpo */
+.tabla-stats-lateral {
+    table-layout: fixed;
+    font-size: clamp(10px, 0.8vw, 12px);
+}
+
+.tabla-stats-lateral thead th {
+    padding: 7px 3px;
+    font-size: clamp(9px, 0.72vw, 11px);
     white-space: nowrap;
 }
 
-.stat-columnas-header span {
+.tabla-stats-lateral tbody td {
+    padding: 5px 3px;
+    line-height: 1.2;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.stat-columnas-header .col-escudo,
-.tabla-stats-lateral td.col-escudo {
+.tabla-stats-lateral .col-escudo {
+    width: 10%;
     text-align: left;
-    width: 28px;
-    padding-left: 2px;
+    padding-left: 4px;
+}
+
+.tabla-stats-lateral .col-jugador {
+    width: 25%;
+    text-align: left;
+}
+
+.tabla-stats-lateral .col-apellido {
+    width: 22%;
+    text-align: left;
+}
+
+.tabla-stats-lateral .col-stat {
+    width: 8.6%;
 }
 
 .tabla-stats-lateral td.col-escudo .escudo-chip--xxs {

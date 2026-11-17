@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <link rel="stylesheet" th:href="@{/css/app.css?v=5}"/>
+  <link rel="stylesheet" th:href="@{/css/app.css?v=7}"/>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fixture del torneo - Administración</title>
@@ -51,22 +51,6 @@
             color: #ffffff;
             font-size: 20px;
             font-weight: bold;
-        }
-
-        .boton-volver {
-            display: inline-block;
-            padding: 12px 20px;
-            background: #b6ff00;
-            color: #232323;
-            text-decoration: none;
-            font-weight: 900;
-            border-radius: 10px;
-            transition: 0.2s ease;
-        }
-
-        .boton-volver:hover {
-            background: #d0ff66;
-            transform: translateY(-2px);
         }
 
         .sin-jornadas {
@@ -296,6 +280,7 @@
                     </h3>
 
                     <span class="estado"
+                          th:classappend="${jornada.estado != null and #strings.equalsIgnoreCase(jornada.estado, 'Finalizada')} ? 'estado--jugada' : 'estado--pendiente'"
                           th:text="${jornada.estado}">
                         Pendiente
                     </span>

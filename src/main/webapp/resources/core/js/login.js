@@ -4,14 +4,18 @@ const btnLoginNode = document.getElementById("btn-login");
 const inputEmailNode = document.getElementById("email");
 const inputPasswordNode = document.getElementById("password");
 
-inputEmailNode.addEventListener("keyup", (event) => {
-  const inputEmailValue = event.target.value;
-  const inputPasswordValue = inputPasswordNode.value;
-  btnLoginNode.disabled = !validarCamposDeLogin(inputEmailValue, inputPasswordValue);
-});
+function actualizarBotonLogin() {
+  const email = inputEmailNode.value;
+  const password = inputPasswordNode.value;
+  btnLoginNode.disabled = !validarCamposDeLogin(email, password);
+}
 
-inputPasswordNode.addEventListener("keyup", (event) => {
-  const inputEmailValue = inputEmailNode.value;
-  const inputPasswordValue = event.target.value;
-  btnLoginNode.disabled = !validarCamposDeLogin(inputEmailValue, inputPasswordValue);
-});
+// Cubre escritura, pegado y autocompletado del navegador.
+for (const input of [inputEmailNode, inputPasswordNode]) {
+  input.addEventListener("keyup", actualizarBotonLogin);
+  input.addEventListener("input", actualizarBotonLogin);
+  input.addEventListener("change", actualizarBotonLogin);
+}
+
+window.addEventListener("load", actualizarBotonLogin);
+actualizarBotonLogin();

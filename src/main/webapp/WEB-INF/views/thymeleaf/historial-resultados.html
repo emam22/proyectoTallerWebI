@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" th:href="@{/css/app.css?v=5}"/>
+    <link rel="stylesheet" th:href="@{/css/app.css?v=7}"/>
     <link rel="icon" type="image/png" th:href="@{/img/favicon.png?v=2}"/>
 
     <title>Historial de resultados</title>
@@ -196,32 +196,15 @@
             margin-top: 20px;
         }
 
-        /* BOTÓN VOLVER */
+        /* BOTON VOLVER: comparte el estilo base y ocupa todo el ancho */
         a.volver-lobby,
         a.volver-lobby:link,
         a.volver-lobby:visited {
-            display: block;
+            display: flex;
             width: 100%;
-            padding: 12px 10px;
             box-sizing: border-box;
-            background: #1f1f1f;
-            color: #b6ff00;
-            border: 2px solid #b6ff00;
-            border-radius: 8px;
             text-align: center;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: bold;
-            line-height: 1.4;
-            overflow-wrap: anywhere;
-            transition: background 0.2s, color 0.2s,
-            transform 0.1s;
-        }
-
-        a.volver-lobby:hover {
-            background: #b6ff00;
-            color: #111111;
-            transform: translateY(-1px);
+            white-space: normal;
         }
 
         /* RESPONSIVE */
@@ -285,7 +268,7 @@
             }
         }
     </style>
-    <link rel="stylesheet" th:href="@{/css/equipos-modern.css?v=1}"/>
+    <link rel="stylesheet" th:href="@{/css/equipos-modern.css?v=5}"/>
 </head>
 
 <body>
@@ -399,7 +382,7 @@
         <div class="acciones-volver">
 
             <a th:href="@{/lobby(idTorneo=${idTorneoActual})}"
-               class="volver-lobby">
+               class="btn-volver--inline volver-lobby">
                 Volver al lobby
             </a>
 

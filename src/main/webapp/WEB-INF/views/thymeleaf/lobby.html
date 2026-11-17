@@ -2,7 +2,7 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" th:href="@{/css/app.css?v=5}"/>
+    <link rel="stylesheet" th:href="@{/css/app.css?v=7}"/>
     <link rel="icon" type="image/png" th:href="@{/img/favicon.png?v=2}"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Simulador de Torneo</title>
@@ -300,17 +300,28 @@
         .partido-fila .mini-equipos {
             color: #b6ff00;
             font-weight: 900;
-            font-size: 15px;
-            letter-spacing: 0.6px;
+            font-size: clamp(12px, 1vw, 15px);
+            letter-spacing: 0.4px;
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 16px;
+            gap: 8px;
             width: 100%;
+            min-width: 0;
             text-transform: uppercase;
         }
 
-        .partido-fila .mini-equipos span {
+        .partido-fila .mini-equipos .mini-equipo {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            min-width: 0;
+        }
+
+        .partido-fila .mini-equipos .mini-equipo > span:not(.escudo-chip) {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
             white-space: nowrap;
         }
 
@@ -318,6 +329,7 @@
             color: #ffffff;
             font-size: 13px;
             font-weight: normal;
+            flex: 0 0 auto;
         }
 
         .partido-fila .partido-fecha {
@@ -551,7 +563,7 @@
             }
         }
     </style>
-    <link rel="stylesheet" th:href="@{/css/equipos-modern.css?v=4}"/>
+    <link rel="stylesheet" th:href="@{/css/equipos-modern.css?v=5}"/>
 </head>
 
 
@@ -718,6 +730,12 @@
 
                     <tbody>
 
+                    <tr th:if="${#lists.isEmpty(tablaPosiciones)}">
+                        <td colspan="10" class="sin-datos">
+                            No hay posiciones disponibles todavía.
+                        </td>
+                    </tr>
+
                     <tr th:each="fila, iter : ${tablaPosiciones}">
 
                         <td class="posicion" th:text="${iter.count}">1</td>
@@ -763,22 +781,24 @@
                         Estadísticas de Jugadores
                     </span>
 
-                    <div class="stat-columnas-header">
-                        <span class="col-escudo">Esc.</span>
-                        <span class="col-jugador">Nombre</span>
-                        <span class="col-apellido">Apellido</span>
-                        <span class="col-stat">Goles</span>
-                        <span class="col-stat">Asist.</span>
-                        <span class="col-stat">Part.</span>
-                        <span class="col-stat">TA</span>
-                        <span class="col-stat">TR</span>
-                    </div>
-
                 </div>
 
                 <div class="stat-body-content">
 
                     <table class="tabla-stats-lateral">
+
+                        <thead>
+                        <tr>
+                            <th class="col-escudo">Esc.</th>
+                            <th class="col-jugador">Nombre</th>
+                            <th class="col-apellido">Apellido</th>
+                            <th class="col-stat">Goles</th>
+                            <th class="col-stat">Asist.</th>
+                            <th class="col-stat" title="Participaciones en gol">Part.</th>
+                            <th class="col-stat">TA</th>
+                            <th class="col-stat">TR</th>
+                        </tr>
+                        </thead>
 
                         <tbody>
 
