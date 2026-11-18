@@ -26,7 +26,7 @@
     if (tipo !== "ok") {
       titulo.className = "modal-titulo--error";
     }
-    titulo.textContent = tipo === "ok" ? "Listo" : "Atención";
+    titulo.textContent = tipo === "ok" ? "Listo" : "Atenci\u00f3n";
 
     var detalle = document.createElement("p");
     detalle.id = "mensaje-proyecto-detalle";
@@ -123,11 +123,11 @@
       var detalle = camposInvalidos
         .map(nombreCampo)
         .map(function (nombre) {
-          return "• " + nombre;
+          return "- " + nombre;
         })
         .join("\n");
 
-      mostrar("Completá los campos obligatorios:\n" + detalle, "error", function () {
+      mostrar("Complet\u00e1 los campos obligatorios:\n" + detalle, "error", function () {
         camposInvalidos[0].focus();
       });
     });

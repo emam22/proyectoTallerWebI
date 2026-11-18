@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const passInput = document.getElementById("password") ? document.getElementById("password").value : "";
 
       if (!emailInput || !passInput) {
-        alert("Por favor completa tu email y contraseña antes de continuar con la compra.");
+        alert("Por favor completa tu email y contrase\u00f1a antes de continuar con la compra.");
         return;
       }
 
@@ -19,7 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         if (!data.valido) {
           alert(data.mensaje);
-          return; // Frena acá si es débil, no va a Mercado Pago
+          return; // Frena ac\u00e1 si es d\u00e9bil, no va a Mercado Pago
         }
 
         const params = new URLSearchParams({
@@ -30,8 +30,8 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = "/spring/pagar-inscripcion?" + params.toString();
 
       } catch (err) {
-        console.error("Error al validar contraseña:", err);
-        alert("Error al verificar la contraseña.");
+        console.error("Error al validar contrase\u00f1a:", err);
+        alert("Error al verificar la contrase\u00f1a.");
       }
     });
   }

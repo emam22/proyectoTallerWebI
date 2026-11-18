@@ -46,7 +46,7 @@ const renderPaymentBrick = async (bricksBuilderInstance) => {
               installments: formData.installments,
               identificationType: formData.payer.identification ? formData.payer.identification.type : "DNI",
               identificationNumber: formData.payer.identification ? formData.payer.identification.number : "12345678",
-              email: adminEmail, // El email real que se guardará en la BD para el admin
+              email: adminEmail, // El email real que se guardar\u00e1 en la BD para el admin
               password: adminPassword
             })
           })
@@ -54,7 +54,7 @@ const renderPaymentBrick = async (bricksBuilderInstance) => {
               const data = await response.json();
 
               if (!response.ok || data.status === "error") {
-                alert("No se pudo completar el registro: " + (data.mensaje || "Datos inválidos"));
+                alert("No se pudo completar el registro: " + (data.mensaje || "Datos inv\u00e1lidos"));
                 reject();
                 window.location.href = "/spring/nuevo-usuario";
                 return;
@@ -63,7 +63,7 @@ const renderPaymentBrick = async (bricksBuilderInstance) => {
               if (data.status === "approved") {
                 resolve();
                 window.MensajesProyecto.mostrar(
-                  "¡Cuenta de Administrador creada y pago aprobado con éxito!",
+                  "\u00a1Cuenta de Administrador creada y pago aprobado con \u00e9xito!",
                   "ok"
                 );
                 window.location.href = data.redirect || "/spring/lobbyAdmin";
@@ -74,7 +74,7 @@ const renderPaymentBrick = async (bricksBuilderInstance) => {
               }
             })
             .catch((err) => {
-              alert("Ocurrió un error al comunicarse con el servidor.");
+              alert("Ocurri\u00f3 un error al comunicarse con el servidor.");
               reject(err);
               window.location.href = "/spring/nuevo-usuario";
             });

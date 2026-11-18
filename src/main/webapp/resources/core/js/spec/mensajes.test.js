@@ -49,7 +49,7 @@ describe("MensajesProyecto", () => {
 
     expect(evento.defaultPrevented).toBeTrue();
     expect(document.querySelector(".modal-confirmacion__mensaje").textContent).toContain(
-      "Completá los campos obligatorios:\n• Nombre"
+      "Completá los campos obligatorios:\n- Nombre"
     );
   });
 
