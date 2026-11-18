@@ -63,6 +63,23 @@
             background-color: #484848;
         }
 
+        .btn-card-admin--bloqueado {
+            opacity: 0.45;
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+
+        .mensaje-error-fixture {
+            background-color: #4a1d1d;
+            border: 1px solid #ff4d4d;
+            border-radius: 8px;
+            padding: 10px 12px;
+            color: #ffb3b3;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+        }
+
         .panel-fechas-admin form .btn-card-admin {
             width: 100%;
             cursor: pointer;
@@ -233,7 +250,8 @@
 <div th:replace="~{fragments/nav :: barraNavegacion}"></div>
 
 
-<div class="admin-dashboard-container">
+<div class="admin-dashboard-container"
+     th:with="edicionBloqueada=${torneo != null and !torneo.permiteModificaciones()}">
 
     <div class="fechaLimite"
          th:text="${torneo?.getFechaLimite() != null} ?
@@ -242,22 +260,34 @@
         FECHA LÍMITE
     </div>
 
-    <div th:if="${torneo != null and !torneo.permiteModificaciones()}"
+    <div th:if="${edicionBloqueada}"
          style="color: #ff4d4d; font-weight: bold; text-align: center; margin-bottom: 15px;">
         El plazo de edición expiró. Las opciones de modificación de equipos están bloqueadas.
     </div>
 
     <div class="fila-botones-superiores">
-        <a th:href="@{/editar-equipo(idTorneo=${idTorneoActual})}" class="btn-card-admin">
+        <a th:href="@{/editar-equipo(idTorneo=${idTorneoActual})}"
+           class="btn-card-admin"
+           th:classappend="${edicionBloqueada} ? ' btn-card-admin--bloqueado' : ''"
+           th:attr="aria-disabled=${edicionBloqueada} ? 'true' : null, tabindex=${edicionBloqueada} ? '-1' : null">
             EDITAR EQUIPO
         </a>
-        <a th:href="@{/elegirEquipoSancion(idTorneo=${idTorneoActual})}" class="btn-card-admin">
+        <a th:href="@{/elegirEquipoSancion(idTorneo=${idTorneoActual})}"
+           class="btn-card-admin"
+           th:classappend="${edicionBloqueada} ? ' btn-card-admin--bloqueado' : ''"
+           th:attr="aria-disabled=${edicionBloqueada} ? 'true' : null, tabindex=${edicionBloqueada} ? '-1' : null">
             AGREGAR SANCIÓN
         </a>
-        <a th:href="@{/creacion-equipo-admin(idTorneo=${idTorneoActual})}" class="btn-card-admin">
+        <a th:href="@{/creacion-equipo-admin(idTorneo=${idTorneoActual})}"
+           class="btn-card-admin"
+           th:classappend="${edicionBloqueada} ? ' btn-card-admin--bloqueado' : ''"
+           th:attr="aria-disabled=${edicionBloqueada} ? 'true' : null, tabindex=${edicionBloqueada} ? '-1' : null">
             CREAR NUEVO<br>EQUIPO
         </a>
-        <a th:href="@{/desvincular-equipo(idTorneo=${idTorneoActual})}" class="btn-card-admin">
+        <a th:href="@{/desvincular-equipo(idTorneo=${idTorneoActual})}"
+           class="btn-card-admin"
+           th:classappend="${edicionBloqueada} ? ' btn-card-admin--bloqueado' : ''"
+           th:attr="aria-disabled=${edicionBloqueada} ? 'true' : null, tabindex=${edicionBloqueada} ? '-1' : null">
             DESVINCULAR<br>EQUIPO
         </a>
     </div>
@@ -268,6 +298,11 @@
 
         <div class="panel-fechas-admin">
 
+            <div class="mensaje-error-fixture"
+                 th:if="${error != null}"
+                 th:text="${error}">
+            </div>
+
             <!-- Cuando todavía no existe el fixture -->
             <div th:if="${jornadas == null or #lists.isEmpty(jornadas)}"
                  class="card-fecha-bloque">
@@ -277,7 +312,6 @@
                 <p style="color: white; font-size: 13px; text-align: center;">
                     Todavía no se generó el fixture.
                 </p>
-
 
                 <form th:action="@{/finalizarTorneoAdmin}" method="post">
                     <input type="hidden"
