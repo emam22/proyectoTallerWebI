@@ -324,7 +324,7 @@
             <input type="hidden" name="idEquipo" th:value="${filaEquipo.equipo.id}"/>
             <input type="text" th:field="*{nombre}" placeholder="Nombre" required/>
             <input type="text" th:field="*{apellido}" placeholder="Apellido" required/>
-            <input type="number" th:field="*{dorsal}" placeholder="Dorsal" min="1"/>
+            <input type="number" th:field="*{dorsal}" placeholder="Dorsal" min="1" required/>
             <select th:field="*{puesto}">
                 <option value="Arquero">Arquero</option>
                 <option value="Defensor">Defensor</option>

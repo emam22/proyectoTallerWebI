@@ -30,6 +30,7 @@ public class ServicioSimulacionTorneoTest {
     repositorioEstadisticaJugadorMock = mock(RepositorioEstadisticaJugador.class);
     repositorioEventoPartidoMock = mock(RepositorioEventoPartido.class);
     servicioJugadorMock = mock(ServicioJugador.class);
+    servicioEquipoTorneoMock = mock(ServicioEquipoTorneo.class);
 
     servicioSimulacion =
       new ServicioSimulacionTorneoImpl(
@@ -115,7 +116,11 @@ public class ServicioSimulacionTorneoTest {
     EstadisticaJugador estadisticaLocal = crearEstadistica(jugadorLocal);
     EstadisticaJugador estadisticaVisitante = crearEstadistica(jugadorVisitante);
 
+    Torneo torneo = new Torneo();
+    torneo.setId(idTorneo);
+
     when(servicioTorneoMock.obtenerJornadasPorTorneo(idTorneo)).thenReturn(Arrays.asList(jornada));
+    when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
 
     when(repositorioJugadorEquipoTorneoMock.listarPorEquipoYTorneo(10L, idTorneo))
       .thenReturn(Arrays.asList(inscripcionLocal));
@@ -123,10 +128,10 @@ public class ServicioSimulacionTorneoTest {
     when(repositorioJugadorEquipoTorneoMock.listarPorEquipoYTorneo(20L, idTorneo))
       .thenReturn(Arrays.asList(inscripcionVisitante));
 
-    when(repositorioEstadisticaJugadorMock.buscarEstadisticasPorIdJugador(100L))
+    when(repositorioEstadisticaJugadorMock.buscarEstadisticasPorJugadorYTorneo(100L, idTorneo))
       .thenReturn(estadisticaLocal);
 
-    when(repositorioEstadisticaJugadorMock.buscarEstadisticasPorIdJugador(200L))
+    when(repositorioEstadisticaJugadorMock.buscarEstadisticasPorJugadorYTorneo(200L, idTorneo))
       .thenReturn(estadisticaVisitante);
 
     // Ejecución
@@ -229,7 +234,11 @@ public class ServicioSimulacionTorneoTest {
     Partido partido = crearPartido(equipoLocal, equipoVisitante);
     Jornada jornada = crearJornadaConPartido(partido);
 
+    Torneo torneo = new Torneo();
+    torneo.setId(idTorneo);
+
     when(servicioTorneoMock.obtenerJornadasPorTorneo(idTorneo)).thenReturn(Arrays.asList(jornada));
+    when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
 
     when(repositorioJugadorEquipoTorneoMock.listarPorEquipoYTorneo(10L, idTorneo))
       .thenReturn(Arrays.asList(crearInscripcion(jugadorDeshabilitado)));
@@ -259,7 +268,11 @@ public class ServicioSimulacionTorneoTest {
     Partido partido = crearPartido(equipoLocal, equipoVisitante);
     Jornada jornada = crearJornadaConPartido(partido);
 
+    Torneo torneo = new Torneo();
+    torneo.setId(idTorneo);
+
     when(servicioTorneoMock.obtenerJornadasPorTorneo(idTorneo)).thenReturn(Arrays.asList(jornada));
+    when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
 
     when(repositorioJugadorEquipoTorneoMock.listarPorEquipoYTorneo(10L, idTorneo))
       .thenReturn(Arrays.asList(inscripcion));

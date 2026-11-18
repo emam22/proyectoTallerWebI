@@ -132,7 +132,53 @@ public class ControladorJugadoresTest {
   }
 
   @Test
-  public void deberiaAceptarDorsalYPuestoNulosAlAgregarUnJugador() throws JugadorNoExiste {
+  public void noDeberiaAgregarSiElDorsalEsNulo() throws JugadorNoExiste {
+    // preparacion
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(2L);
+    torneo.setCantidadMaxJugadores(25);
+    inscribirEquipoEnTorneo(2L, 20L, torneo);
+    when(this.servicioJugadorMock.obtenerJugadores(20L)).thenReturn(new ArrayList<>());
+
+    // ejecucion
+    ModelAndView mav =
+      this.controlador.agregarJugador(
+          agregarDto(torneo, equipo(20L), "Ana", "Gomez", null, "Delantero"),
+          redirectAttributesMock
+        );
+
+    // verificacion
+    verify(this.servicioJugadorMock, never()).agregarJugador(any(), any());
+    verify(redirectAttributesMock).addFlashAttribute("error", "El dorsal es obligatorio.");
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneo?idTorneo=2"));
+  }
+
+  @Test
+  public void noDeberiaAgregarSiElDorsalNoEsPositivo() throws JugadorNoExiste {
+    // preparacion
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(2L);
+    torneo.setCantidadMaxJugadores(25);
+    inscribirEquipoEnTorneo(2L, 20L, torneo);
+    when(this.servicioJugadorMock.obtenerJugadores(20L)).thenReturn(new ArrayList<>());
+
+    // ejecucion
+    ModelAndView mav =
+      this.controlador.agregarJugador(
+          agregarDto(torneo, equipo(20L), "Ana", "Gomez", 0, "Delantero"),
+          redirectAttributesMock
+        );
+
+    // verificacion
+    verify(this.servicioJugadorMock, never()).agregarJugador(any(), any());
+    verify(redirectAttributesMock).addFlashAttribute("error", "El dorsal debe ser mayor a cero.");
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneo?idTorneo=2"));
+  }
+
+  @Test
+  public void deberiaAceptarPuestoNuloAlAgregarUnJugador() throws JugadorNoExiste {
     // preparacion
     RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
     Torneo torneo = new Torneo();
@@ -143,7 +189,7 @@ public class ControladorJugadoresTest {
 
     // ejecucion
     this.controlador.agregarJugador(
-        agregarDto(torneo, equipo(20L), "Ana", "Gomez", null, null),
+        agregarDto(torneo, equipo(20L), "Ana", "Gomez", 9, null),
         redirectAttributesMock
       );
 

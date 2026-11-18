@@ -100,7 +100,8 @@ public class ServicioEstadisticasJugadorTest {
 
     when(servicioJugadorMock.consultarJugador(1L)).thenReturn(jugador);
     when(servicioTorneoMock.consultarTorneoPorId(10L)).thenReturn(torneo);
-    when(repoEstadisticasMock.buscarEstadisticasPorIdJugador(1L)).thenReturn(estadisticas);
+    when(repoEstadisticasMock.buscarEstadisticasPorJugadorYTorneo(1L, 10L))
+      .thenReturn(estadisticas);
 
     servicioEstadistica.registrarTarjetaAmarilla(1L, 10L);
 
@@ -122,7 +123,8 @@ public class ServicioEstadisticasJugadorTest {
 
     when(servicioJugadorMock.consultarJugador(1L)).thenReturn(jugador);
     when(servicioTorneoMock.consultarTorneoPorId(10L)).thenReturn(torneo);
-    when(repoEstadisticasMock.buscarEstadisticasPorIdJugador(1L)).thenReturn(estadisticas);
+    when(repoEstadisticasMock.buscarEstadisticasPorJugadorYTorneo(1L, 10L))
+      .thenReturn(estadisticas);
 
     servicioEstadistica.registrarTarjetaRoja(1L, 10L);
 

@@ -50,31 +50,31 @@ const renderPaymentBrick = async (bricksBuilderInstance) => {
               password: adminPassword
             })
           })
-              .then(async (response) => {
-                const data = await response.json();
+            .then(async (response) => {
+              const data = await response.json();
 
-                if (!response.ok || data.status === "error") {
-                  alert("No se pudo completar el registro: " + (data.mensaje || "Datos inválidos"));
-                  reject();
-                  window.location.href = "/spring/nuevo-usuario";
-                  return;
-                }
-
-                if (data.status === "approved") {
-                  resolve();
-                  alert("¡Cuenta de Administrador creada y pago aprobado con éxito!");
-                  window.location.href = data.redirect || "/spring/lobbyAdmin";
-                } else {
-                  alert("El pago no fue aprobado: " + (data.status_detail || data.status));
-                  resolve();
-                  window.location.href = "/spring/nuevo-usuario";
-                }
-              })
-              .catch((err) => {
-                alert("Ocurrió un error al comunicarse con el servidor.");
-                reject(err);
+              if (!response.ok || data.status === "error") {
+                alert("No se pudo completar el registro: " + (data.mensaje || "Datos inválidos"));
+                reject();
                 window.location.href = "/spring/nuevo-usuario";
-              });
+                return;
+              }
+
+              if (data.status === "approved") {
+                resolve();
+                alert("¡Cuenta de Administrador creada y pago aprobado con éxito!");
+                window.location.href = data.redirect || "/spring/lobbyAdmin";
+              } else {
+                alert("El pago no fue aprobado: " + (data.status_detail || data.status));
+                resolve();
+                window.location.href = "/spring/nuevo-usuario";
+              }
+            })
+            .catch((err) => {
+              alert("Ocurrió un error al comunicarse con el servidor.");
+              reject(err);
+              window.location.href = "/spring/nuevo-usuario";
+            });
         });
       },
       onError: () => {
@@ -85,9 +85,9 @@ const renderPaymentBrick = async (bricksBuilderInstance) => {
   };
 
   window.paymentBrickController = await bricksBuilderInstance.create(
-      "payment",
-      "paymentBrick_container",
-      settings
+    "payment",
+    "paymentBrick_container",
+    settings
   );
 };
 

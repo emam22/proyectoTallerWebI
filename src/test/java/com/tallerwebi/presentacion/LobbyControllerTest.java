@@ -53,7 +53,7 @@ public class LobbyControllerTest {
     estadisticas.add(goleador);
     estadisticas.add(otro);
 
-    when(servicioEstadisticasMock.obtenerEstadisticas()).thenReturn(estadisticas);
+    when(servicioEstadisticasMock.obtenerEstadisticasPorTorneo(1L)).thenReturn(estadisticas);
 
     // Ejecución
     Torneo torneoStats = new Torneo();
@@ -69,13 +69,13 @@ public class LobbyControllerTest {
 
     assertThat(mav.getModel().get("idTorneoActual"), equalTo(1L));
 
-    verify(servicioEstadisticasMock, times(1)).obtenerEstadisticas();
+    verify(servicioEstadisticasMock, times(1)).obtenerEstadisticasPorTorneo(1L);
   }
 
   @Test
   public void alVerLasEstadisticasDeJugadoresSinRegistrosNoDebeExponerGoleador() {
     // Preparación
-    when(servicioEstadisticasMock.obtenerEstadisticas()).thenReturn(new ArrayList<>());
+    when(servicioEstadisticasMock.obtenerEstadisticasPorTorneo(1L)).thenReturn(new ArrayList<>());
 
     // Ejecución
     ModelAndView mav = lobbyController.verEstadisticasJugadores(null);
@@ -106,7 +106,7 @@ public class LobbyControllerTest {
     equipo.setEscudo("escudo.png");
 
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
-    when(servicioEstadisticasMock.obtenerEstadisticas()).thenReturn(stats);
+    when(servicioEstadisticasMock.obtenerEstadisticasPorTorneo(idTorneo)).thenReturn(stats);
     when(servicioEquipoMock.consultarEquipoJugador(5L)).thenReturn(equipo);
 
     Torneo torneoLobby = new Torneo();
@@ -126,7 +126,7 @@ public class LobbyControllerTest {
   public void queIrAlLobbyFuncioneConListaDeEstadisticasVacia() {
     Long idTorneo = 1L;
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(new Torneo());
-    when(servicioEstadisticasMock.obtenerEstadisticas()).thenReturn(new ArrayList<>());
+    when(servicioEstadisticasMock.obtenerEstadisticasPorTorneo(1L)).thenReturn(new ArrayList<>());
 
     Torneo torneoLobby = new Torneo();
     torneoLobby.setId(idTorneo);

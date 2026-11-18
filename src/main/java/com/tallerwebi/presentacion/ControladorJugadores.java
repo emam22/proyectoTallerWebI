@@ -224,7 +224,15 @@ public class ControladorJugadores {
       );
     }
 
-    if (dorsal != null && tieneDorsal(jugadores, dorsal)) {
+    if (dorsal == null) {
+      return rechazar(redireccion, "El dorsal es obligatorio.", redirectAttributes);
+    }
+
+    if (dorsal <= 0) {
+      return rechazar(redireccion, "El dorsal debe ser mayor a cero.", redirectAttributes);
+    }
+
+    if (tieneDorsal(jugadores, dorsal)) {
       return rechazar(
         redireccion,
         "Ya hay un jugador con el dorsal " + dorsal + " en este equipo.",
