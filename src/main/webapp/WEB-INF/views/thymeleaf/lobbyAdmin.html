@@ -2,7 +2,7 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" th:href="@{/css/app.css?v=7}"/>
+    <link rel="stylesheet" th:href="@{/css/app.css?v=9}"/>
     <link rel="icon" type="image/png" th:href="@{/img/favicon.png?v=2}"/>
     <title>Simulador de Torneo</title>
     <style>
@@ -122,6 +122,14 @@
 <!-- NAVBAR GLOBAL -->
 <div th:replace="~{fragments/nav :: barraNavegacion}"></div>
 
+
+<!-- MENSAJES FLASH (EXITO / ERROR) -->
+<div th:if="${mensaje}" class="flash flash--ok" role="status" th:text="${mensaje}">
+    Torneo eliminado correctamente.
+</div>
+<div th:if="${error}" class="flash flash--error" role="alert" th:text="${error}">
+    Error
+</div>
 
 <!-- CONTENIDO CON LOS BOTONES DE ADMINISTRACIÓN -->
 <main class="contenedor">

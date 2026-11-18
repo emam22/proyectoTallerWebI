@@ -62,7 +62,10 @@ const renderPaymentBrick = async (bricksBuilderInstance) => {
 
               if (data.status === "approved") {
                 resolve();
-                alert("¡Cuenta de Administrador creada y pago aprobado con éxito!");
+                window.MensajesProyecto.mostrar(
+                  "¡Cuenta de Administrador creada y pago aprobado con éxito!",
+                  "ok"
+                );
                 window.location.href = data.redirect || "/spring/lobbyAdmin";
               } else {
                 alert("El pago no fue aprobado: " + (data.status_detail || data.status));

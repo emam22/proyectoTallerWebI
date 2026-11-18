@@ -10,4 +10,5 @@ public interface RepositorioEstadisticaJugador {
   void actualizarEstadisticasJugador(EstadisticaJugador estadisticas);
   List<EstadisticaJugador> obtenerEstadisticasPorTorneo(Long idTorneo);
   EstadisticaJugador buscarEstadisticasPorJugadorYTorneo(Long idJugador, Long idTorneo);
+  void eliminarPorTorneo(Long idTorneo);
 }

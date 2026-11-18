@@ -80,4 +80,13 @@ public class RepositorioEstadisticaJugadorImpl implements RepositorioEstadistica
 
     return resultados.isEmpty() ? null : resultados.get(0);
   }
+
+  @Override
+  public void eliminarPorTorneo(Long idTorneo) {
+    sf
+      .getCurrentSession()
+      .createQuery("delete from EstadisticaJugador e where e.torneo.id = :idTorneo")
+      .setParameter("idTorneo", idTorneo)
+      .executeUpdate();
+  }
 }

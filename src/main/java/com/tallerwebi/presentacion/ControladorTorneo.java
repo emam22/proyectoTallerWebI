@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -530,13 +531,9 @@ public class ControladorTorneo {
     Long idTorneo = obtenerIdTorneo(torneo);
 
     try {
-      validarModificacionTorneo(idTorneo);
       servicioTorneo.eliminarTorneo(idTorneo);
-      redirectAttributes.addFlashAttribute("mensaje", "Torneo eliminado correctamente.");
+      redirectAttributes.addFlashAttribute("mensaje", mensajeTorneoEliminado(torneo, idTorneo));
       return new ModelAndView(REDIRECT_LOBBY_ADMIN);
-    } catch (FechaLimiteEditarTorneo e) {
-      redirectAttributes.addFlashAttribute(ERROR, e.getMessage());
-      return new ModelAndView(REDIRECT_ADMINISTRAR_TORNEO_ADMIN + idTorneo);
     } catch (Exception e) {
       redirectAttributes.addFlashAttribute(
         ERROR,
@@ -544,6 +541,29 @@ public class ControladorTorneo {
       );
       return new ModelAndView(REDIRECT_ADMINISTRAR_TORNEO_ADMIN + idTorneo);
     }
+  }
+
+  private String mensajeTorneoEliminado(Torneo torneo, Long idTorneo) {
+    if (torneo == null) {
+      return "Torneo eliminado correctamente. ID: " + idTorneo + ".";
+    }
+
+    StringBuilder mensaje = new StringBuilder("Torneo eliminado correctamente: ")
+      .append(torneo.getNombre() == null ? "(sin nombre)" : torneo.getNombre())
+      .append(" (ID ")
+      .append(idTorneo)
+      .append(", inicio ")
+      .append(
+        torneo.getFechaInicio() == null
+          ? "sin fecha"
+          : torneo.getFechaInicio().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+      );
+
+    if (torneo.getCantidadDeEquipos() != null) {
+      mensaje.append(", ").append(torneo.getCantidadDeEquipos()).append(" equipos");
+    }
+
+    return mensaje.append(").").toString();
   }
 
   @RequestMapping("/elegirEquipoSancion")

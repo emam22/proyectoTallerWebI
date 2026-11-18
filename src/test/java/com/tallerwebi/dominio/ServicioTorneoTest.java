@@ -24,6 +24,9 @@ public class ServicioTorneoTest {
   private RepositorioJornada repositorioJornadaMock;
   private RepositorioEquipoTorneo repositorioEquipoTorneoMock;
   private ServicioEquipoTorneo servicioEquipoTorneoMock;
+  private RepositorioEventoPartido repositorioEventoPartidoMock;
+  private RepositorioEstadisticaJugador repositorioEstadisticaJugadorMock;
+  private RepositorioJugadorEquipoTorneo repositorioJugadorEquipoTorneoMock;
 
   @BeforeEach
   public void init() {
@@ -33,6 +36,9 @@ public class ServicioTorneoTest {
     this.repositorioJornadaMock = mock(RepositorioJornada.class);
     this.repositorioEquipoTorneoMock = mock(RepositorioEquipoTorneo.class);
     this.servicioEquipoTorneoMock = mock(ServicioEquipoTorneo.class);
+    this.repositorioEventoPartidoMock = mock(RepositorioEventoPartido.class);
+    this.repositorioEstadisticaJugadorMock = mock(RepositorioEstadisticaJugador.class);
+    this.repositorioJugadorEquipoTorneoMock = mock(RepositorioJugadorEquipoTorneo.class);
 
     this.servicioTorneo =
       new ServicioTorneoImpl(
@@ -40,7 +46,10 @@ public class ServicioTorneoTest {
         this.repositorioEquipoMock,
         this.repositorioJornadaMock,
         this.repositorioEquipoTorneoMock,
-        this.servicioEquipoTorneoMock
+        this.servicioEquipoTorneoMock,
+        this.repositorioEventoPartidoMock,
+        this.repositorioEstadisticaJugadorMock,
+        this.repositorioJugadorEquipoTorneoMock
       );
   }
 
@@ -425,7 +434,18 @@ public class ServicioTorneoTest {
     servicioTorneo.eliminarTorneo(idTorneo);
 
     // Verificación de orden
-    InOrder inOrder = inOrder(repositorioEquipoTorneoMock, repositorioTorneoMock);
+    InOrder inOrder = inOrder(
+      repositorioEventoPartidoMock,
+      repositorioJornadaMock,
+      repositorioEstadisticaJugadorMock,
+      repositorioJugadorEquipoTorneoMock,
+      repositorioEquipoTorneoMock,
+      repositorioTorneoMock
+    );
+    inOrder.verify(repositorioEventoPartidoMock, times(1)).eliminarPorTorneo(idTorneo);
+    inOrder.verify(repositorioJornadaMock, times(1)).eliminarFixturePorTorneo(idTorneo);
+    inOrder.verify(repositorioEstadisticaJugadorMock, times(1)).eliminarPorTorneo(idTorneo);
+    inOrder.verify(repositorioJugadorEquipoTorneoMock, times(1)).eliminarPorTorneo(idTorneo);
     inOrder.verify(repositorioEquipoTorneoMock, times(1)).eliminarPorTorneo(idTorneo);
     inOrder.verify(repositorioTorneoMock, times(1)).borrar(idTorneo);
   }
@@ -440,7 +460,18 @@ public class ServicioTorneoTest {
 
     servicioTorneo.eliminarTorneo(idTorneo);
 
-    InOrder inOrder = inOrder(repositorioEquipoTorneoMock, repositorioTorneoMock);
+    InOrder inOrder = inOrder(
+      repositorioEventoPartidoMock,
+      repositorioJornadaMock,
+      repositorioEstadisticaJugadorMock,
+      repositorioJugadorEquipoTorneoMock,
+      repositorioEquipoTorneoMock,
+      repositorioTorneoMock
+    );
+    inOrder.verify(repositorioEventoPartidoMock, times(1)).eliminarPorTorneo(idTorneo);
+    inOrder.verify(repositorioJornadaMock, times(1)).eliminarFixturePorTorneo(idTorneo);
+    inOrder.verify(repositorioEstadisticaJugadorMock, times(1)).eliminarPorTorneo(idTorneo);
+    inOrder.verify(repositorioJugadorEquipoTorneoMock, times(1)).eliminarPorTorneo(idTorneo);
     inOrder.verify(repositorioEquipoTorneoMock, times(1)).eliminarPorTorneo(idTorneo);
     inOrder.verify(repositorioTorneoMock, times(1)).borrar(idTorneo);
   }

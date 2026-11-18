@@ -33,4 +33,13 @@ public class RepositorioEventoPartidoImpl implements RepositorioEventoPartido {
       .setParameter("idPartido", idPartido)
       .getResultList();
   }
+
+  @Override
+  public void eliminarPorTorneo(Long idTorneo) {
+    sf
+      .getCurrentSession()
+      .createQuery("delete from EventoPartido e where e.partido.jornada.torneo.id = :idTorneo")
+      .setParameter("idTorneo", idTorneo)
+      .executeUpdate();
+  }
 }

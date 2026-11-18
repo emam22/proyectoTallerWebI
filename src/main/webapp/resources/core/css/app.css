@@ -648,3 +648,161 @@ body > :not(.barra-nav):not(script) {
         transition-duration: 0.001ms !important;
     }
 }
+
+/* =========================
+   FLASH MESSAGES (redirect attributes)
+======================== */
+
+.flash {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 12px 18px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: var(--surface-2);
+    color: var(--text);
+    font-family: var(--font-base);
+    font-size: 14px;
+    line-height: 1.4;
+    text-align: center;
+    box-shadow: 0 4px 14px var(--shadow);
+}
+
+.flash--ok {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-weight: bold;
+}
+
+.flash--error {
+    border-color: var(--error);
+    background: var(--error-bg);
+    color: var(--error-soft);
+    font-weight: bold;
+}
+
+/* =========================
+   MODAL DE CONFIRMACION
+======================== */
+
+.modal-confirmacion {
+    position: fixed;
+    inset: 0;
+    z-index: 4000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-confirmacion[hidden] {
+    display: none;
+}
+
+.modal-confirmacion__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.72);
+}
+
+.modal-confirmacion__dialog {
+    position: relative;
+    width: 100%;
+    max-width: 460px;
+    padding: 26px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 12px 40px var(--shadow);
+    color: var(--text);
+    font-family: var(--font-base);
+}
+
+.modal-confirmacion__dialog h2 {
+    margin: 0 0 12px;
+    color: var(--accent);
+    font-size: 20px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.modal-confirmacion__dialog p {
+    margin: 0 0 10px;
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.modal-confirmacion__dialog strong {
+    color: var(--text);
+}
+
+.modal-confirmacion__nota {
+    color: var(--text-faint) !important;
+    font-size: 12px !important;
+}
+
+.modal-confirmacion__acciones {
+    display: flex;
+    gap: 12px;
+    margin-top: 22px;
+}
+
+.btn-modal {
+    flex: 1;
+    padding: 11px 14px;
+    border-radius: var(--radius-sm);
+    font-family: var(--font-base);
+    font-size: 13px;
+    font-weight: bold;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: background var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+
+.btn-modal:hover {
+    transform: translateY(-1px);
+}
+
+.btn-modal:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.btn-modal--cancelar {
+    background: var(--surface-3);
+    border: 1px solid var(--border);
+    color: var(--text);
+}
+
+.btn-modal--cancelar:hover {
+    background: var(--surface-2);
+}
+
+.btn-modal--confirmar {
+    background: var(--error);
+    border: 1px solid var(--error-soft);
+    color: var(--text);
+}
+
+.btn-modal--confirmar:hover {
+    background: var(--error-soft);
+}
+
+.modal-confirmacion__dialog--ok {
+    border-color: var(--accent);
+}
+
+.modal-confirmacion__dialog--error {
+    border-color: var(--error);
+}
+
+.modal-confirmacion__dialog h2.modal-titulo--error {
+    color: var(--error-soft);
+}
+
+.modal-confirmacion__mensaje {
+    white-space: pre-line;
+}

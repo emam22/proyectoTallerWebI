@@ -18,6 +18,9 @@ public class ServicioTorneoImpl implements ServicioTorneo {
   private RepositorioTorneo repositorioTorneo;
   private RepositorioJornada repositorioJornada;
   private RepositorioEquipoTorneo repositorioEquipoTorneo;
+  private RepositorioEventoPartido repositorioEventoPartido;
+  private RepositorioEstadisticaJugador repositorioEstadisticaJugador;
+  private RepositorioJugadorEquipoTorneo repositorioJugadorEquipoTorneo;
 
   private List<Equipo> equiposFechaLibreIda = new ArrayList<>();
 
@@ -27,13 +30,19 @@ public class ServicioTorneoImpl implements ServicioTorneo {
     RepositorioEquipoImpl repositorioEquipo,
     RepositorioJornada repositorioJornada,
     RepositorioEquipoTorneo repositorioEquipoTorneo,
-    ServicioEquipoTorneo servicioEquipoTorneo
+    ServicioEquipoTorneo servicioEquipoTorneo,
+    RepositorioEventoPartido repositorioEventoPartido,
+    RepositorioEstadisticaJugador repositorioEstadisticaJugador,
+    RepositorioJugadorEquipoTorneo repositorioJugadorEquipoTorneo
   ) {
     this.repositorioTorneo = repositorioTorneo;
     this.repositorioEquipo = repositorioEquipo;
     this.repositorioJornada = repositorioJornada;
     this.repositorioEquipoTorneo = repositorioEquipoTorneo;
     this.servicioEquipoTorneo = servicioEquipoTorneo;
+    this.repositorioEventoPartido = repositorioEventoPartido;
+    this.repositorioEstadisticaJugador = repositorioEstadisticaJugador;
+    this.repositorioJugadorEquipoTorneo = repositorioJugadorEquipoTorneo;
   }
 
   @Override
@@ -100,6 +109,10 @@ public class ServicioTorneoImpl implements ServicioTorneo {
       return;
     }
 
+    repositorioEventoPartido.eliminarPorTorneo(id);
+    repositorioJornada.eliminarFixturePorTorneo(id);
+    repositorioEstadisticaJugador.eliminarPorTorneo(id);
+    repositorioJugadorEquipoTorneo.eliminarPorTorneo(id);
     repositorioEquipoTorneo.eliminarPorTorneo(id);
 
     repositorioTorneo.borrar(id);

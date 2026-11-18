@@ -3,8 +3,10 @@ package com.tallerwebi.presentacion;
 import static net.bytebuddy.matcher.ElementMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.text.IsEqualIgnoringCase.equalToIgnoringCase;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -1027,7 +1029,9 @@ public class ControladorTorneoTest {
     Long idTorneo = 1L;
     Torneo torneo = new Torneo();
     torneo.setId(idTorneo);
-    torneo.setFechaInicio(LocalDateTime.now().plusDays(5));
+    torneo.setNombre("Torneo Apertura 2011");
+    torneo.setFechaInicio(LocalDateTime.of(2011, 8, 5, 0, 0));
+    torneo.setCantidadDeEquipos(20);
 
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
     RedirectAttributes redirectAttributes = new RedirectAttributesModelMap();
@@ -1038,18 +1042,20 @@ public class ControladorTorneoTest {
     assertThat(mav.getViewName(), equalTo("redirect:/lobbyAdmin"));
     assertThat(
       redirectAttributes.getFlashAttributes().get("mensaje").toString(),
-      equalTo("Torneo eliminado correctamente.")
+      equalTo(
+        "Torneo eliminado correctamente: Torneo Apertura 2011 (ID 1, inicio 05/08/2011, 20 equipos)."
+      )
     );
   }
 
   @Test
-  public void eliminarTorneoFueraDeFechaLimiteDebeRedirigirConError()
-    throws FechaLimiteEditarTorneo {
+  public void eliminarTorneoFueraDeFechaLimiteDebeEliminarIgual() throws FechaLimiteEditarTorneo {
     Long idTorneo = 1L;
 
     Torneo torneo = new Torneo();
     torneo.setId(idTorneo);
-    torneo.setFechaInicio(LocalDateTime.now().plusHours(10));
+    torneo.setNombre("Torneo con plazo vencido");
+    torneo.setFechaInicio(LocalDateTime.now().minusDays(30));
 
     when(servicioTorneoMock.consultarTorneoPorId(idTorneo)).thenReturn(torneo);
 
@@ -1065,9 +1071,14 @@ public class ControladorTorneoTest {
 
     ModelAndView mav = controladorTorneo.eliminarTorneoAdmin(torneo, redirectAttributes);
 
-    verify(servicioTorneoMock, never()).eliminarTorneo(idTorneo);
-    assertThat(mav.getViewName(), equalTo("redirect:/administrarTorneoAdmin/1"));
-    assertThat(redirectAttributes.getFlashAttributes().get("error"), notNullValue());
+    verify(servicioTorneoMock, times(1)).eliminarTorneo(idTorneo);
+    verify(validadorTorneoMock, never()).validarModificacion(any());
+    assertThat(mav.getViewName(), equalTo("redirect:/lobbyAdmin"));
+    assertThat(
+      redirectAttributes.getFlashAttributes().get("mensaje").toString(),
+      containsString("Torneo eliminado correctamente: Torneo con plazo vencido")
+    );
+    assertThat(redirectAttributes.getFlashAttributes().get("error"), nullValue());
   }
 
   @Test

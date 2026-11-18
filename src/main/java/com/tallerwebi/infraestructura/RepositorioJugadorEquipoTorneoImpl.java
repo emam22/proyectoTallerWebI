@@ -49,4 +49,13 @@ public class RepositorioJugadorEquipoTorneoImpl implements RepositorioJugadorEqu
       .setParameter("idTorneo", idTorneo)
       .getResultList();
   }
+
+  @Override
+  public void eliminarPorTorneo(Long idTorneo) {
+    sessionFactory
+      .getCurrentSession()
+      .createQuery("delete from JugadorEquipoTorneo jet where jet.torneo.id = :idTorneo")
+      .setParameter("idTorneo", idTorneo)
+      .executeUpdate();
+  }
 }

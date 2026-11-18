@@ -6,4 +6,5 @@ public interface RepositorioEventoPartido {
   void guardar(EventoPartido evento);
 
   List<EventoPartido> obtenerEventosPorPartido(Long idPartido);
+  void eliminarPorTorneo(Long idTorneo);
 }
