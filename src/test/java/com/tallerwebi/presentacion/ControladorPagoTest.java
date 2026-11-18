@@ -74,7 +74,7 @@ public class ControladorPagoTest {
     Map<String, Object> body = (Map<String, Object>) response.getBody();
     assertThat(body, notNullValue());
     assertThat(body.get("status"), equalTo("approved"));
-    assertThat(body.get("redirect"), equalTo("/spring/lobbyAdmin"));
+    assertThat(body.get("redirect"), equalTo("/spring/login"));
 
     verify(servicioLoginMock).registrar(any(Usuario.class));
     verify(sessionMock).setAttribute("ROL", "admin");
