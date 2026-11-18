@@ -267,6 +267,7 @@
     <div class="seccion" th:each="filaEquipo : ${equipos}">
         <div class="seccion-titulo" th:text="${filaEquipo.equipo.nombre}">Equipo</div>
 
+        <div class="tabla-scroll">
         <table>
             <thead>
             <tr>
@@ -302,6 +303,11 @@
             </tr>
             </tbody>
         </table>
+        </div>
+
+        <p class="aviso"
+           th:if="${torneo.cantidadMinJugadores != null and #lists.size(filaEquipo.jugadores) lt torneo.cantidadMinJugadores}"
+           th:text="${'El plantel tiene ' + #lists.size(filaEquipo.jugadores) + ' de ' + torneo.cantidadMinJugadores + ' jugadores minimos.'}">Aviso minimo</p>
 
         <form class="form-confirmar-plantel"
               th:action="@{/jugadoresTorneo/confirmar(idTorneo=${torneo.id})}"

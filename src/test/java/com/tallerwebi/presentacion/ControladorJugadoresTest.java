@@ -230,8 +230,7 @@ public class ControladorJugadoresTest {
     torneo.setId(1L);
     torneo.setCantidadMinJugadores(1);
     inscribirEquipoEnTorneo(1L, 10L, torneo);
-    when(this.servicioJugadorMock.obtenerJugadores(10L))
-      .thenReturn(List.of(new Jugador(), new Jugador()));
+    when(this.servicioJugadorMock.obtenerJugadores(10L)).thenReturn(List.of(jugador(99L)));
 
     // ejecucion
     ModelAndView mav =
@@ -263,7 +262,7 @@ public class ControladorJugadoresTest {
   }
 
   @Test
-  public void noDeberiaEliminarSiElEquipoAlcanzoElMinimoDeJugadores() {
+  public void deberiaEliminarAunqueElEquipoQuedePorDebajoDelMinimo() {
     // preparacion
     RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
     Torneo torneo = new Torneo();
@@ -271,7 +270,26 @@ public class ControladorJugadoresTest {
     torneo.setCantidadMinJugadores(2);
     inscribirEquipoEnTorneo(1L, 10L, torneo);
     when(this.servicioJugadorMock.obtenerJugadores(10L))
-      .thenReturn(List.of(new Jugador(), new Jugador()));
+      .thenReturn(List.of(jugador(99L), jugador(100L)));
+
+    // ejecucion
+    ModelAndView mav =
+      this.controlador.eliminarJugador(torneo, equipo(10L), jugador(99L), redirectAttributesMock);
+
+    // verificacion
+    verify(this.servicioJugadorMock).eliminarJugador(10L, 99L);
+    verify(redirectAttributesMock).addFlashAttribute("ok", "Jugador eliminado correctamente.");
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneo?idTorneo=1"));
+  }
+
+  @Test
+  public void noDeberiaEliminarSiElJugadorNoPerteneceAlEquipo() {
+    // preparacion
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    inscribirEquipoEnTorneo(1L, 10L, torneo);
+    when(this.servicioJugadorMock.obtenerJugadores(10L)).thenReturn(List.of(jugador(100L)));
 
     // ejecucion
     ModelAndView mav =
@@ -279,7 +297,8 @@ public class ControladorJugadoresTest {
 
     // verificacion
     verify(this.servicioJugadorMock, never()).eliminarJugador(any(), any());
-    verify(redirectAttributesMock).addFlashAttribute(eq("error"), anyString());
+    verify(redirectAttributesMock)
+      .addFlashAttribute("error", "El jugador no pertenece a este equipo.");
     assertThat(mav.getViewName(), is("redirect:/jugadoresTorneo?idTorneo=1"));
   }
 
@@ -401,6 +420,46 @@ public class ControladorJugadoresTest {
 
     verify(this.servicioEquipoTorneoMock).confirmarPlantel(10L);
     verify(redirectAttributesMock).addFlashAttribute("ok", "Plantel confirmado correctamente.");
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneo?idTorneo=1"));
+  }
+
+  @Test
+  public void deberiaConfirmarUnPlantelConLaCantidadMinimaExacta()
+    throws PlantelIncompletoException {
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    torneo.setCantidadMinJugadores(2);
+    inscribirEquipoEnTorneo(1L, 10L, torneo);
+    when(this.servicioJugadorMock.obtenerJugadores(10L))
+      .thenReturn(List.of(jugador(1L), jugador(2L)));
+
+    ModelAndView mav =
+      this.controlador.confirmarPlantel(torneo, equipo(10L), redirectAttributesMock);
+
+    verify(this.servicioEquipoTorneoMock).confirmarPlantel(10L);
+    verify(redirectAttributesMock).addFlashAttribute("ok", "Plantel confirmado correctamente.");
+    assertThat(mav.getViewName(), is("redirect:/jugadoresTorneo?idTorneo=1"));
+  }
+
+  @Test
+  public void noDeberiaConfirmarUnPlantelPorDebajoDelMinimo() throws PlantelIncompletoException {
+    RedirectAttributes redirectAttributesMock = mock(RedirectAttributes.class);
+    Torneo torneo = new Torneo();
+    torneo.setId(1L);
+    torneo.setCantidadMinJugadores(2);
+    inscribirEquipoEnTorneo(1L, 10L, torneo);
+    when(this.servicioJugadorMock.obtenerJugadores(10L)).thenReturn(List.of(jugador(1L)));
+
+    ModelAndView mav =
+      this.controlador.confirmarPlantel(torneo, equipo(10L), redirectAttributesMock);
+
+    verify(this.servicioEquipoTorneoMock, never()).confirmarPlantel(any());
+    verify(redirectAttributesMock)
+      .addFlashAttribute(
+        "error",
+        "No se puede confirmar el plantel. El equipo tiene 1 jugador y el minimo es 2."
+      );
     assertThat(mav.getViewName(), is("redirect:/jugadoresTorneo?idTorneo=1"));
   }
 

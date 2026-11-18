@@ -101,14 +101,17 @@ public class ServicioJugadorTest {
     jugador.setId(7L);
     equipo.setJugadores(new ArrayList<>(List.of(jugador)));
     when(this.repositorioEquipoMock.buscarPorId(1L)).thenReturn(equipo);
+    when(this.repositorioJugadorMock.obtenerJugador(7L)).thenReturn(jugador);
 
     // ejecucion
     this.servicioJugador.eliminarJugador(1L, 7L);
 
     // verificacion
     assertThat(equipo.getJugadores(), hasSize(0));
+    assertThat(jugador.getHabilitado(), is(false));
     verify(this.repositorioEquipoMock).guardar(equipo);
-    verify(this.repositorioJugadorMock).eliminar(7L);
+    verify(this.repositorioJugadorMock).actualizar(jugador);
+    verify(this.repositorioJugadorMock, never()).eliminar(7L);
   }
 
   @Test

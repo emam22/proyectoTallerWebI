@@ -62,7 +62,12 @@ public class ServicioJugadorImpl implements ServicioJugador {
       equipo.getJugadores().removeIf(jugador -> idJugador.equals(jugador.getId()));
       repositorioEquipo.guardar(equipo);
     }
-    repositorioJugador.eliminar(idJugador);
+
+    Jugador jugador = repositorioJugador.obtenerJugador(idJugador);
+    if (jugador != null) {
+      jugador.setHabilitado(false);
+      repositorioJugador.actualizar(jugador);
+    }
   }
 
   @Override

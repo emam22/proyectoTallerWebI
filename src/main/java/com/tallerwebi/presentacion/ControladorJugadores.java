@@ -332,22 +332,11 @@ public class ControladorJugadores {
       return rechazar(redireccion, ERROR_EQUIPO_NO_INSCRIPTO, redirectAttributes);
     }
 
-    if (jugador == null) {
+    if (jugador == null || !perteneceAlEquipo(idEquipo, jugador.getId())) {
       return rechazar(redireccion, "El jugador no pertenece a este equipo.", redirectAttributes);
     }
 
-    List<Jugador> jugadores = servicioJugador.obtenerJugadores(idEquipo);
-
-    if (alcanzaMinimo(jugadores, torneo)) {
-      return rechazar(
-        redireccion,
-        "El equipo no puede quedar por debajo del minimo de jugadores.",
-        redirectAttributes
-      );
-    }
-
     Long idJugador = jugador.getId();
-    servicioEstadisticas.eliminarEstadisticas(idJugador);
     servicioJugador.eliminarJugador(idEquipo, idJugador);
 
     redirectAttributes.addFlashAttribute(OK, "Jugador eliminado correctamente.");
@@ -418,6 +407,23 @@ public class ControladorJugadores {
 
     if (equipo == null || !equipoInscriptoEnTorneo(idTorneo, idEquipo)) {
       return rechazar(redireccion, ERROR_EQUIPO_NO_INSCRIPTO, redirectAttributes);
+    }
+
+    List<Jugador> jugadores = servicioJugador.obtenerJugadores(idEquipo);
+    Integer minimo = torneo.getCantidadMinJugadores();
+
+    if (minimo != null && plantelPorDebajoDelMinimo(jugadores, minimo)) {
+      return rechazar(
+        redireccion,
+        "No se puede confirmar el plantel. El equipo tiene " +
+        jugadores.size() +
+        " jugador" +
+        (jugadores.size() == 1 ? "" : "es") +
+        " y el minimo es " +
+        minimo +
+        ".",
+        redirectAttributes
+      );
     }
 
     try {
@@ -657,10 +663,8 @@ public class ControladorJugadores {
     return maximo != null && jugadores.size() >= maximo;
   }
 
-  private boolean alcanzaMinimo(List<Jugador> jugadores, Torneo torneo) {
-    Integer minimo = torneo.getCantidadMinJugadores();
-
-    return minimo != null && jugadores.size() <= minimo;
+  private boolean plantelPorDebajoDelMinimo(List<Jugador> jugadores, Integer minimo) {
+    return minimo != null && jugadores.size() < minimo;
   }
 
   private boolean tieneDorsal(List<Jugador> jugadores, Integer dorsal) {
