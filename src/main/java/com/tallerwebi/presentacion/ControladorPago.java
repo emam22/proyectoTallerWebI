@@ -18,7 +18,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -33,6 +32,9 @@ public class ControladorPago {
   private static final String CLAVE_STATUS = "status";
   private static final String CLAVE_MENSAJE = "mensaje";
   private static final String ESTADO_ERROR = "error";
+  private static final String ESTADO_OK = "ok";
+  private static final String REGISTRO_ADMIN_EMAIL = "REGISTRO_ADMIN_EMAIL";
+  private static final String REGISTRO_ADMIN_PASSWORD = "REGISTRO_ADMIN_PASSWORD";
 
   private final ServicioMercadoPago mpService;
   private final ServicioLogin loginService;
@@ -50,11 +52,11 @@ public class ControladorPago {
     return modelAndView;
   }
 
-  @GetMapping("/api/validar-password")
+  @PostMapping("/api/validar-password")
   @ResponseBody
-  public ResponseEntity<?> validarPasswordPrevia(@RequestParam("password") String password) {
+  public ResponseEntity<?> validarPasswordPrevia(@RequestBody RegistroAdminDTO dto) {
     Map<String, Object> resp = new HashMap<>();
-    String error = obtenerErrorPassword(password);
+    String error = obtenerErrorPassword(dto.getPassword());
     if (error != null) {
       resp.put("valido", false);
       resp.put(CLAVE_MENSAJE, error);
@@ -64,27 +66,72 @@ public class ControladorPago {
     return ResponseEntity.ok(resp);
   }
 
+  @PostMapping("/api/preparar-pago")
+  @ResponseBody
+  public ResponseEntity<?> prepararPago(@RequestBody RegistroAdminDTO dto, HttpSession session) {
+    Map<String, Object> resp = new HashMap<>();
+
+    if (dto.getEmail() == null || dto.getEmail().trim().isEmpty()) {
+      resp.put(CLAVE_STATUS, ESTADO_ERROR);
+      resp.put(CLAVE_MENSAJE, "El email no puede estar vac\u00edo.");
+      return ResponseEntity.badRequest().body(resp);
+    }
+
+    String error = obtenerErrorPassword(dto.getPassword());
+    if (error != null) {
+      resp.put(CLAVE_STATUS, ESTADO_ERROR);
+      resp.put(CLAVE_MENSAJE, error);
+      return ResponseEntity.badRequest().body(resp);
+    }
+
+    session.setAttribute(REGISTRO_ADMIN_EMAIL, dto.getEmail().trim());
+    session.setAttribute(REGISTRO_ADMIN_PASSWORD, dto.getPassword());
+    resp.put(CLAVE_STATUS, ESTADO_OK);
+    return ResponseEntity.ok(resp);
+  }
+
   @PostMapping("/api/pagos/procesar")
   @ResponseBody
   public ResponseEntity<?> procesarPago(@RequestBody ProcesoPagoDTO dto, HttpSession session) {
-    Map<String, Object> respuesta = new HashMap<>();
-
-    String errorValidacion = obtenerErrorPassword(dto.getPassword());
-    if (errorValidacion != null) {
-      respuesta.put(CLAVE_STATUS, ESTADO_ERROR);
-      respuesta.put(CLAVE_MENSAJE, errorValidacion);
-      return ResponseEntity.badRequest().body(respuesta);
-    }
-
     try {
-      Payment pago = mpService.crearPago(dto);
-      return armarRespuestaExito(pago, dto, session);
-    } catch (MPApiException apiException) {
-      return manejarErrorApi(apiException);
-    } catch (MPException mpException) {
-      return manejarErrorSdk(mpException);
-    } catch (Exception e) {
-      return manejarErrorGeneral(e);
+      Map<String, Object> respuesta = new HashMap<>();
+
+      String email = (String) session.getAttribute(REGISTRO_ADMIN_EMAIL);
+      String password = (String) session.getAttribute(REGISTRO_ADMIN_PASSWORD);
+
+      if (
+        email == null || email.trim().isEmpty() || password == null || password.trim().isEmpty()
+      ) {
+        respuesta.put(CLAVE_STATUS, ESTADO_ERROR);
+        respuesta.put(
+          CLAVE_MENSAJE,
+          "No hay datos de registro para el pago. Volv\u00e9 al formulario e intent\u00e1 de nuevo."
+        );
+        return ResponseEntity.badRequest().body(respuesta);
+      }
+
+      dto.setEmail(email);
+      dto.setPassword(password);
+
+      String errorValidacion = obtenerErrorPassword(dto.getPassword());
+      if (errorValidacion != null) {
+        respuesta.put(CLAVE_STATUS, ESTADO_ERROR);
+        respuesta.put(CLAVE_MENSAJE, errorValidacion);
+        return ResponseEntity.badRequest().body(respuesta);
+      }
+
+      try {
+        Payment pago = mpService.crearPago(dto);
+        return armarRespuestaExito(pago, dto, session);
+      } catch (MPApiException apiException) {
+        return manejarErrorApi(apiException);
+      } catch (MPException mpException) {
+        return manejarErrorSdk(mpException);
+      } catch (Exception e) {
+        return manejarErrorGeneral(e);
+      }
+    } finally {
+      limpiarCredencialesDeSesion(session);
     }
   }
 
@@ -99,7 +146,7 @@ public class ControladorPago {
       registrarAdminSiAplica(dto, session);
       respuesta.put(CLAVE_STATUS, ESTADO_APROBADO);
       respuesta.put("id", pago.getId());
-      respuesta.put("redirect", "/spring/lobbyAdmin");
+      respuesta.put("redirect", "/spring/login");
       return ResponseEntity.ok(respuesta);
     }
 
@@ -152,14 +199,14 @@ public class ControladorPago {
 
   private String obtenerErrorPassword(String password) {
     if (password == null || password.trim().isEmpty()) {
-      return "La contraseña no puede estar vacía.";
+      return "La contrase\u00f1a no puede estar vac\u00eda.";
     }
     String fortaleza = loginService.validarFortaleza(password);
     if (FORTALEZA_DEBIL.equalsIgnoreCase(fortaleza)) {
-      return "La contraseña es demasiado débil. Requiere al menos 8 caracteres, 1 número y 1 símbolo especial.";
+      return "La contrase\u00f1a es demasiado d\u00e9bil. Requiere al menos 8 caracteres, 1 n\u00famero y 1 s\u00edmbolo especial.";
     }
     if (FORTALEZA_INVALIDA.equalsIgnoreCase(fortaleza)) {
-      return "La contraseña no puede estar vacía.";
+      return "La contrase\u00f1a no puede estar vac\u00eda.";
     }
     return null;
   }
@@ -176,6 +223,11 @@ public class ControladorPago {
     loginService.registrar(nuevoAdmin);
 
     session.setAttribute("ROL", nuevoAdmin.getRol());
-    session.setAttribute("usuario", nuevoAdmin);
+    session.setAttribute("USUARIO", nuevoAdmin);
+  }
+
+  private void limpiarCredencialesDeSesion(HttpSession session) {
+    session.removeAttribute(REGISTRO_ADMIN_EMAIL);
+    session.removeAttribute(REGISTRO_ADMIN_PASSWORD);
   }
 }

@@ -1,8 +1,5 @@
 /* global MercadoPago */
-const urlParams = new URLSearchParams(window.location.search);
-const adminEmail = urlParams.get("email");
-const adminPassword = urlParams.get("password");
-
+// El email y la contrase\u00f1a del administrador los lee el servidor de la sesi\u00f3n.
 const emailTestComprador = "TESTUSER1664296236612020723@testuser.com";
 
 const mp = new MercadoPago("TEST-e2192b44-67af-42b5-81e8-8379b2da8959", {
@@ -45,9 +42,7 @@ const renderPaymentBrick = async (bricksBuilderInstance) => {
               transactionAmount: formData.transaction_amount,
               installments: formData.installments,
               identificationType: formData.payer.identification ? formData.payer.identification.type : "DNI",
-              identificationNumber: formData.payer.identification ? formData.payer.identification.number : "12345678",
-              email: adminEmail, // El email real que se guardar\u00e1 en la BD para el admin
-              password: adminPassword
+              identificationNumber: formData.payer.identification ? formData.payer.identification.number : "12345678"
             })
           })
             .then(async (response) => {
